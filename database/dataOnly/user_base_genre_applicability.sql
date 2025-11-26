@@ -1,0 +1,31 @@
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Dumping data for table `genre_applicability`
+--
+
+LOCK TABLES `genre_applicability` WRITE;
+/*!40000 ALTER TABLE `genre_applicability` DISABLE KEYS */;
+INSERT INTO `genre_applicability` VALUES (1,'shared'),(2,'shared'),(3,'shared'),(4,'shared'),(5,'shared'),(6,'shared'),(7,'shared'),(8,'shared'),(9,'shared'),(10,'shared'),(11,'shared'),(12,'shared'),(13,'shared'),(14,'shared'),(15,'shared'),(16,'book'),(17,'shared'),(18,'shared'),(19,'book'),(20,'shared'),(21,'shared'),(22,'shared'),(23,'book'),(24,'shared'),(25,'book'),(25,'movie'),(26,'book'),(27,'shared'),(28,'book'),(29,'shared'),(30,'book'),(31,'movie'),(32,'movie'),(33,'movie'),(34,'shared'),(35,'movie'),(35,'show'),(36,'movie'),(37,'show'),(38,'show'),(39,'show'),(40,'shared'),(41,'show'),(42,'show'),(43,'show'),(44,'show');
+/*!40000 ALTER TABLE `genre_applicability` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

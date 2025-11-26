@@ -1,0 +1,289 @@
+/**
+ * Table Components
+ * Table layouts, cells, and responsive behavior
+ */
+
+/* ============================================
+   BASE TABLE
+   ============================================ */
+table {
+  border-collapse: collapse;
+  width: var(--table-width-default);
+  background: var(--color-bg-primary);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--border-radius-xl);
+  overflow: hidden;
+  margin: var(--spacing-xl) auto;
+  table-layout: fixed;
+}
+
+.profile-table {
+  width: var(--table-width-profile);
+}
+
+/* ============================================
+   TABLE HEADERS
+   ============================================ */
+th {
+  padding: var(--spacing-lg) var(--spacing-md);
+  border-bottom: var(--border-width-medium) solid var(--color-border-medium);
+  text-align: center;
+  vertical-align: middle;
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-gray-700);
+  color: var(--color-text-inverse);
+}
+
+/* Sortable headers */
+th[data-column-key] {
+  cursor: pointer;
+  user-select: none;
+  transition: var(--transition-colors);
+}
+
+th[data-column-key]:hover {
+  background-color: var(--color-gray-800);
+}
+
+/* ============================================
+   TABLE CELLS
+   ============================================ */
+td {
+  padding: var(--spacing-lg) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-border-medium);
+  text-align: center;
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ============================================
+   COLUMN WIDTHS
+   ============================================ */
+th.col-name,
+td.col-name {
+  width: var(--col-width-name);
+}
+
+th.col-tags,
+td.col-tags,
+th.col-genres,
+td.col-genres {
+  width: var(--col-width-tags);
+}
+
+th.col-score,
+td.col-score {
+  width: var(--col-width-score);
+}
+
+th.col-completed,
+td.col-completed {
+  width: var(--col-width-completed);
+}
+
+th.col-actions,
+td.col-actions {
+  width: var(--col-width-actions);
+}
+
+/* ============================================
+   SPECIAL COLUMNS
+   ============================================ */
+
+/* Name column */
+td.col-name {
+  font-size: var(--font-size-lg);
+  text-align: center;
+  font-weight: var(--font-weight-bold);
+  word-wrap: break-word;
+}
+
+.col-actions {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.action-buttons-group {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+/* ============================================
+   SCORE STYLING
+   ============================================ */
+.score-cell {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-inverse);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-circle);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--score-badge-size);
+  height: var(--score-badge-size);
+  box-sizing: border-box;
+}
+
+.score-low {
+  background-color: var(--color-score-low);
+}
+
+.score-medium {
+  background-color: var(--color-score-medium);
+  color: var(--color-warning-text);
+}
+
+.score-high {
+  background-color: var(--color-score-high);
+}
+
+/* ============================================
+   ROW STATES
+   ============================================ */
+tbody tr {
+  transition: var(--transition-colors);
+}
+
+tbody tr:hover {
+  background-color: var(--color-gray-50);
+}
+
+/* Save error state */
+tr.save-error td {
+  background-color: #fee;
+  border-color: #f5c6cb;
+}
+
+/* ============================================
+   COLUMN VISIBILITY
+   ============================================ */
+[data-hidden-columns~="tags"] .col-tags,
+[data-hidden-columns~="tags"] th.col-tags {
+  display: none;
+}
+
+[data-hidden-columns~="genres"] .col-genres,
+[data-hidden-columns~="genres"] th.col-genres {
+  display: none;
+}
+
+[data-hidden-columns~="completed"] .col-completed,
+[data-hidden-columns~="completed"] th.col-completed {
+  display: none;
+}
+
+[data-hidden-columns~="actions"] .col-actions,
+[data-hidden-columns~="actions"] th.col-actions {
+  display: none;
+}
+
+/* ============================================
+   COLUMN CONTROLS
+   ============================================ */
+.column-controls {
+  margin: var(--spacing-lg) 0;
+  padding: var(--spacing-md);
+  background-color: var(--color-gray-100);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+}
+
+#column-toggle-container {
+  display: flex;
+  gap: var(--spacing-xl);
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#column-toggle-container label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: var(--spacing-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.column-controls-title {
+  font-weight: var(--font-weight-bold);
+  margin-right: var(--spacing-md);
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.table-empty-state {
+  text-align: center;
+  padding: var(--spacing-4xl);
+  color: var(--color-text-secondary);
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+.loading-text {
+  text-align: center;
+  padding: var(--spacing-4xl);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+}
+
+/* ============================================
+   USER LIST TABLE
+   ============================================ */
+.user-list-table {
+  width: 80%;
+  max-width: 800px;
+}
+
+.user-list-table th,
+.user-list-table td {
+  text-align: left;
+  padding: var(--spacing-lg);
+}
+
+.view-profile-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: var(--transition-colors);
+}
+
+.view-profile-link:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+/* ============================================
+   RESPONSIVE TABLES
+   ============================================ */
+@media (max-width: 768px) {
+  table {
+    width: 95%;
+    font-size: var(--font-size-sm);
+  }
+
+  th, td {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  td.col-name {
+    font-size: var(--font-size-base);
+    padding-left: var(--spacing-md);
+    text-align: center;
+  }
+
+  .score-cell {
+    width: 32px;
+    height: 32px;
+    font-size: var(--font-size-sm);
+  }
+  .col-tags,
+  th.col-tags {
+    display: none;
+  }
+}

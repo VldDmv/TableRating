@@ -1,0 +1,8 @@
+
+/.idea
+/target
+/node/
+/node_modules/
+/src/main/resources/application.properties
+/.smarttomcat/
+*.iml
