@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}"
+      lang="en">
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/pages/dashboard.css}">
+</head>
+
+<body>
+<main layout:fragment="content">
+    <div class="dashboard-container">
+        <!-- Welcome Header -->
+        <div class="welcome-header">
+            <h1>Welcome back, <span sec:authentication="name">User</span>!</h1>
+            <p>Here's your collection overview</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <!-- Games Stats -->
+            <div class="stat-card card-games">
+                <div class="stat-icon">🎮</div>
+                <div class="stat-content">
+                    <h3>Games</h3>
+                    <div class="stat-number" th:text="${gamesStats.count}">0</div>
+                    <div class="stat-details">
+                        <div class="stat-row">
+                            <span class="stat-label">Average:</span>
+                            <span class="stat-value" th:text="${gamesStats.avgScore}">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Top Score:</span>
+                            <span class="stat-value" th:text="${gamesStats.maxScore}">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Completed:</span>
+                            <span class="stat-value">
+                                <span th:text="${gamesStats.completedCount}">0</span>
+                                <span class="stat-percentage" th:text="'(' + ${gamesStats.completionRate} + '%)'">(%)</span>
+                            </span>
+                        </div>
+                    </div>
+                    <a th:href="@{/games}" class="stat-link">View All →</a>
+                </div>
+            </div>
+
+            <!-- Movies Stats -->
+            <div class="stat-card card-movies">
+                <div class="stat-icon">🎬</div>
+                <div class="stat-content">
+                    <h3>Movies</h3>
+                    <div class="stat-number" th:text="${moviesStats.count}">0</div>
+                    <div class="stat-details">
+                        <div class="stat-row">
+                            <span class="stat-label">Average:</span>
+                            <span class="stat-value" th:text="${moviesStats.avgScore}">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Top Score:</span>
+                            <span class="stat-value" th:text="${moviesStats.maxScore}">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Completed:</span>
+                            <span class="stat-value">
+                                <span th:text="${moviesStats.completedCount}">0</span>
+                                <span class="stat-percentage" th:text="'(' + ${moviesStats.completionRate} + '%)'">(%)</span>
+                            </span>
+                        </div>
+                    </div>
+                    <a th:href="@{/movies}" class="stat-link">View All →</a>
+                </div>
+            </div>
+
+            <!-- Books Stats -->
+            <div class="stat-card card-books">
+                <div class="stat-icon">📚</div>
+                <div class="stat-content">
+                    <h3>Books</h3>
+                    <div class="stat-number" th:text="${booksStats.count}">0</div>
+                    <div class="stat-details">
+                        <div class="stat-row">
+                            <span class="stat-label">Average:</span>
+                            <span class="stat-value" th:text="${booksStats.avgScore}">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Top Score:</span>
+                            <span class="stat-value" th:text="${booksStats.maxScore}">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Completed:</span>
+                            <span class="stat-value">
+                                <span th:text="${booksStats.completedCount}">0</span>
+                                <span class="stat-percentage" th:text="'(' + ${booksStats.completionRate} + '%)'">(%)</span>
+                            </span>
+                        </div>
+                    </div>
+                    <a th:href="@{/books}" class="stat-link">View All →</a>
+                </div>
+            </div>
+
+            <!-- Shows Stats -->
+            <div class="stat-card card-shows">
+                <div class="stat-icon">📺</div>
+                <div class="stat-content">
+                    <h3>Shows</h3>
+                    <div class="stat-number" th:text="${showsStats.count}">0</div>
+                    <div class="stat-details">
+                        <div class="stat-row">
+                            <span class="stat-label">Average:</span>
+                            <span class="stat-value" th:text="${showsStats.avgScore}">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Top Score:</span>
+                            <span class="stat-value" th:text="${showsStats.maxScore}">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Completed:</span>
+                            <span class="stat-value">
+                                <span th:text="${showsStats.completedCount}">0</span>
+                                <span class="stat-percentage" th:text="'(' + ${showsStats.completionRate} + '%)'">(%)</span>
+                            </span>
+                        </div>
+                    </div>
+                    <a th:href="@{/shows}" class="stat-link">View All →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Users Link -->
+        <div class="all-users-link">
+            <a th:href="@{/users}" class="choice-brick brick-users">
+                👥 View All Users
+            </a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

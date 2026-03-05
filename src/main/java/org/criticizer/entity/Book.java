@@ -1,51 +1,39 @@
 package org.criticizer.entity;
 
-import java.util.List;
+import jakarta.persistence.*;
 
-//Represents a book entity in the system, associated with a user and genres
-public class Book {
-    private final int id;
-    private final String name;
-    private final int userId;
-    private final int score;
-    private final boolean completed;
-    private List<Genre> genres;
+import java.util.HashSet;
+import java.util.Set;
 
-    //Constructs a new Book with the specified attributes
-    public Book(int id, String name, int userId, int score, boolean completed) {
-        this.id = id;
-        this.name = name;
-        this.userId = userId;
-        this.score = score;
-        this.completed = completed;
+/**
+ * Book entity with genre associations.
+ */
+@Entity
+@Table(name = "books", indexes = {
+        @Index(name = "idx_books_user_name", columnList = "user_id, name")
+})
+public class Book extends BaseEntity {
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "book_genres",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
+    private Set<Genre> genres = new HashSet<>();
+
+    protected Book() {
     }
 
-    public int getId() {
-        return id;
+    public Book(Integer id, String name, Integer userId, Integer score, boolean completed) {
+        super(id, name, userId, score, completed);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public List<Genre> getGenres() {
+    public Set<Genre> getGenres() {
         return genres;
     }
 
-    public void setGenres(List<Genre> genres) {
+    public void setGenres(Set<Genre> genres) {
         this.genres = genres;
     }
 }
-

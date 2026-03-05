@@ -5,22 +5,22 @@ import org.criticizer.exceptions.validation.InvalidInputException;
 import org.criticizer.exceptions.validation.InvalidScoreException;
 import org.criticizer.exceptions.validation.WeakPasswordException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Centralized validation logic for service layer.
  */
+@Component
 public class ServiceValidator {
 
-    private final Logger log;
+    private static final Logger log = LoggerFactory.getLogger(ServiceValidator.class);
 
     private static final int MIN_PASSWORD_LENGTH = 6;
     private static final int MAX_PASSWORD_LENGTH = 128;
     private static final int MAX_USERNAME_LENGTH = 50;
     private static final int MAX_SEARCH_TERM_LENGTH = 100;
 
-    public ServiceValidator(Logger log) {
-        this.log = log;
-    }
 
     /**
      * Validates that score is within acceptable range

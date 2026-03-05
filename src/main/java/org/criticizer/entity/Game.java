@@ -1,50 +1,39 @@
 package org.criticizer.entity;
 
-import java.util.List;
+import jakarta.persistence.*;
 
-//Represents a game entity in the system, associated with a user and tags
-public class Game {
-    private final int id;
-    private final String name;
-    private final int userId;
-    private final int score;
-    private final boolean completed;
-    private List<Tag> tags;
+import java.util.HashSet;
+import java.util.Set;
 
-    //Constructs a new Game with the specified attributes
-    public Game(int id, String name, int userId, int score, boolean completed) {
-        this.id = id;
-        this.name = name;
-        this.userId = userId;
-        this.score = score;
-        this.completed = completed;
+/**
+ * Game entity with tag associations.
+ */
+@Entity
+@Table(name = "games", indexes = {
+        @Index(name = "idx_games_user_name", columnList = "user_id, name")
+})
+public class Game extends BaseEntity {
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "game_tags",
+            joinColumns = @JoinColumn(name = "game_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
+
+    protected Game() {
     }
 
-    public int getId() {
-        return id;
+    public Game(Integer id, String name, Integer userId, Integer score, boolean completed) {
+        super(id, name, userId, score, completed);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public List<Tag> getTags() {
+    public Set<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(Set<Tag> tags) {
         this.tags = tags;
     }
 }

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}"
+      lang="en">
+<head>
+    <title>Users Directory</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/pages/users.css}">
+</head>
+
+<body>
+<main layout:fragment="content">
+    <div class="users-container">
+
+        <div class="users-header">
+            <h1>Users Directory</h1>
+            <p class="users-subtitle">Discover and connect with other media enthusiasts</p>
+
+
+            <div th:replace="~{fragments/fragments :: navigation('/dashboard', 'Back to Dashboard')}"></div>
+        </div>
+
+        <!-- Search & Sort Controls -->
+        <div class="users-controls">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text"
+                       id="userSearch"
+                       placeholder="Search users by name..."
+                       autocomplete="off">
+            </div>
+
+            <!-- Sort & View Toggle -->
+            <div class="controls-right">
+
+                <div class="sort-box">
+                    <label for="sortBy">Sort by:</label>
+                    <select id="sortBy">
+                        <option value="name">Name (A-Z)</option>
+                        <option value="totalItems" selected>Most Active</option>
+                        <option value="gamesCount">Most Games</option>
+                        <option value="moviesCount">Most Movies</option>
+                        <option value="booksCount">Most Books</option>
+                        <option value="showsCount">Most Shows</option>
+                    </select>
+
+                    <button id="sortOrderBtn" class="sort-order-btn" title="Toggle sort direction">
+                        <span class="sort-icon">↓</span>
+                    </button>
+                </div>
+
+                <div class="view-toggle">
+                    <button id="cardsViewBtn" class="view-btn active" title="Cards View">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        </svg>
+                    </button>
+                    <button id="listViewBtn" class="view-btn" title="List View">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="8" y1="6" x2="21" y2="6"/>
+                            <line x1="8" y1="12" x2="21" y2="12"/>
+                            <line x1="8" y1="18" x2="21" y2="18"/>
+                            <line x1="3" y1="6" x2="3.01" y2="6"/>
+                            <line x1="3" y1="12" x2="3.01" y2="12"/>
+                            <line x1="3" y1="18" x2="3.01" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Stats Summary -->
+        <div class="users-stats-summary">
+            <div class="stat-item">
+                <span class="stat-icon">👤</span>
+                <span class="stat-value" id="totalUsers">0</span>
+                <span class="stat-label">Total Users</span>
+            </div>
+        </div>
+
+        <!-- Users Grid (Cards View) -->
+        <div id="usersGrid" class="users-grid" style="display: grid;">
+            <!-- Loading state -->
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading users...</p>
+            </div>
+        </div>
+
+        <!-- Users List (List View) -->
+        <div id="usersList" class="users-list" style="display: none;">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">😔</div>
+            <h3>No users found</h3>
+            <p>Try adjusting your search criteria</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-controls-container" id="paginationContainer">
+            <div class="pagination-controls">
+                <button id="prevPage" class="pagination-btn">«</button>
+                <div class="relative-container">
+                    <button id="pageDropdown" class="pagination-btn">Page 1 of 1</button>
+                    <ul id="pageList" class="page-list"></ul>
+                </div>
+                <button id="nextPage" class="pagination-btn">»</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="scripts">
+    <script type="module" th:src="@{/js/pages/usersPage.js}"></script>
+</th:block>
+</body>
+</html>

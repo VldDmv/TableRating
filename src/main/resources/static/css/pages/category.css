@@ -1,0 +1,454 @@
+
+@import url('../components/content/cardEdit.css');
+/* ============================================
+    BODY PADDING
+   ============================================ */
+body.games-page,
+body.movies-page,
+body.books-page,
+body.shows-page {
+  padding-top: 80px !important;
+}
+
+/* ============================================
+   CATEGORY HEADINGS
+   ============================================ */
+h1 {
+  color: var(--category-color, var(--color-text-primary));
+  font-size: var(--font-size-4xl);
+  margin-bottom: var(--spacing-2xl);
+  text-align: center;
+}
+
+h2 {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-2xl);
+  margin: var(--spacing-5xl) 0 var(--spacing-2xl) 0;
+  text-align: center;
+}
+
+/* ============================================
+   CATEGORY-SPECIFIC THEMES
+   ============================================ */
+
+/* Games Page */
+body.games-page {
+  --category-color: var(--color-games);
+  --category-color-dark: var(--color-games-dark);
+  border-top: var(--border-width-header) solid var(--color-games);
+}
+
+.games-page h1,
+.games-page .form-input-row input[type="text"]:focus,
+.games-page .form-input-row input[type="number"]:focus {
+  color: var(--color-games);
+  border-color: var(--color-games);
+}
+
+.games-page th {
+  background-color: var(--color-games-dark);
+  color: var(--color-text-inverse);
+}
+
+.games-page form[id^="add-"] button[type="submit"] {
+  background-color: var(--color-games);
+}
+
+.games-page form[id^="add-"] button[type="submit"]:hover {
+  background-color: var(--color-games-dark);
+}
+
+/* Movies Page */
+body.movies-page {
+  --category-color: var(--color-movies);
+  --category-color-dark: var(--color-movies-dark);
+  border-top: var(--border-width-header) solid var(--color-movies);
+}
+
+.movies-page h1,
+.movies-page .form-input-row input[type="text"]:focus,
+.movies-page .form-input-row input[type="number"]:focus {
+  color: var(--color-movies);
+  border-color: var(--color-movies);
+}
+
+.movies-page th {
+  background-color: var(--color-movies-dark);
+  color: var(--color-text-inverse);
+}
+
+.movies-page form[id^="add-"] button[type="submit"] {
+  background-color: var(--color-movies);
+}
+
+.movies-page form[id^="add-"] button[type="submit"]:hover {
+  background-color: var(--color-movies-dark);
+}
+
+/* Books Page */
+body.books-page {
+  --category-color: var(--color-books-alt);
+  --category-color-dark: var(--color-books-alt-dark);
+  border-top: var(--border-width-header) solid var(--color-books-alt);
+}
+
+.books-page h1,
+.books-page .form-input-row input[type="text"]:focus,
+.books-page .form-input-row input[type="number"]:focus {
+  color: var(--color-books-alt);
+  border-color: var(--color-books-alt);
+}
+
+.books-page th {
+  background-color: var(--color-books-alt-dark);
+  color: var(--color-text-inverse);
+}
+
+.books-page form[id^="add-"] button[type="submit"] {
+  background-color: var(--color-books-alt);
+  color: var(--color-text-inverse);
+  border: none;
+}
+
+.books-page form[id^="add-"] button[type="submit"]:hover {
+  background-color: var(--color-books-alt-dark);
+}
+
+/* Shows Page */
+body.shows-page {
+  --category-color: var(--color-shows);
+  --category-color-dark: var(--color-shows-dark);
+  border-top: var(--border-width-header) solid var(--color-shows);
+}
+
+.shows-page h1,
+.shows-page .form-input-row input[type="text"]:focus,
+.shows-page .form-input-row input[type="number"]:focus {
+  color: var(--color-shows);
+  border-color: var(--color-shows);
+}
+
+.shows-page th {
+  background-color: var(--color-shows-dark);
+  color: var(--color-text-inverse);
+}
+
+.shows-page form[id^="add-"] button[type="submit"] {
+  background-color: var(--color-shows);
+  color: var(--color-text-inverse);
+  border: none;
+}
+
+.shows-page form[id^="add-"] button[type="submit"]:hover {
+  background-color: var(--color-shows-dark);
+}
+
+
+/* ============================================
+   FORM SECTIONS
+   ============================================ */
+form[id^="add-"] {
+  max-width: 800px;
+  margin: var(--spacing-3xl) auto var(--spacing-xl) auto;
+  padding: var(--spacing-xl);
+  background-color: var(--color-bg-primary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  text-align: left;
+  scroll-margin-top: 100px;
+}
+
+.form-input-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  align-items: center;
+}
+
+.form-input-row input[type="text"],
+.form-input-row input[type="number"] {
+  margin: 0;
+}
+
+form[id^="add-"] input[type="number"] {
+  width: 150px;
+  text-align: center;
+}
+
+
+form[id^="add-"] input[type="text"]:focus,
+form[id^="add-"] input[type="number"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--category-color, var(--color-primary-light));
+}
+
+form[id^="add-"] button[type="submit"] {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-inverse);
+  background-color: var(--category-color, var(--color-primary));
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: var(--transition-all);
+  margin-top: var(--spacing-lg);
+}
+
+form[id^="add-"] button[type="submit"]:hover {
+  background-color: var(--category-color-dark, var(--color-primary-hover));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================
+   RESPONSIVE CATEGORY PAGES
+   ============================================ */
+@media (max-width: 768px) {
+  body.games-page,
+  body.movies-page,
+  body.books-page,
+  body.shows-page {
+    padding-top: 70px !important;
+  }
+
+  h1 {
+    font-size: var(--font-size-3xl);
+  }
+
+  h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  form[id^="add-"] {
+    padding: var(--spacing-lg);
+    scroll-margin-top: 80px;
+  }
+
+  .form-input-row {
+    grid-template-columns: 1fr;
+  }
+
+  form[id^="add-"] input[type="number"] {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   TABLE ROW HOVER
+   ============================================ */
+tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.03) !important;
+  transform: scale(1.002);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 1;
+}
+
+
+/* ============================================
+   SCORE BADGES
+   ============================================ */
+.score-cell {
+  transition: transform 0.2s ease;
+}
+
+.score-cell:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   TAG BADGES
+   ============================================ */
+.tag-badge {
+  transition: all 0.2s ease;
+}
+
+.tag-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   ACTION BUTTONS
+   ============================================ */
+.action-buttons-group button {
+  transition: all 0.2s ease;
+}
+
+.action-buttons-group button:hover {
+  transform: scale(1.05);
+}
+
+/* ============================================
+   FORM CARD SHADOW
+   ============================================ */
+form[id^="add-"] {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+form[id^="add-"]:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   TABLE HEADER GRADIENT
+   ============================================ */
+/* Games */
+.games-page th {
+  background: linear-gradient(135deg, var(--color-games-dark) 0%, var(--color-games) 100%);
+}
+
+/* Movies */
+.movies-page th {
+  background: linear-gradient(135deg, var(--color-movies-dark) 0%, var(--color-movies) 100%);
+}
+
+/* Books */
+.books-page th {
+  background: linear-gradient(135deg, var(--color-books-alt-dark) 0%, var(--color-books-alt) 100%);
+}
+
+/* Shows */
+.shows-page th {
+  background: linear-gradient(135deg, var(--color-shows-dark) 0%, var(--color-shows) 100%);
+}
+
+/* ============================================
+   SMOOTH PAGE TRANSITIONS
+   ============================================ */
+table {
+  animation: fadeInTable 0.4s ease-out;
+}
+
+@keyframes fadeInTable {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+tbody tr {
+  animation: fadeInRow 0.3s ease-out backwards;
+}
+
+tbody tr:nth-child(1) { animation-delay: 0.05s; }
+tbody tr:nth-child(2) { animation-delay: 0.1s; }
+tbody tr:nth-child(3) { animation-delay: 0.15s; }
+tbody tr:nth-child(4) { animation-delay: 0.2s; }
+tbody tr:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes fadeInRow {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================================
+   SUBMIT BUTTON
+   ============================================ */
+form[id^="add-"] button[type="submit"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+form[id^="add-"] button[type="submit"]:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+form[id^="add-"] button[type="submit"]:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   INPUT FOCUS GLOW
+   ============================================ */
+.form-input-row input[type="text"]:focus,
+.form-input-row input[type="number"]:focus {
+  box-shadow: 0 0 0 4px rgba(var(--category-color), 0.15) !important;
+  border-width: 2px;
+}
+
+/* ============================================
+   TABLE CONTROLS
+   ============================================ */
+.table-controls {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+}
+
+.table-controls select,
+.table-controls input[type="text"] {
+  border: 2px solid #e0e0e0;
+  transition: border-color 0.2s ease;
+}
+
+.table-controls select:hover,
+.table-controls input[type="text"]:hover {
+  border-color: #999;
+}
+
+.table-controls select:focus,
+.table-controls input[type="text"]:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* ============================================
+   DISABLE ANIMATIONS ON MOBILE
+   ============================================ */
+@media (max-width: 768px) {
+  tbody tr:hover {
+    transform: none;
+  }
+
+  .score-cell:hover,
+  .tag-badge:hover,
+  form[id^="add-"]:hover {
+    transform: none;
+  }
+
+  tbody tr {
+    animation: none;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+[data-theme="dark"] .add-tag-btn {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-border-medium);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .table-controls {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-medium);
+}

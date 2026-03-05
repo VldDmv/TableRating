@@ -1,25 +1,73 @@
 package org.criticizer.service.game;
 
+import org.criticizer.dto.game.GameResponse;
+import org.criticizer.dto.tag.TagResponse;
 import org.criticizer.entity.Game;
-import org.criticizer.service.user.UserPageResult;
+import org.criticizer.entity.Tag;
+import org.criticizer.repository.GameRepository;
+import org.criticizer.repository.TagRepository;
+import org.criticizer.service.helper.AbstractMediaService;
+import org.criticizer.service.helper.ServiceValidator;
+import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
-public interface GameService {
-    List<Game> getUserGames(int userId);
+@Service
+public class GameService extends AbstractMediaService<Game, GameResponse> {
 
-    void addGame(String name, int userId, int score, List<Integer> tagIds);
+    private final TagRepository tagRepository;
 
-    void removeGame(String name, int userId);
+    public GameService(GameRepository gameRepository,
+                       TagRepository tagRepository,
+                       ServiceValidator validator) {
+        super(gameRepository, validator);
+        this.tagRepository = tagRepository;
+    }
 
-    void toggleGameStatus(String name, int userId);
+    @Override
+    protected String getEntityName() {
+        return "Game";
+    }
 
-    void updateGameAndName(String oldName, String newName, int newScore, int userId, List<Integer> tagIds);
+    @Override
+    protected Game createEntity(String name, String coverUrl, Integer userId, Integer score) {
+        Game game = new Game(null, name, userId, score, false);
+        game.setCoverUrl(coverUrl);
+        return game;
+    }
 
-    boolean isGameExists(String name, int userId);
+    @Override
+    protected void assignCategories(Game game, List<Integer> tagIds) {
+        if (tagIds == null || tagIds.isEmpty()) {
+            game.setTags(new HashSet<>());
+            return;
+        }
+        List<Tag> tags = tagRepository.findAllById(tagIds);
 
-    boolean getGameStatus(String name, int userId);
+        game.setTags(new HashSet<>(tags));
+    }
 
-    UserPageResult<Game> getUserGamesPage(int userId, int page, int pageSize, Integer tagId, String searchTerm, String sortBy, String sortOrder);
+    @Override
+    protected GameResponse toResponse(Game game) {
+        List<TagResponse> tagResponses = game.getTags() != null
+                ? game.getTags().stream()
+                .map(tag -> new TagResponse(tag.getId(), tag.getName()))
+                .toList()
+                : List.of();
 
+        return new GameResponse(
+                game.getId(),
+                game.getName(),
+                game.getCoverUrl(),
+                game.getScore(),
+                game.isCompleted(),
+                tagResponses
+        );
+    }
+
+    @Override
+    public String getMediaType() {
+        return "games";
+    }
 }

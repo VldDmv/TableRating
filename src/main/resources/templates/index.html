@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/pages/auth.css}">
+</head>
+<body>
+
+<div class="form-container" id="form-container">
+    <!-- Login Form -->
+    <form id="login-form" th:action="@{/login}" method="post">
+        <h2>Login</h2>
+
+        <!-- Error Message -->
+        <div th:if="${param.error}" class="flash-error-message">
+            Invalid username or password
+        </div>
+
+        <!-- Logout Message -->
+        <div th:if="${param.logout}" class="flash-success-message">
+            You have been logged out
+        </div>
+
+        <label for="login-name">Name:</label>
+        <input type="text" name="username" id="login-name" required>
+
+        <label for="login-password">Password:</label>
+        <input type="password" name="password" id="login-password" required minlength="6" autocomplete="current-password">
+
+        <button type="submit">Login</button>
+
+        <p>Don't have an account? <a id="show-register" href="#">Register here</a></p>
+    </form>
+
+    <!-- Registration Form -->
+    <form id="register-form" th:action="@{/auth/register}" method="post" class="hidden">
+        <h2>Register</h2>
+
+        <!-- Flash Error Message for Registration -->
+        <div th:if="${flashErrorMessage}" class="flash-error-message">
+            <span th:text="${flashErrorMessage}"></span>
+        </div>
+
+        <label for="register-name">Name:</label>
+        <div class="input-with-indicator">
+            <input type="text" name="username" id="register-name" required>
+            <!-- Username availability indicator -->
+            <span id="username-indicator" class="username-indicator"></span>
+        </div>
+        <div id="username-message" class="username-message"></div>
+
+        <label for="register-password">Password:</label>
+        <input type="password" name="password" id="register-password" required minlength="6" autocomplete="new-password">
+
+        <label for="register-confirm-password">Confirm Password:</label>
+        <input type="password" name="confirmPassword" id="register-confirm-password" required autocomplete="new-password">
+
+        <button type="submit" id="register-button">Register</button>
+
+        <p>Already have an account? <a id="show-login" href="#">Login here</a></p>
+    </form>
+</div>
+
+<script type="module" th:src="@{/js/pages/regScripts.js}"></script>
+
+</body>
+</html>

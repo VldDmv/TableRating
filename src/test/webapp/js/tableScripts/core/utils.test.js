@@ -7,7 +7,7 @@ import {
     entityUtils,
     ICONS,
     CONSTANTS
-} from '../../../../../main/webapp/js/tableScripts/core/utils.js';
+} from '@/tableScripts/core/utils.js';
 
 describe('htmlUtils', () => {
     describe('escape', () => {

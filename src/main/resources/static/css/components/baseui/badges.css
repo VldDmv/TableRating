@@ -1,0 +1,349 @@
+/**
+ * Badges Component
+ */
+
+/* ============================================
+   BASE BADGE
+   ============================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 4px 12px;
+  border-radius: var(--border-radius-pill);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  transition: var(--transition-all);
+}
+
+/* ============================================
+   ROLE BADGES (Admin, User)
+   ============================================ */
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: var(--border-radius-pill);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+}
+
+.role-badge.role-admin,
+.role-admin {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.role-badge.role-user,
+.role-user {
+  background: var(--color-gray-200);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-medium);
+}
+
+/* ============================================
+   MEDIA TYPE BADGES (Movies, Books, Shows, Shared)
+   ============================================ */
+.media-badge {
+  padding: 4px 10px;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+}
+
+.media-badge-sm {
+  padding: 2px 6px;
+  font-size: 11px;
+}
+
+.media-movie {
+  background: rgba(231, 76, 60, 0.1);
+  color: #c0392b;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.media-book {
+  background: rgba(155, 89, 182, 0.1);
+  color: #8e44ad;
+  border: 1px solid rgba(155, 89, 182, 0.3);
+}
+
+.media-show {
+  background: rgba(52, 152, 219, 0.1);
+  color: #2980b9;
+  border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+.media-shared {
+  background: rgba(149, 165, 166, 0.1);
+  color: #7f8c8d;
+  border: 1px solid rgba(149, 165, 166, 0.3);
+}
+
+/* ============================================
+   STAT BADGES (used in admin/user pages)
+   ============================================ */
+.stat-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-lg);
+  background: var(--color-bg-primary);
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--border-radius-lg);
+  transition: all 0.3s ease;
+}
+
+.stat-badge:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-badge-icon {
+  font-size: 1.5rem;
+}
+
+.stat-badge-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.stat-badge-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+}
+
+/* ============================================
+   PRIVACY BADGES (Public, Private)
+   ============================================ */
+.privacy-badge {
+  padding: 2px 8px;
+  border-radius: var(--border-radius-pill);
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.privacy-badge.public {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--color-success);
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.privacy-badge.private {
+  background: rgba(108, 117, 125, 0.1);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border-medium);
+}
+
+/* ============================================
+   TAG BADGES
+   ============================================ */
+.tag-badge {
+  display: inline-block;
+  background-color: var(--color-gray-200);
+  color: var(--color-text-primary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-pill);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  transition: var(--transition-colors);
+}
+
+.tag-badge:hover {
+  background-color: var(--color-gray-300);
+}
+
+/* Category-specific tag colors */
+.category-games .tag-badge {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: var(--color-games-dark);
+  border: var(--border-width-thin) solid var(--color-games);
+}
+
+.category-movies .tag-badge {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--color-movies-dark);
+  border: var(--border-width-thin) solid var(--color-movies);
+}
+
+.category-books .tag-badge {
+  background-color: rgba(111, 66, 193, 0.1);
+  color: var(--color-books-alt-dark);
+  border: var(--border-width-thin) solid var(--color-books-alt);
+}
+
+.category-shows .tag-badge {
+  background-color: rgba(23, 162, 184, 0.1);
+  color: var(--color-shows-dark);
+  border: var(--border-width-thin) solid var(--color-shows);
+}
+
+/* ============================================
+   CURRENT USER BADGE
+   ============================================ */
+.current-badge,
+.current-admin-badge {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: var(--border-radius-pill);
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+
+/* ============================================
+   TOTAL ITEMS BADGE
+   ============================================ */
+.total-items-badge {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: var(--border-radius-pill);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* ============================================
+   FILTER BADGES (for management pages)
+   ============================================ */
+.filter-badge {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--border-radius-pill);
+  background: var(--color-bg-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.filter-badge:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+}
+
+.filter-badge.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+[data-theme="dark"] .role-badge.role-user,
+[data-theme="dark"] .role-user {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border-medium);
+}
+
+[data-theme="dark"] .media-movie {
+  background: rgba(192, 57, 43, 0.2);
+  color: #e74c3c;
+}
+
+[data-theme="dark"] .media-book {
+  background: rgba(142, 68, 173, 0.2);
+  color: #9b59b6;
+}
+
+[data-theme="dark"] .media-show {
+  background: rgba(41, 128, 185, 0.2);
+  color: #3498db;
+}
+
+[data-theme="dark"] .media-shared {
+  background: rgba(127, 140, 141, 0.2);
+  color: #95a5a6;
+}
+
+[data-theme="dark"] .stat-badge {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-medium);
+}
+
+[data-theme="dark"] .tag-badge {
+  background-color: var(--color-bg-tertiary);
+}
+
+[data-theme="dark"] .filter-badge {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-medium);
+}
+
+[data-theme="dark"] .filter-badge:hover {
+  background: var(--color-bg-tertiary);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .tag-badge {
+    font-size: var(--font-size-xs);
+    padding: 2px var(--spacing-xs);
+  }
+
+  .total-items-badge {
+    position: static;
+    margin: var(--spacing-md) auto 0;
+    display: inline-block;
+  }
+
+  .filter-badge {
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 12px;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+.filter-badge:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .badge,
+  .role-badge,
+  .media-badge,
+  .stat-badge,
+  .filter-badge {
+    transition: none;
+  }
+
+  .stat-badge:hover,
+  .filter-badge:hover {
+    transform: none;
+  }
+}

@@ -1,43 +1,54 @@
 package org.criticizer.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.*;
+
 import java.util.Objects;
 
-//Represents a genre entity associated with media types such as movies, books, or shows.
+/**
+ * Genre entity.
+ * Represents a genre that can be associated with movies, books, or shows.
+ * <p>
+ * Media type associations are stored in genre_applicability table.
+ */
+@Entity
+@Table(name = "genres")
 public class Genre {
-    private int id;
-    private String name;
-    private List<String> mediaTypes = new ArrayList<>();
 
-    //Constructs a new Genre with the specified ID and name
-    public Genre(int id, String name) {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "name", nullable = false, unique = true, length = 255)
+    private String name;
+
+    protected Genre() {
+        // JPA requires protected no-arg constructor
+    }
+
+    /**
+     * Constructs a new Genre with the specified ID and name.
+     */
+    public Genre(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public int getId() {
+    // Getters and Setters
+
+    public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public List<String> getMediaTypes() {
-        return mediaTypes;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setMediaTypes(List<String> mediaTypes) {
-        this.mediaTypes = mediaTypes;
     }
 
     @Override
@@ -45,7 +56,7 @@ public class Genre {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Genre genre = (Genre) o;
-        return id == genre.id;
+        return Objects.equals(id, genre.id);
     }
 
     @Override
@@ -55,10 +66,6 @@ public class Genre {
 
     @Override
     public String toString() {
-        return "Genre{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", mediaType='" + mediaTypes + '\'' +
-                '}';
+        return "Genre{id=" + id + ", name='" + name + "'}";
     }
 }

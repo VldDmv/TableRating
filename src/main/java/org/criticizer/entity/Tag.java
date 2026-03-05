@@ -1,28 +1,49 @@
 package org.criticizer.entity;
 
-import java.util.Objects;
-//Represents a tag entity used to categorize games in the system.
+import jakarta.persistence.*;
 
+import java.util.Objects;
+
+/**
+ * Represents a tag entity used to categorize games in the system.
+ */
+@Entity
+@Table(name = "tags")
 public class Tag {
-    private int id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "name", nullable = false, unique = true, length = 255)
     private String name;
 
-    // Constructs a new Tag with the specified ID and name.
-    public Tag(int id, String name) {
+
+    // Constructors
+
+    protected Tag() {
+    }
+
+    /**
+     * Constructs a new Tag with the specified ID and name.
+     */
+    public Tag(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public int getId() {
+    // Getters and Setters
+
+    public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public void setName(String name) {
@@ -34,7 +55,7 @@ public class Tag {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Tag tag = (Tag) o;
-        return id == tag.id;
+        return Objects.equals(id, tag.id);
     }
 
     @Override
@@ -44,9 +65,6 @@ public class Tag {
 
     @Override
     public String toString() {
-        return "Tag{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
+        return "Tag{id=" + id + ", name='" + name + "'}";
     }
 }

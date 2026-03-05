@@ -1,5 +1,5 @@
 import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals';
-import { ErrorHandler } from '../../../../../main/webapp/js/tableScripts/core/errorHandler.js';
+import { ErrorHandler } from '@/tableScripts/core/errorHandler.js';
 
 describe('ErrorHandler', () => {
     let consoleErrorSpy;

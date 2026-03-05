@@ -1,25 +1,73 @@
 package org.criticizer.service.book;
 
+import org.criticizer.dto.book.BookResponse;
+import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.entity.Book;
-import org.criticizer.service.user.UserPageResult;
+import org.criticizer.entity.Genre;
+import org.criticizer.repository.BookRepository;
+import org.criticizer.repository.GenreRepository;
+import org.criticizer.service.helper.AbstractMediaService;
+import org.criticizer.service.helper.ServiceValidator;
+import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
-public interface BookService {
-    List<Book> getUserBooks(int userId);
+@Service
+public class BookService extends AbstractMediaService<Book, BookResponse> {
 
-    void addBook(String name, int userId, int score, List<Integer> genreIds);
+    private final GenreRepository genreRepository;
 
-    void removeBook(String name, int userId);
+    public BookService(BookRepository bookRepository,
+                       GenreRepository genreRepository,
+                       ServiceValidator validator) {
+        super(bookRepository, validator);
+        this.genreRepository = genreRepository;
+    }
 
-    void toggleBookStatus(String name, int userId);
+    @Override
+    protected String getEntityName() {
+        return "Book";
+    }
 
-    void updateBookAndName(String oldName, String newName, int newScore, int userId, List<Integer> genreIds);
+    @Override
+    protected Book createEntity(String name, String coverUrl, Integer userId, Integer score) {
+        Book book = new Book(null, name, userId, score, false);
+        book.setCoverUrl(coverUrl);
+        return book;
+    }
 
-    boolean isBookExists(String name, int userId);
+    @Override
+    protected void assignCategories(Book book, List<Integer> genreIds) {
+        if (genreIds == null || genreIds.isEmpty()) {
+            book.setGenres(new HashSet<>());
+            return;
+        }
 
-    boolean getBookStatus(String name, int userId);
+        List<Genre> genres = genreRepository.findAllById(genreIds);
+        book.setGenres(new HashSet<>(genres));
+    }
 
-    UserPageResult<Book> getUserBooksPage(int userId, int page, int pageSize, Integer genreId, String searchTerm, String sortBy, String sortOrder);
+    @Override
+    protected BookResponse toResponse(Book book) {
+        List<GenreResponse> genreResponses = book.getGenres() != null
+                ? book.getGenres().stream()
+                .map(GenreResponse::from)
+                .toList()
+                : List.of();
 
+        return new BookResponse(
+                book.getId(),
+                book.getName(),
+                book.getCoverUrl(),
+                book.getScore(),
+                book.isCompleted(),
+                genreResponses
+        );
+    }
+
+    @Override
+    public String getMediaType() {
+        return "books";
+    }
 }

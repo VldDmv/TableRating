@@ -1,23 +1,43 @@
 package org.criticizer.entity;
 
-import org.mindrot.jbcrypt.BCrypt;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
-/**
- * Represents a user in the system with attributes for identification, authentication, and role-based access.
- */
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+@Entity
+@Table(name = "users")
 public class User {
-    private static final String DUMMY_HASH =
-            BCrypt.hashpw("dummy_password_12345", BCrypt.gensalt());
-    private final String name;
-    private final String password;
-    private final Role role;
-    private int id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "name", nullable = false, unique = true, length = 50)
+    private String name;
+
+    @JsonIgnore
+    @Column(name = "password", nullable = false, length = 128)
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, columnDefinition = "VARCHAR(20)")
+    private Role role;
+
+    @Column(name = "profile_is_public", nullable = false)
     private boolean profileIsPublic;
 
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    //Constructs a new User with all attributes
+    // Constructors
+    public User() {
+    }
 
-    public User(int id, String name, String password, Role role, boolean profileIsPublic) {
+    public User(Integer id, String name, String password, Role role, boolean profileIsPublic) {
         if (name == null || password == null || role == null) {
             throw new IllegalArgumentException("User arguments cannot be null");
         }
@@ -26,10 +46,8 @@ public class User {
         this.password = password;
         this.role = role;
         this.profileIsPublic = profileIsPublic;
-
     }
 
-    //Constructs a new User with default role USER and private profile.
     public User(String name, String password) {
         if (name == null || password == null) {
             throw new IllegalArgumentException("User arguments cannot be null");
@@ -40,39 +58,29 @@ public class User {
         this.profileIsPublic = false;
     }
 
+    // Getters and Setters
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
     }
 
-    public boolean checkPassword(String txtPassword) {
-        String hashToCheck = !this.password.isEmpty()
-                ? this.password
-                : DUMMY_HASH;
-
-        String passwordToCheck = (txtPassword != null)
-                ? txtPassword
-                : "";
-
-        try {
-            boolean matches = BCrypt.checkpw(passwordToCheck, hashToCheck);
-            return matches && !this.password.isEmpty();
-
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    public String getPasswordHashInternal() {
-        return password;
-    }
-
-    public int getId() {
-        return id;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Role getRole() {
         return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public boolean isProfileIsPublic() {
@@ -83,8 +91,43 @@ public class User {
         this.profileIsPublic = profileIsPublic;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @JsonIgnore
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Equality based on database ID.
+     * Consistent with how Tag and Genre implement equals/hashCode.
+     * Handles null ID (transient entities not yet persisted).
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
     @Override
     public String toString() {
-        return "User{name='" + name + "', password='<PROTECTED>'" + ", role=" + role + "}";
+        return "User{id=" + id + ", name='" + name + "', password='<PROTECTED>', role=" + role + ", createdAt=" + createdAt + "}";
     }
 }

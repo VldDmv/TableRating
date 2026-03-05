@@ -1,25 +1,72 @@
 package org.criticizer.service.show;
 
+import org.criticizer.dto.genre.GenreResponse;
+import org.criticizer.dto.show.ShowResponse;
+import org.criticizer.entity.Genre;
 import org.criticizer.entity.Show;
-import org.criticizer.service.user.UserPageResult;
+import org.criticizer.repository.GenreRepository;
+import org.criticizer.repository.ShowRepository;
+import org.criticizer.service.helper.ServiceValidator;
+import org.criticizer.service.helper.AbstractMediaService;
+import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
-public interface ShowService {
-    List<Show> getUserShows(int userId);
+@Service
+public class ShowService extends AbstractMediaService<Show, ShowResponse> {
 
-    void addShow(String name, int userId, int score, List<Integer> genreIds);
+    private final GenreRepository genreRepository;
 
-    void removeShow(String name, int userId);
+    public ShowService(ShowRepository showRepository,
+                       GenreRepository genreRepository,
+                       ServiceValidator validator) {
+        super(showRepository, validator);
+        this.genreRepository = genreRepository;
+    }
 
-    void toggleShowStatus(String name, int userId);
+    @Override
+    protected String getEntityName() {
+        return "Show";
+    }
 
-    void updateShowAndName(String oldName, String newName, int newScore, int userId, List<Integer> genreIds);
+    @Override
+    protected Show createEntity(String name, String coverUrl, Integer userId, Integer score) {
+        Show show = new Show(null, name, userId, score, false);
+        show.setCoverUrl(coverUrl);
+        return show;
+    }
 
-    boolean isShowExists(String name, int userId);
+    @Override
+    protected void assignCategories(Show show, List<Integer> genreIds) {
+        if (genreIds == null || genreIds.isEmpty()) {
+            show.setGenres(new HashSet<>());
+            return;
+        }
+        List<Genre> genres = genreRepository.findAllById(genreIds);
 
-    boolean getShowStatus(String name, int userId);
+        show.setGenres(new HashSet<>(genres));
+    }
 
-    UserPageResult<Show> getUserShowsPage(int userId, int page, int pageSize, Integer genreId, String searchTerm, String sortBy, String sortOrder);
+    @Override
+    protected ShowResponse toResponse(Show show) {
+        List<GenreResponse> genreResponses = show.getGenres() != null
+                ? show.getGenres().stream()
+                .map(GenreResponse::from)
+                .toList()
+                : List.of();
 
+        return new ShowResponse(
+                show.getId(),
+                show.getName(),
+                show.getCoverUrl(),
+                show.getScore(),
+                show.isCompleted(),
+                genreResponses
+        );
+    }
+    @Override
+    public String getMediaType() {
+        return "shows";
+    }
 }

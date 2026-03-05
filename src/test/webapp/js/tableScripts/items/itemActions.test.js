@@ -1,594 +1,382 @@
-import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals';
-import { ItemActionsManager } from '../../../../../main/webapp/js/tableScripts/items/itemActions.js';
 
-describe('ItemActionsManager', () => {
-    let itemActionsManager;
+
+import { jest } from '@jest/globals';
+
+// ─── Mock dependencies ────────────────────────────────────────────────────────
+
+jest.unstable_mockModule('@/tableScripts/core/errorHandler.js', () => ({
+    ErrorHandler: {
+        parseErrorResponse: jest.fn(async () => 'Server Error'),
+        handle:             jest.fn()
+    }
+}));
+
+jest.unstable_mockModule('@/tableScripts/core/utils.js', () => ({
+    securityUtils: { getCsrfToken: jest.fn(() => 'mock-csrf-token') },
+    ICONS:         { COMPLETED: '✅', NOT_COMPLETED: '❌' }
+}));
+
+const { ItemActionsManager } = await import('@/tableScripts/items/itemActions.js');
+const { ErrorHandler }       = await import('@/tableScripts/core/errorHandler.js');
+const { securityUtils }      = await import('@/tableScripts/core/utils.js');
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function makeConfig() {
+    return {
+        entityType: 'games',
+        selectors: {
+            statusButtonClass:     '.status-button',
+            editIconButtonClass:   '.edit-button',
+            deleteIconButtonClass: '.delete-button'
+        }
+    };
+}
+
+function makeTableBody() {
+    const tb = document.createElement('tbody');
+    document.body.appendChild(tb);
+    return tb;
+}
+
+function makeRow(options = {}) {
+    const tr = document.createElement('tr');
+    if (options.editing) tr.classList.add('is-editing');
+
+    const td = document.createElement('td');
+    const btn = document.createElement('button');
+    btn.className       = options.btnClass || 'status-button';
+    btn.dataset.itemName = options.itemName || 'Test Game';
+    btn.innerHTML       = options.icon || '✅';
+    td.appendChild(btn);
+    tr.appendChild(td);
+    return { tr, btn };
+}
+
+// ─── setButtonLoading ─────────────────────────────────────────────────────────
+
+describe('ItemActionsManager.setButtonLoading', () => {
+    let manager;
     let tableBody;
-    let mockConfig;
-    let mockInlineEditManager;
 
     beforeEach(() => {
-        HTMLFormElement.prototype.submit = jest.fn();
-
-        const meta = document.createElement('meta');
-        meta.name = '_csrf_token';
-        meta.content = 'test-token';
-        document.head.appendChild(meta);
-
-        tableBody = document.createElement('tbody');
-
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>Test Game</td>
-            <td>85</td>
-            <td></td>
-            <td>
-                <button class="status-button" data-item-name="Test Game">✅</button>
-            </td>
-            <td>
-                <button class="btn btn--icon btn--edit" data-item-name="Test Game">✏️</button>
-                <form>
-                    <button type="button" class="btn btn--icon btn--delete" data-item-name="Test Game">🗑️</button>
-                </form>
-            </td>
-        `;
-        tableBody.appendChild(row);
-
-        mockConfig = {
-            entityType: 'games',
-            entityNameSingular: 'Game',
-            selectors: {
-                statusButtonClass: '.status-button',
-                deleteIconButtonClass: '.btn--delete',
-                editIconButtonClass: '.btn--edit'
-            },
-            paramNames: {
-                toggleItemStatus: 'toggleGameStatus',
-                removeItem: 'removeGame'
-            },
-            itemNameAttribute: 'data-item-name',
-            csrfParameterName: '_csrf'
-        };
-
-        mockInlineEditManager = {
-            toggleRowEdit: jest.fn()
-        };
-
-        itemActionsManager = new ItemActionsManager(tableBody, mockConfig, mockInlineEditManager);
-
-        global.fetch = jest.fn();
-        global.confirm = jest.fn(() => true);
-        global.alert = jest.fn();
+        tableBody = makeTableBody();
+        manager   = new ItemActionsManager(tableBody, makeConfig(), null);
     });
 
     afterEach(() => {
-        document.head.innerHTML = '';
-        jest.restoreAllMocks();
-        delete HTMLFormElement.prototype.submit;
+        document.body.innerHTML = '';
     });
 
-    describe('Constructor', () => {
-        test('should initialize with tableBody, config, and inlineEditManager', () => {
-            expect(itemActionsManager.tableBody).toBe(tableBody);
-            expect(itemActionsManager.config).toBe(mockConfig);
-            expect(itemActionsManager.inlineEditManager).toBe(mockInlineEditManager);
-        });
+    test('disables button when loading=true', () => {
+        const btn = document.createElement('button');
+        manager.setButtonLoading(btn, true);
+        expect(btn.disabled).toBe(true);
     });
 
-    describe('init', () => {
-        test('should attach event listener to tableBody', () => {
-            const spy = jest.spyOn(tableBody, 'addEventListener');
-
-            itemActionsManager.init();
-
-            expect(spy).toHaveBeenCalledWith('click', expect.any(Function));
-        });
-
-        test('should log error if tableBody is missing', () => {
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-            const manager = new ItemActionsManager(null, mockConfig, mockInlineEditManager);
-
-            manager.init();
-
-            expect(consoleErrorSpy).toHaveBeenCalled();
-            consoleErrorSpy.mockRestore();
-        });
-
-        test('should log error if selectors are missing', () => {
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-            const badConfig = { ...mockConfig, selectors: null };
-            const manager = new ItemActionsManager(tableBody, badConfig, mockInlineEditManager);
-
-            manager.init();
-
-            expect(consoleErrorSpy).toHaveBeenCalled();
-            consoleErrorSpy.mockRestore();
-        });
+    test('reduces opacity to 0.5 when loading', () => {
+        const btn = document.createElement('button');
+        manager.setButtonLoading(btn, true);
+        expect(btn.style.opacity).toBe('0.5');
     });
 
-    describe('handleToggleStatus', () => {
-        beforeEach(() => {
-            itemActionsManager.init();
-        });
-
-        test('should toggle status successfully', async () => {
-            global.fetch.mockResolvedValue({
-                ok: true,
-                json: async () => ({ success: true, data: { newStatus: false } })
-            });
-
-            const statusButton = tableBody.querySelector('.status-button');
-            statusButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(global.fetch).toHaveBeenCalled();
-            expect(statusButton.innerHTML).toBe('❌');
-        });
-
-        test('should send correct form data', async () => {
-            global.fetch.mockResolvedValue({
-                ok: true,
-                json: async () => ({ success: true, data: { newStatus: true } })
-            });
-
-            const statusButton = tableBody.querySelector('.status-button');
-            statusButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            const callArgs = global.fetch.mock.calls[0];
-            const formData = new URLSearchParams(callArgs[1].body);
-
-            expect(formData.get('toggleGameStatus')).toBe('Test Game');
-            expect(formData.get('_csrf')).toBe('test-token');
-        });
-
-        test('should handle missing item name', () => {
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-            const statusButton = tableBody.querySelector('.status-button');
-            statusButton.removeAttribute('data-item-name');
-
-            statusButton.click();
-
-            expect(consoleErrorSpy).toHaveBeenCalled();
-            expect(global.fetch).not.toHaveBeenCalled();
-
-            consoleErrorSpy.mockRestore();
-        });
-
-        test('should prevent toggle during edit mode', () => {
-            global.alert = jest.fn();
-
-            const row = tableBody.querySelector('tr');
-            row.classList.add('is-editing');
-
-            const statusButton = tableBody.querySelector('.status-button');
-            statusButton.click();
-
-            expect(global.alert).toHaveBeenCalledWith(
-                expect.stringContaining('save or cancel your edits')
-            );
-            expect(global.fetch).not.toHaveBeenCalled();
-        });
-
-        test('should handle missing CSRF token', () => {
-            document.head.innerHTML = '';
-            global.alert = jest.fn();
-
-            const statusButton = tableBody.querySelector('.status-button');
-            statusButton.click();
-
-            expect(global.alert).toHaveBeenCalledWith(
-                expect.stringContaining('Security token missing')
-            );
-            expect(global.fetch).not.toHaveBeenCalled();
-        });
-
-        test('should show loading state', async () => {
-            global.fetch.mockResolvedValue({
-                ok: true,
-                json: async () => ({ success: true, data: { newStatus: false } })
-            });
-
-            const statusButton = tableBody.querySelector('.status-button');
-
-            statusButton.click();
-
-            expect(statusButton.disabled).toBe(true);
-            expect(statusButton.style.opacity).toBe('0.5');
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(statusButton.disabled).toBe(false);
-            expect(statusButton.style.opacity).toBe('1');
-        });
-
-        test('should handle server errors', async () => {
-            global.fetch.mockResolvedValue({
-                ok: false,
-                status: 500,
-                text: async () => 'Server error'
-            });
-
-            const statusButton = tableBody.querySelector('.status-button');
-            const originalContent = statusButton.innerHTML;
-
-            statusButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(statusButton.innerHTML).toBe(originalContent);
-        });
-
-        test('should handle network errors', async () => {
-            global.fetch.mockRejectedValue(new Error('Network error'));
-
-            const statusButton = tableBody.querySelector('.status-button');
-            const originalContent = statusButton.innerHTML;
-
-            statusButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(statusButton.innerHTML).toBe(originalContent);
-        });
-
-        test('should handle invalid response format', async () => {
-            global.fetch.mockResolvedValue({
-                ok: true,
-                json: async () => ({ success: false, message: 'Invalid' })
-            });
-
-            const statusButton = tableBody.querySelector('.status-button');
-            const originalContent = statusButton.innerHTML;
-
-            statusButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(statusButton.innerHTML).toBe(originalContent);
-        });
+    test('enables button when loading=false', () => {
+        const btn    = document.createElement('button');
+        btn.disabled = true;
+        manager.setButtonLoading(btn, false);
+        expect(btn.disabled).toBe(false);
     });
 
-    describe('handleDeleteConfirmation', () => {
-        beforeEach(() => {
-            itemActionsManager.init();
-        });
+    test('restores opacity to 1 when not loading', () => {
+        const btn         = document.createElement('button');
+        btn.style.opacity = '0.5';
+        manager.setButtonLoading(btn, false);
+        expect(btn.style.opacity).toBe('1');
+    });
+});
 
-        test('should show confirmation dialog', () => {
-            const deleteButton = tableBody.querySelector('.btn--delete');
+// ─── handleToggleStatus ───────────────────────────────────────────────────────
 
-            deleteButton.click();
+describe('ItemActionsManager.handleToggleStatus', () => {
+    let manager;
+    let tableBody;
 
-            expect(global.confirm).toHaveBeenCalledWith(
-                expect.stringContaining('Test Game')
-            );
-        });
-
-        test('should delete item via AJAX on confirmation', async () => {
-            global.fetch.mockResolvedValue({
-                ok: true,
-                json: async () => ({ success: true })
-            });
-
-            const deleteButton = tableBody.querySelector('.btn--delete');
-            deleteButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(global.confirm).toHaveBeenCalled();
-            expect(global.fetch).toHaveBeenCalled();
-
-            const callArgs = global.fetch.mock.calls[0];
-            const formData = new URLSearchParams(callArgs[1].body);
-            expect(formData.get('removeGame')).toBe('Test Game');
-            expect(formData.get('_csrf')).toBe('test-token');
-        });
-
-        test('should not delete if user cancels', async () => {
-            global.confirm = jest.fn(() => false);
-            global.fetch.mockResolvedValue({
-                ok: true,
-                json: async () => ({ success: true })
-            });
-
-            const deleteButton = tableBody.querySelector('.btn--delete');
-            deleteButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(global.fetch).not.toHaveBeenCalled();
-        });
-
-        test('should prevent delete during edit mode', () => {
-            global.alert = jest.fn();
-
-            const row = tableBody.querySelector('tr');
-            row.classList.add('is-editing');
-
-            const deleteButton = tableBody.querySelector('.btn--delete');
-            deleteButton.click();
-
-            expect(global.alert).toHaveBeenCalledWith(
-                expect.stringContaining('save or cancel your edits')
-            );
-            expect(global.confirm).not.toHaveBeenCalled();
-        });
-
-        test('should handle missing item name', () => {
-            const deleteButton = tableBody.querySelector('.btn--delete');
-            deleteButton.removeAttribute('data-item-name');
-
-            deleteButton.click();
-
-            expect(global.confirm).not.toHaveBeenCalled();
-        });
-
-        test('should handle missing CSRF token', async () => {
-            document.head.innerHTML = '';
-            global.alert = jest.fn();
-
-            const deleteButton = tableBody.querySelector('.btn--delete');
-            deleteButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(global.alert).toHaveBeenCalledWith(
-                expect.stringContaining('Security token missing')
-            );
-            expect(global.fetch).not.toHaveBeenCalled();
-        });
-
-        test('should remove row after successful delete', async () => {
-            global.fetch.mockResolvedValue({
-                ok: true,
-                json: async () => ({ success: true })
-            });
-
-            const deleteButton = tableBody.querySelector('.btn--delete');
-            const row = deleteButton.closest('tr');
-
-            deleteButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(row.style.opacity).toBe('0');
-
-            await new Promise(resolve => setTimeout(resolve, 350));
-            expect(tableBody.contains(row)).toBe(false);
-        });
-
-        test('should handle server errors', async () => {
-            global.fetch.mockResolvedValue({
-                ok: false,
-                status: 500,
-                text: async () => 'Server error'
-            });
-
-            const deleteButton = tableBody.querySelector('.btn--delete');
-            const originalContent = deleteButton.innerHTML;
-
-            deleteButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(deleteButton.innerHTML).toBe(originalContent);
-        });
+    beforeEach(() => {
+        tableBody = makeTableBody();
+        manager   = new ItemActionsManager(tableBody, makeConfig(), null);
+        global.fetch = jest.fn();
+        securityUtils.getCsrfToken.mockReturnValue('mock-csrf');
     });
 
-    describe('handleEditClick', () => {
-        beforeEach(() => {
-            itemActionsManager.init();
-        });
-
-        test('should call toggleRowEdit on inline edit manager', () => {
-            const editButton = tableBody.querySelector('.btn--edit');
-
-            editButton.click();
-
-            const row = editButton.closest('tr');
-            expect(mockInlineEditManager.toggleRowEdit).toHaveBeenCalledWith(row);
-        });
-
-        test('should handle missing inline edit manager', () => {
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-            const manager = new ItemActionsManager(tableBody, mockConfig, null);
-            manager.init();
-
-            const editButton = tableBody.querySelector('.btn--edit');
-            editButton.click();
-
-            expect(consoleErrorSpy).toHaveBeenCalled();
-            consoleErrorSpy.mockRestore();
-        });
-
-        test('should find correct row element', () => {
-            const editButton = tableBody.querySelector('.btn--edit');
-            editButton.click();
-
-            const row = tableBody.querySelector('tr');
-            expect(mockInlineEditManager.toggleRowEdit).toHaveBeenCalledWith(row);
-        });
+    afterEach(() => {
+        document.body.innerHTML = '';
+        jest.resetAllMocks();
     });
 
-    describe('Event Delegation', () => {
-        beforeEach(() => {
-            itemActionsManager.init();
-        });
-
-        test('should handle clicks on nested elements', () => {
-            const span = document.createElement('span');
-            span.textContent = 'Edit';
-            const editButton = tableBody.querySelector('.btn--edit');
-            editButton.appendChild(span);
-
-            span.click();
-
-            expect(mockInlineEditManager.toggleRowEdit).toHaveBeenCalled();
-        });
-
-        test('should not trigger actions for non-button clicks', () => {
-            const td = tableBody.querySelector('td');
-
-            td.click();
-
-            expect(mockInlineEditManager.toggleRowEdit).not.toHaveBeenCalled();
-            expect(global.fetch).not.toHaveBeenCalled();
-            expect(global.confirm).not.toHaveBeenCalled();
-        });
-
-        test('should handle multiple rows', () => {
-            tableBody.innerHTML += `
-                <tr>
-                    <td>Game 2</td>
-                    <td>75</td>
-                    <td></td>
-                    <td>
-                        <button class="status-button" data-item-name="Game 2">❌</button>
-                    </td>
-                    <td>
-                        <button class="btn btn--edit" data-item-name="Game 2">✏️</button>
-                        <form>
-                            <button type="button" class="btn--delete" data-item-name="Game 2">🗑️</button>
-                        </form>
-                    </td>
-                </tr>
-            `;
-
-            const editButtons = tableBody.querySelectorAll('.btn--edit');
-            editButtons[1].click();
-
-            expect(mockInlineEditManager.toggleRowEdit).toHaveBeenCalled();
-        });
+    test('does nothing when button has no itemName', async () => {
+        const btn = document.createElement('button');
+        btn.dataset.itemName = '';
+        await manager.handleToggleStatus(btn);
+        expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    describe('setButtonLoading', () => {
-        test('should disable and fade button when loading', () => {
-            const button = document.createElement('button');
+    test('alerts and returns when row is editing', async () => {
+        const { tr, btn } = makeRow({ editing: true, itemName: 'Game' });
+        tableBody.appendChild(tr);
+        global.alert = jest.fn();
 
-            itemActionsManager.setButtonLoading(button, true);
+        await manager.handleToggleStatus(btn);
 
-            expect(button.disabled).toBe(true);
-            expect(button.style.opacity).toBe('0.5');
-        });
-
-        test('should enable and restore button when not loading', () => {
-            const button = document.createElement('button');
-            button.disabled = true;
-            button.style.opacity = '0.5';
-
-            itemActionsManager.setButtonLoading(button, false);
-
-            expect(button.disabled).toBe(false);
-            expect(button.style.opacity).toBe('1');
-        });
+        expect(global.alert).toHaveBeenCalled();
+        expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    describe('Integration', () => {
-        test('should handle complete status toggle flow', async () => {
-            itemActionsManager.init();
-
-            global.fetch.mockResolvedValue({
-                ok: true,
-                json: async () => ({ success: true, data: { newStatus: false } })
-            });
-            const statusButton = tableBody.querySelector('.status-button');
-            expect(statusButton.innerHTML).toBe('✅');
-
-            statusButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(statusButton.innerHTML).toBe('❌');
-            expect(statusButton.disabled).toBe(false);
+    test('calls correct PATCH endpoint', async () => {
+        const { tr, btn } = makeRow({ itemName: 'Witcher 3' });
+        tableBody.appendChild(tr);
+        global.fetch.mockResolvedValue({
+            ok:   true,
+            json: async () => ({ completed: true })
         });
 
-        test('should handle complete delete flow', async () => {
-            itemActionsManager.init();
+        await manager.handleToggleStatus(btn);
 
-            global.fetch.mockResolvedValue({
-                ok: true,
-                json: async () => ({ success: true })
-            });
-
-            const deleteButton = tableBody.querySelector('.btn--delete');
-            deleteButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(global.confirm).toHaveBeenCalled();
-            expect(global.fetch).toHaveBeenCalled();
-        });
-
-        test('should handle complete edit flow', () => {
-            itemActionsManager.init();
-
-            const editButton = tableBody.querySelector('.btn--edit');
-            editButton.click();
-
-            expect(mockInlineEditManager.toggleRowEdit).toHaveBeenCalled();
-        });
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/games/Witcher%203/toggle',
+            expect.objectContaining({ method: 'PATCH' })
+        );
     });
 
-    describe('Edge Cases', () => {
-        test('should handle button with missing closest method', () => {
-            itemActionsManager.init();
-
-            const button = {
-                dataset: { itemName: 'Test' }
-            };
-
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-
-            if (typeof button.closest !== 'function') {
-                try {
-                    itemActionsManager.handleEditClick(button);
-                } catch (error) {
-                    expect(error.message).toContain('closest');
-                }
-            }
-
-            consoleErrorSpy.mockRestore();
+    test('sends X-XSRF-TOKEN header', async () => {
+        const { tr, btn } = makeRow({ itemName: 'Game' });
+        tableBody.appendChild(tr);
+        global.fetch.mockResolvedValue({
+            ok:   true,
+            json: async () => ({ completed: false })
         });
 
-        test('should handle very long item names', async () => {
-            itemActionsManager.init();
+        await manager.handleToggleStatus(btn);
 
-            const longName = 'A'.repeat(1000);
-            const statusButton = tableBody.querySelector('.status-button');
-            statusButton.dataset.itemName = longName;
+        expect(global.fetch).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({
+                headers: expect.objectContaining({ 'X-XSRF-TOKEN': 'mock-csrf' })
+            })
+        );
+    });
 
-            global.fetch.mockResolvedValue({
-                ok: true,
-                json: async () => ({ success: true, data: { newStatus: false } })
-            });
-
-            statusButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(global.fetch).toHaveBeenCalled();
+    test('updates button to COMPLETED icon when server returns completed:true', async () => {
+        const { tr, btn } = makeRow({ itemName: 'Game', icon: '❌' });
+        tableBody.appendChild(tr);
+        global.fetch.mockResolvedValue({
+            ok:   true,
+            json: async () => ({ completed: true })
         });
 
-        test('should handle special characters in item names', async () => {
-            itemActionsManager.init();
+        await manager.handleToggleStatus(btn);
 
-            const specialName = '<>&"\'';
-            const statusButton = tableBody.querySelector('.status-button');
-            statusButton.dataset.itemName = specialName;
+        expect(btn.innerHTML).toBe('✅');
+    });
 
-            global.fetch.mockResolvedValue({
-                ok: true,
-                json: async () => ({ success: true, data: { newStatus: false } })
-            });
-
-            statusButton.click();
-
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            const formData = new URLSearchParams(global.fetch.mock.calls[0][1].body);
-            expect(formData.get('toggleGameStatus')).toBe(specialName);
+    test('updates button to NOT_COMPLETED icon when server returns completed:false', async () => {
+        const { tr, btn } = makeRow({ itemName: 'Game', icon: '✅' });
+        tableBody.appendChild(tr);
+        global.fetch.mockResolvedValue({
+            ok:   true,
+            json: async () => ({ completed: false })
         });
+
+        await manager.handleToggleStatus(btn);
+
+        expect(btn.innerHTML).toBe('❌');
+    });
+
+    test('restores original button content on fetch error', async () => {
+        const { tr, btn } = makeRow({ itemName: 'Game', icon: '✅' });
+        tableBody.appendChild(tr);
+        global.fetch.mockResolvedValue({ ok: false, status: 500 });
+
+        await manager.handleToggleStatus(btn);
+
+        expect(btn.innerHTML).toBe('✅');
+    });
+});
+
+// ─── handleDeleteConfirmation ────────────────────────────────────────────────
+
+describe('ItemActionsManager.handleDeleteConfirmation', () => {
+    let manager;
+    let tableBody;
+
+    beforeEach(() => {
+        tableBody = makeTableBody();
+        manager   = new ItemActionsManager(tableBody, makeConfig(), null);
+        global.fetch   = jest.fn();
+        global.confirm = jest.fn(() => true);
+        securityUtils.getCsrfToken.mockReturnValue('mock-csrf');
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = '';
+        jest.resetAllMocks();
+    });
+
+    test('does nothing when no itemName', async () => {
+        const btn = document.createElement('button');
+        btn.dataset.itemName = '';
+        await manager.handleDeleteConfirmation(btn);
+        expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    test('does not delete when user cancels confirmation', async () => {
+        global.confirm = jest.fn(() => false);
+        const { tr, btn } = makeRow({ itemName: 'Game' });
+        tableBody.appendChild(tr);
+
+        await manager.handleDeleteConfirmation(btn);
+
+        expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    test('alerts and returns when row is editing', async () => {
+        const { tr, btn } = makeRow({ editing: true, btnClass: 'delete-button', itemName: 'Game' });
+        tableBody.appendChild(tr);
+        global.alert = jest.fn();
+
+        await manager.handleDeleteConfirmation(btn);
+
+        expect(global.alert).toHaveBeenCalled();
+        expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    test('calls DELETE endpoint with encoded name', async () => {
+        const { tr, btn } = makeRow({ btnClass: 'delete-button', itemName: 'Dark Souls 3' });
+        tableBody.appendChild(tr);
+        global.fetch.mockResolvedValue({ ok: true });
+
+        await manager.handleDeleteConfirmation(btn);
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/games/Dark%20Souls%203',
+            expect.objectContaining({ method: 'DELETE' })
+        );
+    });
+
+    test('removes row from DOM after successful delete', async () => {
+        jest.useFakeTimers();
+        const { tr, btn } = makeRow({ btnClass: 'delete-button', itemName: 'Game' });
+        tableBody.appendChild(tr);
+        global.fetch.mockResolvedValue({ ok: true });
+
+        await manager.handleDeleteConfirmation(btn);
+        jest.advanceTimersByTime(400);
+
+        expect(tableBody.contains(tr)).toBe(false);
+        jest.useRealTimers();
+    });
+
+    test('shows confirmation dialog with item name', async () => {
+        const { tr, btn } = makeRow({ btnClass: 'delete-button', itemName: 'My Game' });
+        tableBody.appendChild(tr);
+        global.fetch.mockResolvedValue({ ok: true });
+
+        await manager.handleDeleteConfirmation(btn);
+
+        expect(global.confirm).toHaveBeenCalledWith(
+            expect.stringContaining('My Game')
+        );
+    });
+});
+
+// ─── handleEditClick ──────────────────────────────────────────────────────────
+
+describe('ItemActionsManager.handleEditClick', () => {
+    afterEach(() => {
+        document.body.innerHTML = '';
+    });
+
+    test('calls inlineEditManager.toggleRowEdit with the row', () => {
+        const tableBody = makeTableBody();
+        const inlineEditMock = { toggleRowEdit: jest.fn() };
+        const manager = new ItemActionsManager(tableBody, makeConfig(), inlineEditMock);
+
+        const tr  = document.createElement('tr');
+        const btn = document.createElement('button');
+        tr.appendChild(btn);
+        tableBody.appendChild(tr);
+
+        manager.handleEditClick(btn);
+
+        expect(inlineEditMock.toggleRowEdit).toHaveBeenCalledWith(tr);
+    });
+
+    test('does nothing when inlineEditManager is null', () => {
+        const tableBody = makeTableBody();
+        const manager   = new ItemActionsManager(tableBody, makeConfig(), null);
+        const btn       = document.createElement('button');
+
+        expect(() => manager.handleEditClick(btn)).not.toThrow();
+    });
+});
+
+// ─── init event delegation ────────────────────────────────────────────────────
+
+describe('ItemActionsManager.init event delegation', () => {
+    let tableBody;
+    let manager;
+
+    beforeEach(() => {
+        tableBody = makeTableBody();
+        manager   = new ItemActionsManager(tableBody, makeConfig(), null);
+        manager.init();
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = '';
+    });
+
+    test('delegates status button click to handleToggleStatus', () => {
+        const spy = jest.spyOn(manager, 'handleToggleStatus').mockResolvedValue();
+
+        const tr  = document.createElement('tr');
+        const btn = document.createElement('button');
+        btn.className        = 'status-button';
+        btn.dataset.itemName = 'Game';
+        tr.appendChild(btn);
+        tableBody.appendChild(tr);
+
+        btn.click();
+
+        expect(spy).toHaveBeenCalledWith(btn);
+    });
+
+    test('delegates delete button click to handleDeleteConfirmation', () => {
+        const spy = jest.spyOn(manager, 'handleDeleteConfirmation').mockResolvedValue();
+
+        const tr  = document.createElement('tr');
+        const btn = document.createElement('button');
+        btn.className        = 'delete-button';
+        btn.dataset.itemName = 'Game';
+        tr.appendChild(btn);
+        tableBody.appendChild(tr);
+
+        btn.click();
+
+        expect(spy).toHaveBeenCalledWith(btn);
+    });
+
+    test('delegates edit button click to handleEditClick', () => {
+        const spy = jest.spyOn(manager, 'handleEditClick').mockImplementation(() => {});
+
+        const tr  = document.createElement('tr');
+        const btn = document.createElement('button');
+        btn.className        = 'edit-button';
+        btn.dataset.itemName = 'Game';
+        tr.appendChild(btn);
+        tableBody.appendChild(tr);
+
+        btn.click();
+
+        expect(spy).toHaveBeenCalledWith(btn);
     });
 });

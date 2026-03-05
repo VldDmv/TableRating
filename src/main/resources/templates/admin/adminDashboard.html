@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}"
+      lang="en">
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/pages/admin/admin.css}">
+</head>
+
+<body class="admin-page">
+<main layout:fragment="content">
+    <!-- Admin Navigation -->
+    <nav class="admin-nav">
+        <a th:href="@{/admin/dashboard}" class="active">Dashboard</a>
+        <a th:href="@{/admin/users}">Manage Users</a>
+        <a th:href="@{/admin/management(type='tags')}">Manage Tags</a>
+        <a th:href="@{/admin/management(type='genres')}">Manage Genres</a>
+    </nav>
+
+    <div class="container">
+        <div class="admin-header">
+            <h1>Dashboard</h1>
+            <p class="admin-subtitle">Overview of your platform statistics</p>
+        </div>
+
+        <!-- Animated Statistics Cards -->
+        <div class="dashboard-stats-grid">
+            <div class="dashboard-stat-card" data-color="purple">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value" th:text="${stats.totalUsers}">0</div>
+                </div>
+            </div>
+
+            <div class="dashboard-stat-card" data-color="blue">
+                <div class="stat-icon">🎮</div>
+                <div class="stat-content">
+                    <div class="stat-label">Games</div>
+                    <div class="stat-value" th:text="${stats.totalGames}">0</div>
+                </div>
+            </div>
+
+            <div class="dashboard-stat-card" data-color="red">
+                <div class="stat-icon">🎬</div>
+                <div class="stat-content">
+                    <div class="stat-label">Movies</div>
+                    <div class="stat-value" th:text="${stats.totalMovies}">0</div>
+                </div>
+            </div>
+
+            <div class="dashboard-stat-card" data-color="green">
+                <div class="stat-icon">📚</div>
+                <div class="stat-content">
+                    <div class="stat-label">Books</div>
+                    <div class="stat-value" th:text="${stats.totalBooks}">0</div>
+                </div>
+            </div>
+
+            <div class="dashboard-stat-card" data-color="orange">
+                <div class="stat-icon">📺</div>
+                <div class="stat-content">
+                    <div class="stat-label">Shows</div>
+                    <div class="stat-value" th:text="${stats.totalShows}">0</div>
+                </div>
+            </div>
+
+            <div class="dashboard-stat-card" data-color="cyan">
+                <div class="stat-icon">🌟</div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Items</div>
+                    <div class="stat-value"
+                         th:text="${stats.totalGames + stats.totalMovies + stats.totalBooks + stats.totalShows}">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Media Distribution Chart -->
+        <div class="dashboard-chart-single">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>📊 Media Distribution</h3>
+                    <p>Breakdown by type</p>
+                </div>
+                <div class="chart-container-single">
+                    <canvas id="mediaDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden data for charts -->
+    <script th:inline="javascript">
+        window.statsData = {
+            totalUsers: [[${stats.totalUsers}]],
+            totalGames: [[${stats.totalGames}]],
+            totalMovies: [[${stats.totalMovies}]],
+            totalBooks: [[${stats.totalBooks}]],
+            totalShows: [[${stats.totalShows}]]
+        };
+    </script>
+</main>
+
+<th:block layout:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script type="module" th:src="@{/js/pages/admin/dashboard.js}"></script>
+</th:block>
+</body>
+</html>

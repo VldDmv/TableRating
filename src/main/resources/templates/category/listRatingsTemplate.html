@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <title th:text="${entityNamePlural}">Media List</title>
+    <meta name="_entity_type" th:content="${entityType}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/pages/category.css}">
+</head>
+
+<body>
+<main layout:fragment="content" class="page-container">
+    <div th:replace="~{fragments/fragments :: navigation('/dashboard', 'Back to Dashboard')}"></div>
+
+    <h2 th:text="|Add a ${entityNameSingular}|">Add Item</h2>
+    <form th:action="@{/{type}(type=${entityType})}" th:id="${addFormId}" method="post" class="category-form">
+
+        <div class="form-input-row">
+            <input type="text" name="name" id="itemName"
+                   th:placeholder="|${entityNameSingular} Name|" required>
+
+            <input type="number" name="score"
+                   th:id="${entityType == 'games' ? 'gameScore' :
+                           (entityType == 'movies' ? 'movieScore' :
+                           (entityType == 'books' ? 'bookScore' : 'showScore'))}"
+                   placeholder="Score (1-100)"
+                   required min="1" max="100">
+        </div>
+
+        <div class="tag-selection-container">
+            <h4 th:text="${entityType == 'games' ? 'Tags:' : 'Genres:'}">Tags:</h4>
+
+            <!-- Chips display area -->
+            <div class="tag-chips-display" id="tagChipsDisplay">
+                <!-- Selected chips will appear here -->
+            </div>
+
+            <!-- Add tag button -->
+            <button type="button" class="add-tag-btn" id="addTagBtn">
+                <span class="add-tag-icon">+</span>
+                <span th:text="${entityType == 'games' ? 'Add Tag' : 'Add Genre'}">Add Tag</span>
+            </button>
+
+            <!-- Dropdown with available tags (hidden by default) -->
+            <div class="tag-dropdown" id="tagDropdown" style="display: none;">
+                <input type="text"
+                       class="tag-search-input"
+                       id="tagSearchInput"
+                       th:placeholder="${entityType == 'games' ? 'Search tags...' : 'Search genres...'}">
+                <div class="tag-dropdown-list">
+                    <label th:each="item : ${entityType == 'games' ? allTags : allGenres}"
+                           class="tag-dropdown-item"
+                           th:data-tag-id="${item.id}"
+                           th:data-tag-name="${item.name}">
+                        <input type="checkbox"
+                               name="selectedIds"
+                               th:value="${item.id}"
+                               style="display: none;">
+                        <span th:text="${item.name}">Item</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" th:text="|Add ${entityNameSingular}|">Add</button>
+    </form>
+
+    <div class="table-controls">
+        <label>Show:
+            <select id="rowsPerPage">
+                <option th:each="size : ${new int[]{10, 25, 50, 100}}"
+                        th:value="${size}" th:text="${size}">10</option>
+            </select>
+        </label>
+
+        <label>Search:
+            <input type="text" id="searchBox"
+                   th:placeholder="|Search ${entityNamePlural}...|">
+        </label>
+
+        <label>
+            <span th:text="${entityType == 'games' ? 'Filter by Tag:' : 'Filter by Genre:'}">Filter by Tag:</span>
+            <select id="tagFilter">
+                <option value="all">All</option>
+                <option th:each="item : ${entityType == 'games' ? allTags : allGenres}"
+                        th:value="${item.id}" th:text="${item.name}">Item</option>
+            </select>
+        </label>
+
+        <div id="column-toggle-container"></div>
+    </div>
+
+    <table th:data-entity-type="${entityType}">
+        <thead>
+        <tr>
+            <th class="col-cover">Cover</th>
+            <th class="col-name" th:text="${entityNameSingular}">Item</th>
+            <th class="col-score">Score</th>
+            <th class="col-tags" th:text="${entityType == 'games' ? 'Tags' : 'Genres'}">Categories</th>
+            <th class="col-completed">Completed</th>
+            <th class="col-actions">Actions</th>
+        </tr>
+        </thead>
+        <tbody th:id="${entityType + 'Body'}"></tbody>
+    </table>
+
+    <!-- Cards Container (pre-created, hidden by default) -->
+    <div id="cards-container" class="cards-grid" style="display: none;"></div>
+
+    <div class="pagination-controls-container">
+        <div class="pagination-controls">
+            <button id="prevPage">&laquo;</button>
+            <div class="relative-container">
+                <button id="pageDropdown">Page 1 of 4</button>
+                <ul id="pageList"></ul>
+            </div>
+            <button id="nextPage">&raquo;</button>
+        </div>
+    </div>
+
+    <div id="tags-edit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Edit <span id="modal-category-name">Tags</span></h2>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="modal-save-tags" class="btn btn--primary">Save</button>
+                <button type="button" id="modal-cancel-tags" class="btn btn--secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Entity type
+        const entityType = /*[[${entityType}]]*/ 'games';
+
+        // Tags/Genres data
+        if (entityType === 'games') {
+            window.allAvailableTags = /*[[${allTags}]]*/ [];
+        } else {
+            window.allAvailableGenres = /*[[${allGenres}]]*/ [];
+        }
+
+        // Initial page data
+        window.initialPageData = /*[[${initialData}]]*/ {};
+        /*]]>*/
+    </script>
+    <script type="module" th:src="@{/js/tableScripts/main.js}"></script>
+</th:block>
+</body>
+</html>

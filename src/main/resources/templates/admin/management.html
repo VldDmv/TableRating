@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}"
+      lang="en">
+<head>
+    <title th:text="|Manage ${itemType}s|">Manage Items</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/pages/admin/admin.css}">
+</head>
+
+<body class="admin-page">
+<main layout:fragment="content">
+    <!-- Admin Navigation -->
+    <nav class="admin-nav">
+        <a th:href="@{/admin/dashboard}">Dashboard</a>
+        <a th:href="@{/admin/users}">Manage Users</a>
+        <a th:href="@{/admin/management(type='tags')}"
+           th:classappend="${type == 'tags'} ? 'active' : ''">Manage Tags</a>
+        <a th:href="@{/admin/management(type='genres')}"
+           th:classappend="${type == 'genres'} ? 'active' : ''">Manage Genres</a>
+    </nav>
+
+    <div class="container">
+        <div class="admin-header">
+            <h1 th:text="| Manage ${itemType}s|">Manage Items</h1>
+            <p class="admin-subtitle">Add, edit, and organize your tags and genres</p>
+        </div>
+
+        <!-- Compact Add Form -->
+        <div class="quick-add-form">
+            <form th:action="@{/admin/{type}(type=${type})}" method="post" class="inline-add-form centered-form">
+                <input type="hidden" name="type" th:value="${type}">
+                <input type="hidden" name="action" value="add">
+
+                <div class="form-row centered-row">
+                    <input type="text"
+                           id="name"
+                           name="name"
+                           placeholder="Enter new tag name..."
+                           th:placeholder="|Enter new ${itemType} name...|"
+                           required
+                           class="quick-input compact-input">
+
+                    <!-- Media Type Selection (only for genres) -->
+                    <div th:if="${type == 'genres'}" class="inline-media-types">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="mediaTypes" value="movie">
+                            <span>🎬 Movies</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="mediaTypes" value="book">
+                            <span>📚 Books</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="mediaTypes" value="show">
+                            <span>📺 Shows</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="mediaTypes" value="shared" checked>
+                            <span>🌐 Shared</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-add-quick">
+                        <span th:text="|➕ Add ${itemType}|">Add Item</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Search & View Toggle -->
+        <div class="admin-controls management-controls">
+            <!-- Search Bar -->
+            <div class="admin-search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text"
+                       id="managementSearch"
+                       placeholder="Search..."
+                       th:placeholder="|Search ${itemType}s...|"
+                       autocomplete="off">
+            </div>
+
+            <!-- View Toggle -->
+            <div class="view-toggle">
+                <button id="cardsViewBtn" class="view-btn active" title="Cards View">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                </button>
+                <button id="tableViewBtn" class="view-btn" title="Table View">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="8" y1="6" x2="21" y2="6"/>
+                        <line x1="8" y1="12" x2="21" y2="12"/>
+                        <line x1="8" y1="18" x2="21" y2="18"/>
+                        <line x1="3" y1="6" x2="3.01" y2="6"/>
+                        <line x1="3" y1="12" x2="3.01" y2="12"/>
+                        <line x1="3" y1="18" x2="3.01" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Media Type Filter (only for genres) -->
+        <div th:if="${type == 'genres'}" class="media-filter">
+            <button class="filter-badge active" data-filter="all">
+                🌐 All
+            </button>
+            <button class="filter-badge" data-filter="movie">
+                🎬 Movies
+            </button>
+            <button class="filter-badge" data-filter="book">
+                📚 Books
+            </button>
+            <button class="filter-badge" data-filter="show">
+                📺 Shows
+            </button>
+            <button class="filter-badge" data-filter="shared">
+                🔗 Shared
+            </button>
+        </div>
+
+        <!-- Cards Grid View -->
+        <div id="itemsCards" class="management-grid">
+            <div th:each="item : ${items}" class="management-item">
+                <!-- Item Header -->
+                <div class="item-header">
+                    <span class="item-name" th:text="${item.name}">Item Name</span>
+                    <span class="item-id">#<span th:text="${item.id}">1</span></span>
+                </div>
+
+                <!-- Media Types (only for genres) -->
+                <div th:if="${type == 'genres'}" class="item-media-types">
+                    <span th:each="mediaType : ${item.mediaTypes}"
+                          class="media-badge"
+                          th:classappend="${mediaType == 'movie'} ? 'media-movie' : (${mediaType == 'book'} ? 'media-book' : (${mediaType == 'show'} ? 'media-show' : 'media-shared'))"
+                          th:text="${mediaType}">type</span>
+                </div>
+
+                <!-- Actions -->
+                <div class="item-actions">
+                    <button class="btn-action btn-edit-action"
+                            th:data-id="${item.id}"
+                            th:data-name="${item.name}"
+                            th:data-media-types="${type == 'genres'} ? ${#strings.listJoin(item.mediaTypes, ',')} : ''"
+                            onclick="editItem(this)">
+                        ✏️ Edit
+                    </button>
+                    <button class="btn-action btn-delete-action"
+                            th:data-id="${item.id}"
+                            th:data-name="${item.name}"
+                            onclick="deleteItem(this)">
+                        🗑️ Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div id="itemsTable" class="management-table-wrapper" style="display: none;">
+            <table class="admin-users-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th th:if="${type == 'genres'}">Applicable To</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${items}">
+                    <td th:text="${item.id}">1</td>
+                    <td th:text="${item.name}">Item Name</td>
+
+                    <!-- Media Types (only for genres) -->
+                    <td th:if="${type == 'genres'}">
+                        <div class="table-media-types">
+                                <span th:each="mediaType : ${item.mediaTypes}"
+                                      class="media-badge media-badge-sm"
+                                      th:classappend="${mediaType == 'movie'} ? 'media-movie' : (${mediaType == 'book'} ? 'media-book' : (${mediaType == 'show'} ? 'media-show' : 'media-shared'))"
+                                      th:text="${mediaType}">type</span>
+                        </div>
+                    </td>
+
+                    <td class="table-actions-cell">
+                        <button class="btn-edit-sm"
+                                th:data-id="${item.id}"
+                                th:data-name="${item.name}"
+                                th:data-media-types="${type == 'genres'} ? ${#strings.listJoin(item.mediaTypes, ',')} : ''"
+                                onclick="editItem(this)">
+                            Edit
+                        </button>
+                        <button class="btn-delete-sm"
+                                th:data-id="${item.id}"
+                                th:data-name="${item.name}"
+                                onclick="deleteItem(this)">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">😔</div>
+            <h3 th:text="|No ${itemType}s found|">No items found</h3>
+            <p>Try adjusting your search</p>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal" th:attr="data-type=${type}">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="modal-title" th:text="|Edit ${itemType}|">Edit Item</h3>
+
+                <form id="edit-form" th:action="@{/admin/{type}(type=${type})}" method="post">
+                    <input type="hidden" name="type" th:value="${type}">
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="id" id="edit-id">
+
+                    <div class="form-group">
+                        <label for="edit-name">Name:</label>
+                        <input type="text" id="edit-name" name="name" required>
+                    </div>
+
+                    <!-- Media Type Selection for Edit (only for genres) -->
+                    <div th:if="${type == 'genres'}" class="form-group">
+                        <label>Applicable To:</label>
+                        <div id="edit-media-types" class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="mediaTypes" value="movie">
+                                <span>🎬 Movies</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="mediaTypes" value="book">
+                                <span>📚 Books</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="mediaTypes" value="show">
+                                <span>📺 Shows</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="mediaTypes" value="shared">
+                                <span>🌐 Shared</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                        <button type="submit" class="btn-save">💾 Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content modal-danger">
+            <div class="modal-body">
+                <h3 class="modal-title-danger">⚠️ Confirm Deletion</h3>
+
+                <div class="warning-box">
+                    <p>Are you sure you want to delete <strong id="delete-name">-</strong>?</p>
+                    <p class="warning-text">⚠️ This action cannot be undone.</p>
+                </div>
+
+                <form id="delete-form" th:action="@{/admin/{type}(type=${type})}" method="post">
+                    <input type="hidden" name="type" th:value="${type}">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="id" id="delete-id">
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                        <button type="submit" class="btn-delete-confirm">🗑️ Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+</main>
+
+<th:block layout:fragment="scripts">
+    <script type="module" th:src="@{/js/pages/admin/managementScripts.js}"></script>
+</th:block>
+</body>
+</html>

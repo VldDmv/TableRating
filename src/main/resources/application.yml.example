@@ -1,0 +1,124 @@
+# Spring Boot Application Configuration
+spring:
+  application:
+    name: TableRating
+
+  # DataSource Configuration
+  datasource:
+    url: jdbc:mysql://localhost:3306/your_db_name
+    username: your_username
+    password: your_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    # HikariCP Connection Pool
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # JPA/Hibernate Configuration
+  jpa:
+    show-sql: false
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Thymeleaf — cache enabled in production
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: true
+    check-template: true
+    check-template-location: true
+
+  # Static Resources
+  web:
+    resources:
+      static-locations: classpath:/static/
+
+  # Session Configuration
+  session:
+    timeout: 30m
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    session:
+      timeout: 30m
+      cookie:
+        http-only: true
+        secure: false  # set true in production with HTTPS
+
+# Logging
+logging:
+  level:
+    root: INFO
+    org.criticizer: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Application-specific properties
+app:
+  pagination:
+    default-page-size: 10
+    max-page-size: 100
+  security:
+    bcrypt-strength: 10
+
+---
+# Development Profile
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  jpa:
+    show-sql: true
+
+  thymeleaf:
+    cache: false
+
+logging:
+  level:
+    org.criticizer: DEBUG
+    org.springframework.security: DEBUG
+
+---
+# Production Profile
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  jpa:
+    show-sql: false
+
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true
+        same-site: strict
+
+logging:
+  level:
+    root: WARN
+    org.criticizer: INFO

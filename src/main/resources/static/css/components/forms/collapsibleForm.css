@@ -1,0 +1,211 @@
+/**
+ * Collapsible Form Styles
+ */
+
+/* ============================================
+   COLLAPSIBLE FORM WRAPPER
+   ============================================ */
+.collapsible-form-wrapper {
+    max-width: 800px;
+    margin: var(--spacing-3xl) auto var(--spacing-xl) auto;
+    background-color: var(--color-bg-primary);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+}
+
+.collapsible-form-wrapper:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.collapsible-form-wrapper.expanded {
+    box-shadow: var(--shadow-xl);
+}
+
+/* ============================================
+   TOGGLE BUTTON CONTAINER
+   ============================================ */
+.collapsible-form-toggle-container {
+    padding: var(--spacing-md);
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.collapsible-form-wrapper.expanded .collapsible-form-toggle-container {
+    border-bottom-color: var(--color-gray-200);
+}
+
+/* ============================================
+   TOGGLE BUTTON
+   ============================================ */
+.collapsible-form-toggle-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: linear-gradient(135deg, var(--category-color, var(--color-primary)) 0%, var(--category-color-dark, var(--color-primary-hover)) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.collapsible-form-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.collapsible-form-toggle-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.collapsible-form-toggle-btn.expanded {
+    background: var(--color-gray-600);
+}
+
+.collapsible-form-toggle-btn.expanded:hover {
+    background: var(--color-gray-700);
+}
+
+/* ============================================
+   TOGGLE BUTTON ICON & TEXT
+   ============================================ */
+.toggle-icon {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+
+.collapsible-form-toggle-btn.expanded .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.toggle-text {
+    font-size: var(--font-size-lg);
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   FORM CONTENT
+   ============================================ */
+.collapsible-form-content {
+    overflow: hidden;
+    transition: height 0.3s ease-out;
+}
+
+.collapsible-form-content form {
+    padding: var(--spacing-xl);
+    margin: 0;
+    box-shadow: none;
+    background: transparent;
+    scroll-margin-top: 0;
+}
+
+/* ============================================
+   CATEGORY-SPECIFIC BUTTON COLORS
+   ============================================ */
+
+/* Games */
+.games-page .collapsible-form-toggle-btn {
+    background: linear-gradient(135deg, var(--color-games) 0%, var(--color-games-dark) 100%);
+}
+
+.games-page .collapsible-form-toggle-btn:hover {
+    background: linear-gradient(135deg, var(--color-games-dark) 0%, var(--color-games) 100%);
+}
+
+/* Movies */
+.movies-page .collapsible-form-toggle-btn {
+    background: linear-gradient(135deg, var(--color-movies) 0%, var(--color-movies-dark) 100%);
+}
+
+.movies-page .collapsible-form-toggle-btn:hover {
+    background: linear-gradient(135deg, var(--color-movies-dark) 0%, var(--color-movies) 100%);
+}
+
+/* Books */
+.books-page .collapsible-form-toggle-btn {
+    background: linear-gradient(135deg, var(--color-books-alt) 0%, var(--color-books-alt-dark) 100%);
+}
+
+.books-page .collapsible-form-toggle-btn:hover {
+    background: linear-gradient(135deg, var(--color-books-alt-dark) 0%, var(--color-books-alt) 100%);
+}
+
+/* Shows */
+.shows-page .collapsible-form-toggle-btn {
+    background: linear-gradient(135deg, var(--color-shows) 0%, var(--color-shows-dark) 100%);
+}
+
+.shows-page .collapsible-form-toggle-btn:hover {
+    background: linear-gradient(135deg, var(--color-shows-dark) 0%, var(--color-shows) 100%);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .collapsible-form-wrapper {
+        margin: var(--spacing-2xl) auto var(--spacing-lg) auto;
+    }
+
+    .collapsible-form-toggle-btn {
+        font-size: var(--font-size-base);
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    .toggle-icon {
+        font-size: 20px;
+    }
+
+    .collapsible-form-content form {
+        padding: var(--spacing-lg);
+    }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.collapsible-form-wrapper.expanded .collapsible-form-content form {
+    animation: slideDown 0.3s ease-out;
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+.collapsible-form-toggle-btn:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .collapsible-form-content,
+    .toggle-icon,
+    .collapsible-form-toggle-btn {
+        transition: none;
+    }
+
+    .collapsible-form-wrapper.expanded .collapsible-form-content form {
+        animation: none;
+    }
+}

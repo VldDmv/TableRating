@@ -1,8 +1,0 @@
-<%-- Reusable navigation link fragment --%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
-<div class="navigation-link-container">
-    <a href="${pageContext.request.contextPath}${backLink}" class="back-to-dashboard-link">
-        &laquo; ${backLinkText}
-    </a>
-</div>

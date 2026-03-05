@@ -1,5 +1,5 @@
 import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals';
-import { ItemFormManager } from '../../../../../main/webapp/js/tableScripts/items/itemForm.js';
+import { ItemFormManager } from '@/tableScripts/items/itemForm.js';
 
 describe('ItemFormManager', () => {
     let formManager;
@@ -10,9 +10,8 @@ describe('ItemFormManager', () => {
     beforeEach(() => {
         formElement = document.createElement('form');
         scoreInput = document.createElement('input');
-        scoreInput.type = 'number';
+        scoreInput.type = 'text';
         scoreInput.name = 'gameScore';
-      scoreInput.type = 'text';
 
         const nameInput = document.createElement('input');
         nameInput.type = 'text';

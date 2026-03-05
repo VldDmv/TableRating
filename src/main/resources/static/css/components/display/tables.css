@@ -1,0 +1,635 @@
+
+/* ============================================
+   BASE TABLE - AUTO LAYOUT
+   ============================================ */
+table {
+  border-collapse: collapse;
+  width: var(--table-width-default);
+  background: var(--color-bg-primary);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--border-radius-xl);
+  overflow: hidden;
+  margin: var(--spacing-xl) auto;
+  table-layout: auto;
+}
+
+/* ============================================
+   COVER COLUMN
+   ============================================ */
+.col-cover,
+th.col-cover {
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+  text-align: center;
+  padding: 8px;
+  vertical-align: middle;
+}
+
+[data-hidden-columns~="cover"] .col-cover,
+[data-hidden-columns~="cover"] th.col-cover {
+  display: none;
+  width: 0;
+  min-width: 0;
+  max-width: 0;
+  padding: 0;
+  border: none;
+}
+
+/* ============================================
+   COLUMN WIDTHS
+   ============================================ */
+
+.col-name,
+th.col-name {
+  width: auto;
+  min-width: 150px;
+}
+
+.col-score,
+th.col-score {
+  width: 140px;
+  min-width: 140px;
+  text-align: center;
+}
+.col-score input[type="number"] {
+    width: 60px;
+    padding: 4px;
+    text-align: center;
+    margin-right: 5px;
+}
+
+.col-tags,
+th.col-tags,
+.col-genres,
+th.col-genres {
+  width: 30%;
+  min-width: 120px;
+}
+
+.col-completed,
+th.col-completed {
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
+  text-align: center;
+}
+
+.col-actions,
+th.col-actions {
+  width: 140px;
+  min-width: 140px;
+  max-width: 140px;
+  text-align: center;
+}
+
+/* ============================================
+   COVER THUMBNAIL
+   ============================================ */
+.cover-thumbnail {
+  width: 40px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: block;
+  margin: 0 auto;
+}
+
+.cover-thumbnail:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+/* ============================================
+   COVER PLACEHOLDER
+   ============================================ */
+.cover-placeholder {
+  width: 40px;
+  height: 56px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+  opacity: 0.7;
+  margin: 0 auto;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cover-placeholder:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ============================================
+   COVER MODAL
+   ============================================ */
+.cover-modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.cover-modal-content {
+  position: relative;
+  margin: 3% auto;
+  max-width: 90%;
+  text-align: center;
+}
+
+.cover-modal-image {
+  max-width: 90vw;
+  max-height: 85vh;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+  animation: zoomIn 0.3s ease-out;
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.cover-modal-title {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.cover-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  color: white;
+  font-size: 48px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  z-index: 10001;
+}
+
+.cover-modal-close:hover {
+  color: #ff4444;
+  transform: scale(1.2);
+}
+
+/* ============================================
+   TABLE HEADERS
+   ============================================ */
+th {
+  padding: var(--spacing-lg) var(--spacing-md);
+  border-bottom: var(--border-width-medium) solid var(--color-border-medium);
+  text-align: center;
+  vertical-align: middle;
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-gray-700);
+  color: var(--color-text-inverse);
+}
+
+th[data-column-key] {
+  cursor: pointer;
+  user-select: none;
+  transition: var(--transition-colors);
+}
+
+th[data-column-key]:hover {
+  background-color: var(--color-gray-800);
+}
+
+/* ============================================
+   TABLE CELLS
+   ============================================ */
+td {
+  padding: var(--spacing-lg) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-border-medium);
+  text-align: center;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ============================================
+   SPECIAL COLUMNS
+   ============================================ */
+td.col-name {
+  font-size: var(--font-size-lg);
+  text-align: center;
+  font-weight: var(--font-weight-bold);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.col-actions {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.action-buttons-group {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   TAGS/GENRES COLUMN
+   ============================================ */
+.col-tags,
+.col-genres {
+  overflow-y: auto;
+  max-height: 80px;
+  text-align: center;
+  padding: var(--spacing-sm);
+}
+
+.col-tags::-webkit-scrollbar,
+.col-genres::-webkit-scrollbar {
+  width: 4px;
+}
+
+.col-tags::-webkit-scrollbar-track,
+.col-genres::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.col-tags::-webkit-scrollbar-thumb,
+.col-genres::-webkit-scrollbar-thumb {
+  background: var(--color-gray-400);
+  border-radius: var(--border-radius-sm);
+}
+
+.col-tags .tag-badge,
+.col-genres .tag-badge {
+  margin: 2px;
+  display: inline-block;
+}
+
+/* ============================================
+   SCORE STYLING
+   ============================================ */
+.score-cell {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-inverse);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-circle);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--score-badge-size);
+  height: var(--score-badge-size);
+  box-sizing: border-box;
+}
+
+.score-low {
+  background-color: var(--color-score-low);
+}
+
+.score-medium {
+  background-color: var(--color-score-medium);
+  color: var(--color-warning-text);
+}
+
+.score-high {
+  background-color: var(--color-score-high);
+}
+
+/* ============================================
+   ROW STATES
+   ============================================ */
+tbody tr {
+  transition: var(--transition-colors);
+}
+
+tbody tr:hover {
+  background-color: var(--color-gray-50);
+}
+
+tr.save-error td {
+  background-color: #fee;
+  border-color: #f5c6cb;
+}
+
+/* ============================================
+   COLUMN VISIBILITY
+   ============================================ */
+
+/* Tags */
+[data-hidden-columns~="tags"] .col-tags,
+[data-hidden-columns~="tags"] th.col-tags {
+  display: none;
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  border: none;
+}
+
+/* Genres */
+[data-hidden-columns~="genres"] .col-genres,
+[data-hidden-columns~="genres"] th.col-genres {
+  display: none;
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  border: none;
+}
+
+/* Completed */
+[data-hidden-columns~="completed"] .col-completed,
+[data-hidden-columns~="completed"] th.col-completed {
+  display: none;
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  border: none;
+}
+
+/* Actions */
+[data-hidden-columns~="actions"] .col-actions,
+[data-hidden-columns~="actions"] th.col-actions {
+  display: none;
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  border: none;
+}
+
+/* ============================================
+   PROFILE TABLE
+   ============================================ */
+.profile-table {
+  width: var(--table-width-profile);
+  table-layout: auto;
+}
+
+.profile-table .col-name,
+.profile-table th.col-name {
+  width: auto;
+}
+
+.profile-table .col-tags,
+.profile-table th.col-tags,
+.profile-table .col-genres,
+.profile-table th.col-genres {
+  width: 30%;
+}
+
+.profile-table .col-score,
+.profile-table th.col-score {
+  width: 90px;
+}
+
+.profile-table .col-completed,
+.profile-table th.col-completed {
+  width: 100px;
+}
+
+/* ============================================
+   COLUMN CONTROLS
+   ============================================ */
+.column-controls {
+  margin: var(--spacing-lg) 0;
+  padding: var(--spacing-md);
+  background-color: var(--color-gray-100);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+}
+
+#column-toggle-container {
+  display: flex;
+  gap: var(--spacing-xl);
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#column-toggle-container label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: var(--spacing-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.column-controls-title {
+  font-weight: var(--font-weight-bold);
+  margin-right: var(--spacing-md);
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.table-empty-state {
+  text-align: center;
+  padding: var(--spacing-4xl);
+  color: var(--color-text-secondary);
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+.loading-text {
+  text-align: center;
+  padding: var(--spacing-4xl);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+}
+
+/* ============================================
+   USER LIST TABLE
+   ============================================ */
+.user-list-table {
+  width: 80%;
+  max-width: 800px;
+  table-layout: auto;
+}
+
+.user-list-table th,
+.user-list-table td {
+  text-align: left;
+  padding: var(--spacing-lg);
+}
+
+.view-profile-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: var(--transition-colors);
+}
+
+.view-profile-link:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+/* ============================================
+   RESPONSIVE TABLES
+   ============================================ */
+@media (max-width: 768px) {
+  table {
+    width: 95%;
+    font-size: var(--font-size-sm);
+  }
+
+  th, td {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .col-cover,
+  th.col-cover {
+    display: none;
+    width: 0;
+    min-width: 0;
+    padding: 0;
+    border: none;
+  }
+
+  .col-name,
+  th.col-name {
+    width: auto;
+  }
+
+  .col-score,
+  th.col-score {
+    width: 70px;
+    min-width: 70px;
+  }
+
+  .col-completed,
+  th.col-completed {
+    width: 80px;
+  }
+
+  .col-actions,
+  th.col-actions {
+    width: 120px;
+  }
+
+  td.col-name,
+  th.col-name {
+    font-size: var(--font-size-base);
+  }
+
+  .score-cell {
+    width: 32px;
+    height: 32px;
+    font-size: var(--font-size-sm);
+  }
+
+  .col-tags,
+  th.col-tags,
+  .col-genres,
+  th.col-genres {
+    display: none;
+    width: 0;
+    padding: 0;
+    border: none;
+  }
+
+  .action-buttons-group {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .cover-modal-close {
+    top: 10px;
+    right: 20px;
+    font-size: 36px;
+  }
+
+  .cover-modal-image {
+    max-width: 95vw;
+    max-height: 80vh;
+  }
+
+  .cover-modal-title {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .action-buttons-group button {
+    width: 100%;
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .col-actions,
+  th.col-actions {
+    width: 100px;
+  }
+
+  .col-name,
+  th.col-name {
+    width: auto;
+  }
+}
+/* ============================================
+   COVER MODAL EDIT BUTTON
+   ============================================ */
+.cover-modal-edit-btn {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  z-index: 10002;
+}
+
+.cover-modal-edit-btn:hover {
+  transform: translateX(-50%) translateY(-3px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.cover-modal-edit-btn:active {
+  transform: translateX(-50%) translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+  .cover-modal-edit-btn {
+    bottom: 20px;
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}

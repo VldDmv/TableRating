@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf_token" th:content="${_csrf.token}">
+
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Criticizer</title>
+
+    <script>
+        (function() {
+            const theme = localStorage.getItem('preferred-theme') || 'light';
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+
+    <th:block layout:fragment="styles"></th:block>
+</head>
+<body th:class="${entityType != null ? entityType + '-page' : ''}">
+
+<div th:replace="~{fragments/fragments :: header}"></div>
+
+
+<div th:replace="~{fragments/fragments :: flashMessages}"></div>
+
+<!-- Main Content -->
+<main layout:fragment="content">
+    <!-- Page content goes here -->
+</main>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const rootElement = document.documentElement;
+        const themeKey = 'preferred-theme';
+
+
+        const savedTheme = localStorage.getItem(themeKey) || 'light';
+        if (savedTheme === 'dark') {
+            rootElement.setAttribute('data-theme', 'dark');
+        } else {
+            rootElement.removeAttribute('data-theme');
+        }
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = rootElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+                if (newTheme === 'dark') {
+                    rootElement.setAttribute('data-theme', 'dark');
+                } else {
+                    rootElement.removeAttribute('data-theme');
+                }
+
+                localStorage.setItem(themeKey, newTheme);
+
+            });
+        }
+    });
+</script>
+
+<th:block layout:fragment="scripts"></th:block>
+</body>
+</html>

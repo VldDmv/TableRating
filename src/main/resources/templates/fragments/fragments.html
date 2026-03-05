@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+<head>
+    <title>Fragments</title>
+</head>
+<body>
+
+<!-- ========================================
+     FRAGMENT: Header
+     ======================================== -->
+<header th:fragment="header" class="main-header" sec:authorize="isAuthenticated()">
+    <div class="header-left">
+    </div>
+
+    <div class="header-right">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <div class="theme-toggle-slider">
+                <span class="theme-toggle-icon-sun">☀️</span>
+                <span class="theme-toggle-icon-moon">🌙</span>
+            </div>
+        </button>
+
+        <div class="user-menu">
+            <button id="user-menu-button" class="user-menu-button">
+                <span class="user-name-display" sec:authentication="name">Username</span>
+                <div class="avatar-circle">
+                    <span th:text="${#strings.substring(#authentication.name, 0, 1)}">U</span>
+                </div>
+            </button>
+            <div id="user-menu-dropdown" class="dropdown-menu">
+                <a th:href="@{/profile(username=${#authentication.name})}">My Profile</a>
+                <form th:action="@{/logout}" method="post" class="logout-form">
+                    <button type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/shared/header.js}"></script>
+</header>
+
+
+<!-- ========================================
+     FRAGMENT: Flash Messages
+     ======================================== -->
+<div th:fragment="flashMessages">
+    <!-- Error Message -->
+    <div th:if="${session.flashErrorMessage}" class="flash-error-message">
+        <span th:text="${session.flashErrorMessage}">Error message</span>
+        <span th:remove="all" th:text="${#session.removeAttribute('flashErrorMessage')}"></span>
+    </div>
+
+    <!-- Success Message -->
+    <div th:if="${session.flashSuccessMessage}" class="flash-success-message">
+        <span th:text="${session.flashSuccessMessage}">Success message</span>
+        <span th:remove="all" th:text="${#session.removeAttribute('flashSuccessMessage')}"></span>
+    </div>
+</div>
+
+
+<!-- ========================================
+     FRAGMENT: Navigation Link
+     ======================================== -->
+<div th:fragment="navigation(backLink, backLinkText)" class="navigation-link-container">
+    <a th:href="@{${backLink}}" class="back-to-dashboard-link">
+        &laquo; <span th:text="${backLinkText}">Back</span>
+    </a>
+</div>
+
+
+<!-- ========================================
+     FRAGMENT: Tag/Genre Selector
+     Parameters:
+     - title: Section title (e.g., "Tags" or "Genres")
+     - items: List of selectable items
+     - paramName: Form parameter name
+     ======================================== -->
+<div th:fragment="selector(title, items, paramName)" class="tag-selection-container">
+    <h4>
+        <span th:text="${title}">Items</span>:
+        <button type="button" id="toggle-tags-btn" class="toggle-btn">[-]</button>
+    </h4>
+    <div class="tags-checkbox-container">
+        <label th:each="item : ${items}" class="tag-checkbox-label">
+            <input type="checkbox"
+                   th:name="${paramName}"
+                   th:value="${item.id}">
+            <span th:text="${item.name}">Item name</span>
+        </label>
+    </div>
+</div>
+
+
+<!-- ========================================
+     FRAGMENT: Empty State
+     ======================================== -->
+<div th:fragment="emptyState(message)" class="empty-state">
+    <p th:text="${message}">No items found.</p>
+</div>
+
+
+<!-- ========================================
+     FRAGMENT: Loading Spinner
+     ======================================== -->
+<div th:fragment="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+</div>
+
+
+<!-- ========================================
+     FRAGMENT: Pagination Controls
+     Parameters:
+     - currentPage: Current page number
+     - totalPages: Total number of pages
+     - baseUrl: Base URL for pagination links
+     - searchTerm: Optional search parameter
+     ======================================== -->
+<div th:fragment="pagination(currentPage, totalPages, baseUrl, searchTerm)" class="pagination">
+    <!-- Previous Button -->
+    <a th:if="${currentPage > 1}"
+       th:href="@{${baseUrl}(page=${currentPage - 1}, search=${searchTerm})}">&laquo; Previous</a>
+    <span th:unless="${currentPage > 1}" class="disabled">&laquo; Previous</span>
+
+    <!-- Page Info -->
+    <span th:text="|Page ${currentPage} of ${totalPages}|">Page 1 of 10</span>
+
+    <!-- Next Button -->
+    <a th:if="${currentPage < totalPages}"
+       th:href="@{${baseUrl}(page=${currentPage + 1}, search=${searchTerm})}">Next &raquo;</a>
+    <span th:unless="${currentPage < totalPages}" class="disabled">Next &raquo;</span>
+</div>
+
+
+<!-- ========================================
+     FRAGMENT: Admin Navigation
+     ======================================== -->
+<nav th:fragment="adminNav" class="admin-nav">
+    <a th:href="@{/admin/dashboard}">Dashboard</a>
+    <a th:href="@{/admin/users}">Manage Users</a>
+    <a th:href="@{/admin/management(type='tags')}">Manage Tags</a>
+    <a th:href="@{/admin/management(type='genres')}">Manage Genres</a>
+</nav>
+
+
+<!-- ========================================
+     FRAGMENT: Meta Tags (for SEO/sharing)
+     ======================================== -->
+<head th:fragment="meta(title, description)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Page Title</title>
+    <meta name="description" th:content="${description}">
+    <meta name="_csrf_token" th:content="${_csrf.token}">
+</head>
+
+</body>
+</html>

@@ -1,0 +1,303 @@
+/**
+ * Card Inline Edit Styles
+ */
+
+/* ============================================
+   CARD EDIT MODE
+   ============================================ */
+
+.media-card.is-editing {
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    transform: scale(1.02);
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg,
+        var(--color-bg-primary) 0%,
+        var(--color-bg-secondary) 100%);
+}
+
+[data-theme="dark"] .media-card.is-editing {
+    border-color: var(--color-primary-light);
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================
+   CARD EDIT FORM
+   ============================================ */
+
+.card-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs) 0;
+}
+
+.card-edit-field {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: var(--spacing-xs);
+    align-items: center;
+}
+
+.card-edit-field label {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-secondary);
+    text-align: right;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-edit-field input {
+    padding: 6px 10px;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-sm);
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    transition: all 0.2s ease;
+}
+
+.card-edit-field input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+    transform: translateY(-1px);
+}
+
+[data-theme="dark"] .card-edit-field input {
+    background-color: var(--color-bg-tertiary);
+    border-color: var(--color-border-medium);
+}
+
+/* ============================================
+   TAGS EDIT SECTION
+   ============================================ */
+
+.card-edit-field.tags-field {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xs);
+}
+
+.card-edit-field.tags-field label {
+    text-align: left;
+    margin-bottom: 0;
+}
+
+.edit-tags-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 32px;
+    padding: 6px;
+    background-color: var(--color-bg-secondary);
+    border: 1px dashed var(--color-border-medium);
+    border-radius: var(--border-radius-sm);
+    align-items: center;
+}
+
+[data-theme="dark"] .edit-tags-display {
+    background-color: var(--color-bg-quaternary);
+}
+
+.edit-tags-display .tag-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+}
+
+.edit-tags-display .no-tags-text {
+    color: var(--color-text-tertiary);
+    font-size: 11px;
+    font-style: italic;
+}
+
+/* ============================================
+   EDIT TAGS BUTTON
+   ============================================ */
+
+.edit-tags-btn {
+    padding: 4px 8px;
+    background-color: transparent;
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--border-radius-sm);
+    font-size: 11px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.edit-tags-btn:hover {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+/* ============================================
+   CARD EDIT ACTIONS
+   ============================================ */
+
+.card-edit-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: var(--spacing-sm);
+}
+
+.save-edit-btn,
+.cancel-edit-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 12px;
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.save-edit-btn {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(0, 128, 0, 0.3);
+    font-weight: 700;
+}
+
+.save-edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 128, 0, 0.4);
+}
+
+.save-edit-btn:active {
+    transform: translateY(0);
+}
+
+.cancel-edit-btn {
+    background: var(--color-gray-200);
+    color: var(--color-text-secondary);
+}
+
+.cancel-edit-btn:hover {
+    background: var(--color-gray-300);
+    transform: translateY(-2px);
+}
+
+[data-theme="dark"] .cancel-edit-btn {
+    background-color: var(--color-gray-700);
+    color: var(--color-text-secondary);
+}
+
+[data-theme="dark"] .cancel-edit-btn:hover {
+    background-color: var(--color-gray-600);
+}
+
+/* ============================================
+   COVER PREVIEW IN EDIT MODE
+   ============================================ */
+
+.media-card.is-editing .card-cover {
+    opacity: 0.8;
+    position: relative;
+}
+
+.media-card.is-editing .card-cover::after {
+    content: 'Editing...';
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.media-card.is-editing .card-cover-image,
+.media-card.is-editing .card-cover-placeholder {
+    pointer-events: none;
+    filter: brightness(0.9);
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+
+.card-edit-actions.loading .save-edit-btn {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.card-edit-actions.loading .save-edit-btn::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid white;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.6s linear infinite;
+    margin-left: 6px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 520px) {
+    .card-edit-field {
+        grid-template-columns: 1fr;
+    }
+
+    .card-edit-field label {
+        text-align: left;
+    }
+
+    .card-edit-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .media-card.is-editing {
+        transform: scale(1);
+    }
+}
+
+/* ============================================
+   SMOOTH TRANSITIONS
+   ============================================ */
+
+.media-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-edit-field input,
+.edit-tags-btn,
+.save-edit-btn,
+.cancel-edit-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   FOCUS VISIBLE FOR ACCESSIBILITY
+   ============================================ */
+
+.save-edit-btn:focus-visible,
+.cancel-edit-btn:focus-visible,
+.edit-tags-btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}

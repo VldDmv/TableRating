@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}"
+      lang="en">
+<head>
+    <title>User Management</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/pages/admin/admin.css}">
+</head>
+
+<body class="admin-page">
+<main layout:fragment="content">
+    <!-- Admin Navigation -->
+    <nav class="admin-nav">
+        <a th:href="@{/admin/dashboard}">Dashboard</a>
+        <a th:href="@{/admin/users}" class="active">Manage Users</a>
+        <a th:href="@{/admin/management(type='tags')}">Manage Tags</a>
+        <a th:href="@{/admin/management(type='genres')}">Manage Genres</a>
+    </nav>
+
+    <div class="container">
+        <div class="admin-header">
+            <h1>User Management</h1>
+            <p class="admin-subtitle">Manage user roles and permissions</p>
+        </div>
+
+        <!-- Search & View Controls -->
+        <div class="admin-controls">
+            <!-- Live Search -->
+            <div class="admin-search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text"
+                       id="liveSearch"
+                       placeholder="Search users by name..."
+                       th:value="${searchTerm}"
+                       autocomplete="off">
+            </div>
+
+            <!-- View Toggle -->
+            <div class="view-toggle">
+                <button id="cardsViewBtn" class="view-btn active" title="Cards View">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                </button>
+                <button id="tableViewBtn" class="view-btn" title="Table View">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="8" y1="6" x2="21" y2="6"/>
+                        <line x1="8" y1="12" x2="21" y2="12"/>
+                        <line x1="8" y1="18" x2="21" y2="18"/>
+                        <line x1="3" y1="6" x2="3.01" y2="6"/>
+                        <line x1="3" y1="12" x2="3.01" y2="12"/>
+                        <line x1="3" y1="18" x2="3.01" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="users-stats">
+            <div class="stat-badge">
+                <span class="stat-badge-icon">👥</span>
+                <span class="stat-badge-value" id="totalUsersCount" th:text="${totalUsers ?: '0'}">6</span>
+                <span class="stat-badge-label">Total Users</span>
+            </div>
+            <div class="stat-badge">
+                <span class="stat-badge-icon">👑</span>
+                <span class="stat-badge-value" id="adminCount">-</span>
+                <span class="stat-badge-label">Admins</span>
+            </div>
+        </div>
+
+        <!-- Cards View -->
+        <div id="usersCards" class="users-cards-grid">
+            <div th:each="user : ${userList}"
+                 class="user-card"
+                 th:classappend="${user.id == currentUserId} ? 'current-user' : ''"
+                 th:attr="data-user-id=${user.id},
+                          data-username=${user.name},
+                          data-role=${user.role}">
+
+                <!-- Avatar -->
+                <div class="user-card-avatar" th:attr="data-username=${user.name}">
+                    <span th:text="${#strings.substring(user.name, 0, 1).toUpperCase()}">T</span>
+                </div>
+
+                <!-- Current User Badge -->
+                <span th:if="${user.id == currentUserId}" class="current-badge">You</span>
+
+                <!-- User Info -->
+                <div class="user-card-body">
+                    <h3 class="user-card-name" th:text="${user.name}">Username</h3>
+                    <span class="role-badge"
+                          th:classappend="${user.role == T(org.criticizer.entity.Role).ADMIN} ? 'role-admin' : 'role-user'"
+                          th:text="${user.role}">USER</span>
+                </div>
+
+                <!-- Actions -->
+                <div class="user-card-actions" th:if="${user.id != currentUserId}">
+                    <button class="btn-edit"
+                            th:data-user-id="${user.id}"
+                            onclick="editUser(this.dataset.userId)">
+                        ✏️ Edit Role
+                    </button>
+                    <button class="btn-delete"
+                            th:data-user-id="${user.id}"
+                            th:data-username="${user.name}"
+                            onclick="deleteUser(this.dataset.userId, this.dataset.username)">
+                        🗑️ Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div id="usersTable" class="users-table-wrapper" style="display: none;">
+            <table class="admin-users-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Current Role</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${userList}"
+                    th:classappend="${user.id == currentUserId} ? 'current-admin-row' : ''">
+                    <td th:text="${user.id}">1</td>
+                    <td th:text="${user.name}">Username</td>
+                    <td>
+                        <span class="role-badge"
+                              th:classappend="${user.role == T(org.criticizer.entity.Role).ADMIN} ? 'role-admin' : 'role-user'"
+                              th:text="${user.role}">USER</span>
+                    </td>
+                    <td class="table-actions-cell">
+                        <div th:if="${user.id != currentUserId}">
+                            <button class="btn-edit-sm"
+                                    th:data-user-id="${user.id}"
+                                    onclick="editUser(this.dataset.userId)">
+                                Edit
+                            </button>
+                            <button class="btn-delete-sm"
+                                    th:data-user-id="${user.id}"
+                                    th:data-username="${user.name}"
+                                    onclick="deleteUser(this.dataset.userId, this.dataset.username)">
+                                Delete
+                            </button>
+                        </div>
+                        <span th:if="${user.id == currentUserId}" class="current-admin-badge">
+                            (Current Admin)
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">😔</div>
+            <h3>No users found</h3>
+            <p>Try adjusting your search criteria</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" th:if="${totalPages > 1}">
+            <a th:if="${currentPage > 1}"
+               th:href="@{/admin/users(page=${currentPage - 1}, search=${searchTerm})}">&laquo; Previous</a>
+            <span th:unless="${currentPage > 1}" class="disabled">&laquo; Previous</span>
+
+            <span class="page-info" th:text="'Page ' + ${currentPage} + ' of ' + ${totalPages}">Page 1 of 1</span>
+
+            <a th:if="${currentPage < totalPages}"
+               th:href="@{/admin/users(page=${currentPage + 1}, search=${searchTerm})}">Next &raquo;</a>
+            <span th:unless="${currentPage < totalPages}" class="disabled">Next &raquo;</span>
+        </div>
+    </div>
+
+    <!-- Edit Role Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form id="editRoleForm" th:action="@{/admin/changeRole}" method="post">
+                    <input type="hidden" id="editUserId" name="userId">
+
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <p id="editUsername" class="username-display">-</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Role:</label>
+                        <div class="role-selector">
+                            <label class="role-option">
+                                <input type="radio" name="newRole" value="USER" id="roleUser">
+                                <div class="role-option-content">
+                                    <span class="role-option-icon">👤</span>
+                                    <span class="role-option-title">USER</span>
+                                    <span class="role-option-desc">Standard user privileges</span>
+                                </div>
+                            </label>
+                            <label class="role-option">
+                                <input type="radio" name="newRole" value="ADMIN" id="roleAdmin">
+                                <div class="role-option-content">
+                                    <span class="role-option-icon">👑</span>
+                                    <span class="role-option-title">ADMIN</span>
+                                    <span class="role-option-desc">Full administrative access</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                        <button type="submit" class="btn-save">💾 Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content modal-danger">
+            <div class="modal-body">
+                <div class="warning-box">
+                    <p>Are you sure you want to delete user <strong id="deleteUsername">-</strong>?</p>
+                    <p class="warning-text">⚠️ This action cannot be undone. All user data will be permanently deleted.</p>
+                </div>
+                <form id="deleteUserForm" th:action="@{/admin/deleteUser}" method="post">
+                    <input type="hidden" id="deleteUserId" name="userId">
+                    <div class="modal-actions">
+                        <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                        <button type="submit" class="btn-delete-confirm">🗑️ Delete User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+</main>
+
+<th:block layout:fragment="scripts">
+    <script type="module" th:src="@{/js/pages/admin/adminUsers.js}"></script>
+</th:block>
+</body>
+</html>

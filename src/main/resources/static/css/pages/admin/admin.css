@@ -1,0 +1,15 @@
+/**
+ * Admin Pages - Main Import File
+ * This file imports all admin modules
+ *
+ * Structure:
+ * - base.css: Common admin styles (navigation, containers, controls, tables, modals)
+ * - dashboard.css: Dashboard stats and charts
+ * - management.css: User cards, table, edit/delete modals
+ * - tagsManage.css: Tags/genres management grid and forms
+ */
+
+@import 'base.css';
+@import 'adminDashboard.css';
+@import 'management.css';
+@import 'tagsManage.css';

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}"
+      lang="en">
+<head>
+    <title th:text="|${profileOwner.name}'s Profile|">Profile</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/pages/profile.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/pages/category.css}">
+</head>
+
+<body>
+<main layout:fragment="content">
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1 th:text="|${profileOwner.name}'s Profile|">Profile</h1>
+            <div th:replace="~{fragments/fragments :: navigation('/users', 'Back to Users')}"></div>
+        </div>
+
+        <!-- Privacy Settings (if owner) -->
+        <div th:if="${isOwnerViewing}" class="privacy-settings">
+            <h3>Profile Settings</h3>
+            <form th:action="@{/profile}" method="post" class="privacy-form" id="privacy-form">
+                <label class="privacy-toggle">
+                    <input type="checkbox"
+                           name="privacy"
+                           value="public"
+                           th:checked="${profileOwner.profileIsPublic}"
+                           id="privacy-checkbox">
+                    <span class="label-text">Make Profile Public</span>
+                </label>
+            </form>
+            <script>
+                document.getElementById('privacy-checkbox')?.addEventListener('change', function() {
+                    document.getElementById('privacy-form').submit();
+                });
+            </script>
+        </div>
+
+        <div th:if="${canView}">
+            <div class="profile-tabs">
+                <button class="tab-link active" data-category="games">Games</button>
+                <button class="tab-link" data-category="movies">Movies</button>
+                <button class="tab-link" data-category="books">Books</button>
+                <button class="tab-link" data-category="shows">Shows</button>
+            </div>
+
+            <div class="table-controls">
+                <label>Show:
+                    <select id="rowsPerPage">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </label>
+
+                <label>Search:
+                    <input type="text" id="searchBox" placeholder="Search...">
+                </label>
+
+                <label>
+                    <span id="filterLabel">Filter by Tag:</span>
+                    <select id="tagFilter">
+                        <option value="all">All</option>
+                    </select>
+                </label>
+
+                <div id="sort-controls" style="display: none; align-items: center; gap: 8px;">
+                    <label for="sortBySelect" style="margin: 0;">Sort by:</label>
+                    <select id="sortBySelect">
+                        <option value="name">Name</option>
+                        <option value="score">Score</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                    <button type="button" id="sortOrderBtn" title="Toggle sort order" class="sort-order-btn">
+                        <span class="sort-icon">↓</span>
+                    </button>
+                </div>
+                <div class="view-toggle-container">
+                    <label class="view-toggle-label">
+                        View:
+                        <div class="view-toggle-buttons">
+                            <button type="button" class="view-toggle-btn active" data-view="table" id="tableViewBtn" title="Table View">
+                                <span class="view-icon">📋</span>
+                                <span class="view-label">Table</span>
+                            </button>
+                            <button type="button" class="view-toggle-btn" data-view="cards" id="cardsViewBtn" title="Card View">
+                                <span class="view-icon">🎴</span>
+                                <span class="view-label">Cards</span>
+                            </button>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div id="tab-content-container" class="tab-content"></div>
+            <div id="cards-container" class="cards-grid" style="display: none;"></div>
+
+            <!--  Pagination Controls -->
+            <div class="pagination-controls-container" id="paginationContainer">
+                <div class="pagination-controls">
+                    <button id="prevPage" class="pagination-btn">«</button>
+
+                    <div class="relative-container">
+                        <button id="pageDropdown" class="pagination-btn">
+                            <span>Page 1 of 1</span>
+                        </button>
+                        <ul id="pageList" class="page-list"></ul>
+                    </div>
+
+                    <button id="nextPage" class="pagination-btn">»</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Private profile message -->
+        <div th:unless="${canView}" class="private-profile-message">
+            <h2>This Profile is Private</h2>
+            <p th:text="|${profileOwner.name} has chosen to keep their lists private.|"></p>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="scripts">
+    <script th:if="${canView}" th:inline="javascript">
+        /*<![CDATA[*/
+
+        window.profileConfig = {
+            username: /*[[${profileOwner.name}]]*/ 'user',
+            initialResult: /*[[${initialData}]]*/ {},
+            contextPath: /*[[@{/}]]*/ '',
+            entityType: 'games',
+            currentPage: /*[[${currentPage ?: 1}]]*/ 1,
+            totalPages: /*[[${totalPages ?: 1}]]*/ 1
+        };
+
+
+        window.allGameTags = /*[[${gameTags ?: {}}]]*/ [];
+        window.allMovieGenres = /*[[${movieGenres ?: {}}]]*/ [];
+        window.allBookGenres = /*[[${bookGenres ?: {}}]]*/ [];
+        window.allShowGenres = /*[[${showGenres ?: {}}]]*/ [];
+        /*]]>*/
+    </script>
+
+    <script th:if="${canView}" type="module" th:src="@{/js/pages/profileScripts.js}"></script>
+</th:block>
+</body>
+</html>
