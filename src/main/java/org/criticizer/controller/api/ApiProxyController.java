@@ -1,5 +1,6 @@
 package org.criticizer.controller.api;
 
+import org.criticizer.service.external.ExternalApiClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -10,20 +11,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/proxy")
 public class ApiProxyController {
 
     private static final Logger log = LoggerFactory.getLogger(ApiProxyController.class);
-    private final RestTemplate restTemplate;
+    private final ExternalApiClient externalApi;
 
-    public ApiProxyController(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public ApiProxyController(ExternalApiClient externalApi) {
+        this.externalApi = externalApi;
     }
 
     @GetMapping("/games")
@@ -85,19 +82,12 @@ public class ApiProxyController {
         }
 
         try {
-            String url = "https://openlibrary.org/search.json?" +
-                    "q=" + URLEncoder.encode(query, StandardCharsets.UTF_8) +
-                    "&limit=" + maxResults;
-
-            log.debug("[ApiProxy] Calling Open Library: {}", url);
-
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-
-            log.info("[ApiProxy] Open Library API success - status: {}", response.getStatusCode());
+            String body = externalApi.searchOpenLibrary(
+                    ExternalApiClient.normalize(query), maxResults);
 
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(response.getBody());
+                    .body(body);
 
         } catch (RestClientException e) {
             log.error("[ApiProxy] Open Library API error: {}", e.getMessage());
