@@ -79,6 +79,35 @@ app:
   security:
     bcrypt-strength: 10
 
+# Spring Boot Actuator — expose only health and info publicly
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: TableRating
+    description: Media collection tracker
+
+# OpenAPI / Swagger UI
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+
 ---
 # Development Profile
 spring:
