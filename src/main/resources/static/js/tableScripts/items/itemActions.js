@@ -38,6 +38,43 @@ export class ItemActionsManager {
                 this.handleEditClick(button);
             }
         });
+
+        this.tableBody.addEventListener('change', (event) => {
+            const select = event.target.closest('select.status-select');
+            if (select) this.handlePipelineChange(select);
+        });
+    }
+
+    async handlePipelineChange(select) {
+        const itemName = select.dataset.itemName;
+        if (!itemName) return;
+
+        const previous = select.dataset.previousValue || 'NONE';
+        const next = select.value;
+        const csrfToken = securityUtils.getCsrfToken();
+
+        try {
+            const url = `/api/${this.config.entityType}/${encodeURIComponent(itemName)}/pipeline`;
+            const response = await fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify({ status: next }),
+            });
+
+            if (!response.ok) {
+                const errorMsg = await ErrorHandler.parseErrorResponse(response);
+                throw new Error(errorMsg);
+            }
+
+            select.className = `status-select status-${next.toLowerCase()}`;
+            select.dataset.previousValue = next;
+        } catch (error) {
+            ErrorHandler.handle(error, 'Error updating status');
+            select.value = previous;
+        }
     }
 
     /**

@@ -29,6 +29,10 @@ public abstract class BaseEntity implements MediaEntity {
     @Column(name = "cover_url", length = 500)
     private String coverUrl;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private MediaStatus status = MediaStatus.NONE;
+
     protected BaseEntity() {
     }
 
@@ -96,5 +100,13 @@ public abstract class BaseEntity implements MediaEntity {
     @Override
     public void setCoverUrl(String coverUrl) {
         this.coverUrl = coverUrl;
+    }
+
+    public MediaStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(MediaStatus status) {
+        this.status = status == null ? MediaStatus.NONE : status;
     }
 }

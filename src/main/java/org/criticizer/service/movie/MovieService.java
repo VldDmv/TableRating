@@ -62,6 +62,7 @@ public class MovieService extends AbstractMediaService<Movie, MovieResponse> {
                 movie.getCoverUrl(),
                 movie.getScore(),
                 movie.isCompleted(),
+                movie.getStatus(),
                 genreResponses
         );
     }

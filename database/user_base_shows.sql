@@ -25,6 +25,7 @@ CREATE TABLE `shows` (
   `user_id` int NOT NULL,
   `score` int DEFAULT '0',
   `completed` tinyint(1) DEFAULT '0',
+  `status` varchar(20) NOT NULL DEFAULT 'NONE',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`name`),
   CONSTRAINT `shows_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
@@ -37,7 +38,7 @@ CREATE TABLE `shows` (
 
 LOCK TABLES `shows` WRITE;
 /*!40000 ALTER TABLE `shows` DISABLE KEYS */;
-INSERT INTO `shows` VALUES (15,'fdgfd53',NULL,39,12,0),(17,'`',NULL,40,11,1);
+INSERT INTO `shows` (`id`, `name`, `cover_url`, `user_id`, `score`, `completed`) VALUES (15,'fdgfd53',NULL,39,12,0),(17,'`',NULL,40,11,1);
 /*!40000 ALTER TABLE `shows` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

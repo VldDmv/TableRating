@@ -128,8 +128,8 @@ describe('TableRenderer.createRow()', () => {
         expect(row.dataset.originalTagIds).toBe('1,2');
     });
 
-    test('has 6 cells: cover, name, score, tags, completed, actions', () => {
-        expect(renderer.createRow(makeItem()).children.length).toBe(6);
+    test('has 7 cells: cover, name, score, tags, completed, status, actions', () => {
+        expect(renderer.createRow(makeItem()).children.length).toBe(7);
     });
 
     test('score cell contains a .score-cell span with the score', () => {

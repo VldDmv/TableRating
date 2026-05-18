@@ -1,6 +1,8 @@
 
 package org.criticizer.service.helper;
 
+import org.criticizer.entity.MediaStatus;
+
 /**
  * Marker interface for all media entities.
  * Enforces common contract for Game, Movie, Book, Show.
@@ -25,4 +27,8 @@ public interface MediaEntity {
     boolean isCompleted();
 
     void setCompleted(boolean completed);
+
+    MediaStatus getStatus();
+
+    void setStatus(MediaStatus status);
 }
