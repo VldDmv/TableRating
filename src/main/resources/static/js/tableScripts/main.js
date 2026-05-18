@@ -27,6 +27,7 @@ import { ItemFormManager } from './items/itemForm.js';
 import { UniversalAutocomplete } from './features/forms/categoryAutocomplete.js';
 import { CollapsibleForm } from './features/forms/collapsibleForm.js';
 import { TagChipsManager } from './features/forms/tagchipsManager.js';
+import { initImportExport } from './features/importExport.js';
 
 class CategoryPageController {
     constructor(config) {
@@ -547,6 +548,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         const app = new CategoryPageController(config);
         app.init();
+        initImportExport();
 
     } catch (error) {
         ErrorHandler.handle(error, 'Application initialization failed');

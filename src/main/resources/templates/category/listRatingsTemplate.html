@@ -88,6 +88,20 @@
         </label>
 
         <div id="column-toggle-container"></div>
+
+        <div class="io-controls">
+            <a class="btn btn--secondary"
+               th:href="@{|/api/export/${entityType}.csv|}"
+               th:title="|Export ${entityNamePlural} as CSV|">Export CSV</a>
+            <a class="btn btn--secondary"
+               th:href="@{|/api/export/${entityType}.json|}"
+               th:title="|Export ${entityNamePlural} as JSON|">Export JSON</a>
+            <label class="btn btn--secondary" th:for="|importFile-${entityType}|">
+                Import
+                <input type="file" th:id="|importFile-${entityType}|" class="import-file-input"
+                       accept=".csv,.json" th:data-category="${entityType}" hidden>
+            </label>
+        </div>
     </div>
 
     <table th:data-entity-type="${entityType}">

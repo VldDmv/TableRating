@@ -410,6 +410,19 @@ form[id^="add-"] button[type="submit"]:active {
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
+.io-controls {
+  display: inline-flex;
+  gap: 8px;
+  margin-left: auto;
+  align-items: center;
+}
+
+.io-controls .btn {
+  display: inline-block;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 /* ============================================
    DISABLE ANIMATIONS ON MOBILE
    ============================================ */
