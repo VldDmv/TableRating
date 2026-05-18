@@ -423,6 +423,35 @@ form[id^="add-"] button[type="submit"]:active {
   cursor: pointer;
 }
 
+.status-select {
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.status-select.status-wishlist  { background: #fff7d6; border-color: #e0c36b; }
+.status-select.status-backlog   { background: #e6f0ff; border-color: #6ba1e0; }
+.status-select.status-dropped   { background: #fde3e3; border-color: #d97a7a; }
+.status-select.status-none      { background: #f5f5f5; color: #888; }
+
+.status-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.status-wishlist { background: #fff7d6; color: #8a6d1b; }
+.status-badge.status-backlog  { background: #e6f0ff; color: #1f4f8b; }
+.status-badge.status-dropped  { background: #fde3e3; color: #8b2828; }
+
+.card-pipeline { margin: 4px 0 8px; }
+
 /* ============================================
    DISABLE ANIMATIONS ON MOBILE
    ============================================ */

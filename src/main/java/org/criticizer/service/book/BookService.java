@@ -62,6 +62,7 @@ public class BookService extends AbstractMediaService<Book, BookResponse> {
                 book.getCoverUrl(),
                 book.getScore(),
                 book.isCompleted(),
+                book.getStatus(),
                 genreResponses
         );
     }

@@ -62,6 +62,7 @@ public class GameService extends AbstractMediaService<Game, GameResponse> {
                 game.getCoverUrl(),
                 game.getScore(),
                 game.isCompleted(),
+                game.getStatus(),
                 tagResponses
         );
     }

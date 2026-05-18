@@ -2,6 +2,7 @@ package org.criticizer.dto.book;
 
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.entity.Book;
+import org.criticizer.entity.MediaStatus;
 
 import java.util.List;
 
@@ -15,15 +16,17 @@ public class BookResponse {
     private final String coverUrl;
     private final int score;
     private final boolean completed;
+    private final MediaStatus status;
     private final List<GenreResponse> genres;
 
     public BookResponse(int id, String name, String coverUrl, int score,
-                        boolean completed, List<GenreResponse> genres) {
+                        boolean completed, MediaStatus status, List<GenreResponse> genres) {
         this.id = id;
         this.name = name;
         this.coverUrl = coverUrl;
         this.score = score;
         this.completed = completed;
+        this.status = status == null ? MediaStatus.NONE : status;
         this.genres = genres != null ? List.copyOf(genres) : List.of();
     }
 
@@ -34,6 +37,7 @@ public class BookResponse {
                 book.getCoverUrl(),
                 book.getScore(),
                 book.isCompleted(),
+                book.getStatus(),
                 book.getGenres().stream()
                         .map(GenreResponse::from)
                         .toList()
@@ -58,6 +62,10 @@ public class BookResponse {
 
     public boolean isCompleted() {
         return completed;
+    }
+
+    public MediaStatus getStatus() {
+        return status;
     }
 
     public List<GenreResponse> getGenres() {
