@@ -1,4 +1,5 @@
 import { ToastService } from '../../shared/toast.js';
+import { securityUtils } from '../core/utils.js';
 
 /**
  * Wires the per-category import file input. Reads the selected file,
@@ -18,9 +19,9 @@ export function initImportExport() {
             const formData = new FormData();
             formData.append('file', file);
 
-            const csrfToken = readCookie('XSRF-TOKEN');
+            const csrfToken = securityUtils.getCsrfToken();
             const headers = {};
-            if (csrfToken) headers['X-XSRF-TOKEN'] = csrfToken;
+            if (csrfToken) headers[securityUtils.getCsrfHeader()] = csrfToken;
 
             try {
                 const response = await fetch(`/api/import/${category}`, {
@@ -53,9 +54,4 @@ export function initImportExport() {
             }
         });
     });
-}
-
-function readCookie(name) {
-    const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
-    return match ? decodeURIComponent(match[1]) : null;
 }
