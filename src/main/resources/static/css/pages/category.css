@@ -441,6 +441,74 @@ form[id^="add-"] button[type="submit"]:active {
 }
 
 /* ============================================
+   PROFILE STATS
+   ============================================ */
+.profile-stats {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.stats-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-pill {
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 4px 12px;
+  font-size: 13px;
+}
+
+.stats-empty {
+  color: #888;
+  font-style: italic;
+}
+
+.stats-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.stats-chart-box {
+  min-width: 0;
+}
+
+.stats-chart-box--wide {
+  grid-column: 1 / -1;
+}
+
+.stats-chart-box h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--color-text, #333);
+}
+
+.stats-chart-box canvas {
+  max-height: 240px;
+}
+
+[data-theme="dark"] .profile-stats {
+  background: #1e1e1e;
+}
+
+[data-theme="dark"] .stat-pill {
+  background: #2a2a2a;
+}
+
+@media (max-width: 768px) {
+  .stats-charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
    DISABLE ANIMATIONS ON MOBILE
    ============================================ */
 @media (max-width: 768px) {

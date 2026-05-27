@@ -286,6 +286,9 @@ function switchCategory(category) {
 
     // Load data
     loadCategoryData();
+
+    // Notify the stats panel so it can refresh for the new category
+    document.dispatchEvent(new CustomEvent('profile:categoryChanged', { detail: { category } }));
 }
 
 /**

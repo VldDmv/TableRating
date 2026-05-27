@@ -46,6 +46,24 @@
                 <button class="tab-link" data-category="shows">Shows</button>
             </div>
 
+            <section id="profile-stats" class="profile-stats">
+                <div class="stats-summary" id="statsSummary"></div>
+                <div class="stats-charts">
+                    <div class="stats-chart-box">
+                        <h4>Score distribution</h4>
+                        <canvas id="scoreDistChart"></canvas>
+                    </div>
+                    <div class="stats-chart-box">
+                        <h4>Completed</h4>
+                        <canvas id="completedChart"></canvas>
+                    </div>
+                    <div class="stats-chart-box stats-chart-box--wide">
+                        <h4>Average by category</h4>
+                        <canvas id="categoryAvgChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
             <div class="table-controls">
                 <label>Show:
                     <select id="rowsPerPage">
@@ -144,7 +162,9 @@
         /*]]>*/
     </script>
 
+    <script th:if="${canView}" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script th:if="${canView}" type="module" th:src="@{/js/pages/profileScripts.js}"></script>
+    <script th:if="${canView}" type="module" th:src="@{/js/pages/profileStats.js}"></script>
 </th:block>
 </body>
 </html>
