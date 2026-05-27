@@ -46,19 +46,19 @@ public class ExportService {
     @Transactional(readOnly = true)
     public List<ExportRow> exportItems(String category, Integer userId) {
         return switch (validateCategory(category)) {
-            case "games" -> gameRepository.findByUserId(userId).stream()
+            case "games" -> gameRepository.findByUserIdWithTags(userId).stream()
                     .map(this::toRow)
                     .sorted(Comparator.comparing(ExportRow::name, String.CASE_INSENSITIVE_ORDER))
                     .toList();
-            case "movies" -> movieRepository.findByUserId(userId).stream()
+            case "movies" -> movieRepository.findByUserIdWithGenres(userId).stream()
                     .map(this::toRow)
                     .sorted(Comparator.comparing(ExportRow::name, String.CASE_INSENSITIVE_ORDER))
                     .toList();
-            case "books" -> bookRepository.findByUserId(userId).stream()
+            case "books" -> bookRepository.findByUserIdWithGenres(userId).stream()
                     .map(this::toRow)
                     .sorted(Comparator.comparing(ExportRow::name, String.CASE_INSENSITIVE_ORDER))
                     .toList();
-            case "shows" -> showRepository.findByUserId(userId).stream()
+            case "shows" -> showRepository.findByUserIdWithGenres(userId).stream()
                     .map(this::toRow)
                     .sorted(Comparator.comparing(ExportRow::name, String.CASE_INSENSITIVE_ORDER))
                     .toList();

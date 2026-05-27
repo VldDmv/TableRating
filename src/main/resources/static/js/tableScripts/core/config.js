@@ -74,7 +74,7 @@ export const ENTITY_CONFIGS = {
         entityType:        'games',
         entityNameSingular:'Game',
         apiEndpoint:       '/api/category/games',
-        filterParamName:   'tag_id',
+        filterParamName:   'categoryId',
         selectors: {
             tableBody:  '#gamesBody',
             addForm:    '#add-game-form',
@@ -108,7 +108,7 @@ export const ENTITY_CONFIGS = {
         entityType:        'movies',
         entityNameSingular:'Movie',
         apiEndpoint:       'category',
-        filterParamName:   'genre_id',
+        filterParamName:   'categoryId',
         selectors: {
             tableBody:  '#moviesBody',
             addForm:    '#add-movie-form',
@@ -142,7 +142,7 @@ export const ENTITY_CONFIGS = {
         entityType:        'shows',
         entityNameSingular:'Show',
         apiEndpoint:       'category',
-        filterParamName:   'genre_id',
+        filterParamName:   'categoryId',
         selectors: {
             tableBody:  '#showsBody',
             addForm:    '#add-show-form',
@@ -176,7 +176,7 @@ export const ENTITY_CONFIGS = {
         entityType:        'books',
         entityNameSingular:'Book',
         apiEndpoint:       'category',
-        filterParamName:   'genre_id',
+        filterParamName:   'categoryId',
         selectors: {
             tableBody:  '#booksBody',
             addForm:    '#add-book-form',

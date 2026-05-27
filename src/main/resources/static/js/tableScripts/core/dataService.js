@@ -87,10 +87,6 @@ export class DataService {
             url.searchParams.set('maxScore', state.maxScore);
         }
 
-        if (state.completed != null && state.completed !== 'all') {
-            url.searchParams.set('completed', state.completed);
-        }
-
         return url;
     }
 

@@ -53,7 +53,7 @@ public class SecurityConfig {
                                                 + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
                                                 + "font-src 'self' https://fonts.gstatic.com data:; "
                                                 + "img-src 'self' data: https:; "
-                                                + "connect-src 'self' https://openlibrary.org https://api.rawg.io https://api.themoviedb.org; "
+                                                + "connect-src 'self' https://openlibrary.org https://api.rawg.io https://api.themoviedb.org https://cdn.jsdelivr.net; "
                                                 + "frame-ancestors 'self'; "
                                                 + "base-uri 'self'; "
                                                 + "form-action 'self'"
