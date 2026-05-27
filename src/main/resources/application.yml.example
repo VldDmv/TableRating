@@ -30,7 +30,7 @@ spring:
       hibernate:
         format_sql: true
 
-  # Thymeleaf — cache enabled in production
+  # Thymeleaf - cache enabled in production
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -79,7 +79,7 @@ app:
   security:
     bcrypt-strength: 10
 
-# Spring Boot Actuator — expose only health and info publicly
+# Spring Boot Actuator - expose only health and info publicly
 management:
   endpoints:
     web:
