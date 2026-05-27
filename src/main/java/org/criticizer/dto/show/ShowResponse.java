@@ -1,7 +1,6 @@
 package org.criticizer.dto.show;
 
 import org.criticizer.dto.genre.GenreResponse;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.Show;
 
 import java.util.List;
@@ -16,17 +15,15 @@ public class ShowResponse {
     private final String coverUrl;
     private final int score;
     private final boolean completed;
-    private final MediaStatus status;
     private final List<GenreResponse> genres;
 
     public ShowResponse(int id, String name, String coverUrl, int score,
-                        boolean completed, MediaStatus status, List<GenreResponse> genres) {
+                        boolean completed, List<GenreResponse> genres) {
         this.id = id;
         this.name = name;
         this.coverUrl = coverUrl;
         this.score = score;
         this.completed = completed;
-        this.status = status == null ? MediaStatus.NONE : status;
         this.genres = genres != null ? List.copyOf(genres) : List.of();
     }
 
@@ -37,7 +34,6 @@ public class ShowResponse {
                 show.getCoverUrl(),
                 show.getScore(),
                 show.isCompleted(),
-                show.getStatus(),
                 show.getGenres().stream()
                         .map(GenreResponse::from)
                         .toList()
@@ -62,10 +58,6 @@ public class ShowResponse {
 
     public boolean isCompleted() {
         return completed;
-    }
-
-    public MediaStatus getStatus() {
-        return status;
     }
 
     public List<GenreResponse> getGenres() {

@@ -5,7 +5,6 @@ import org.criticizer.dto.ioport.ImportResult;
 import org.criticizer.entity.Book;
 import org.criticizer.entity.Game;
 import org.criticizer.entity.Genre;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.Movie;
 import org.criticizer.entity.Show;
 import org.criticizer.entity.Tag;
@@ -124,9 +123,6 @@ public class ImportExportService {
                 if (row.completed()) {
                     toggleByName(cat, row.name(), userId);
                 }
-                if (row.status() != null && row.status() != MediaStatus.NONE) {
-                    setStatusByName(cat, row.name(), row.status(), userId);
-                }
                 imported++;
             } catch (Exception e) {
                 skipped++;
@@ -148,17 +144,6 @@ public class ImportExportService {
             case "movies" -> movieService.toggleStatus(name, userId);
             case "books" -> bookService.toggleStatus(name, userId);
             case "shows" -> showService.toggleStatus(name, userId);
-            default -> { /* unreachable */ }
-        }
-    }
-
-    private void setStatusByName(String category, String name, MediaStatus status, Integer userId) {
-        String value = status.name();
-        switch (category) {
-            case "games" -> gameService.updateStatus(name, value, userId);
-            case "movies" -> movieService.updateStatus(name, value, userId);
-            case "books" -> bookService.updateStatus(name, value, userId);
-            case "shows" -> showService.updateStatus(name, value, userId);
             default -> { /* unreachable */ }
         }
     }
@@ -187,23 +172,23 @@ public class ImportExportService {
     }
 
     private ExportRow toRow(Game g) {
-        return new ExportRow(g.getName(), g.getScore(), g.isCompleted(), g.getStatus(),
-                g.getCoverUrl(), names(g.getTags()));
+        return new ExportRow(g.getName(), g.getScore(), g.isCompleted(), g.getCoverUrl(),
+                names(g.getTags()));
     }
 
     private ExportRow toRow(Movie m) {
-        return new ExportRow(m.getName(), m.getScore(), m.isCompleted(), m.getStatus(),
-                m.getCoverUrl(), genreNames(m.getGenres()));
+        return new ExportRow(m.getName(), m.getScore(), m.isCompleted(), m.getCoverUrl(),
+                genreNames(m.getGenres()));
     }
 
     private ExportRow toRow(Book b) {
-        return new ExportRow(b.getName(), b.getScore(), b.isCompleted(), b.getStatus(),
-                b.getCoverUrl(), genreNames(b.getGenres()));
+        return new ExportRow(b.getName(), b.getScore(), b.isCompleted(), b.getCoverUrl(),
+                genreNames(b.getGenres()));
     }
 
     private ExportRow toRow(Show s) {
-        return new ExportRow(s.getName(), s.getScore(), s.isCompleted(), s.getStatus(),
-                s.getCoverUrl(), genreNames(s.getGenres()));
+        return new ExportRow(s.getName(), s.getScore(), s.isCompleted(), s.getCoverUrl(),
+                genreNames(s.getGenres()));
     }
 
     private List<String> names(Set<Tag> tags) {

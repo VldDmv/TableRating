@@ -91,10 +91,6 @@ export class CardRenderer {
                 <div class="card-tags">
                     ${this._createTagsHtml(tagsOrGenres)}
                 </div>
-                ${(item.status && item.status !== 'NONE') ? `
-                <div class="card-pipeline">
-                    <span class="status-badge status-${item.status.toLowerCase()}">${item.status}</span>
-                </div>` : ''}
                 ${this.config.hideActions ? '' : `
                 <div class="card-status">
                     <button class="status-button" data-item-name="${escapedName}">

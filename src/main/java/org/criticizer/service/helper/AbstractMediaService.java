@@ -1,10 +1,8 @@
 package org.criticizer.service.helper;
 
 import org.criticizer.dto.helper.PageResponse;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.exceptions.data.ItemAlreadyExistsException;
 import org.criticizer.exceptions.data.ResourceNotFoundException;
-import org.criticizer.exceptions.validation.InvalidInputException;
 import org.criticizer.repository.MediaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,33 +221,6 @@ public abstract class AbstractMediaService<T extends MediaEntity, R> {
                 .orElseThrow(() -> new ResourceNotFoundException(getEntityName(), trimmedName));
 
         return entity.isCompleted();
-    }
-
-    /**
-     * Updates the pipeline status (NONE / WISHLIST / BACKLOG / DROPPED).
-     */
-    @Transactional
-    public R updateStatus(String name, String status, Integer userId) {
-        String trimmedName = validator.validateName(name, getEntityName() + " name");
-        MediaStatus newStatus = parseStatus(status);
-
-        T entity = repository.findByNameIgnoreCaseAndUserId(trimmedName, userId)
-                .orElseThrow(() -> new ResourceNotFoundException(getEntityName(), trimmedName));
-
-        entity.setStatus(newStatus);
-        T updated = repository.save(entity);
-
-        log.debug("Set status of {} '{}' to {}", getEntityName(), trimmedName, newStatus);
-        return toResponse(updated);
-    }
-
-    private MediaStatus parseStatus(String raw) {
-        if (raw == null || raw.isBlank()) return MediaStatus.NONE;
-        try {
-            return MediaStatus.valueOf(raw.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new InvalidInputException("Unknown status: " + raw);
-        }
     }
 
     /**

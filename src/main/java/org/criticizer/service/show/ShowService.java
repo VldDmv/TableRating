@@ -62,7 +62,6 @@ public class ShowService extends AbstractMediaService<Show, ShowResponse> {
                 show.getCoverUrl(),
                 show.getScore(),
                 show.isCompleted(),
-                show.getStatus(),
                 genreResponses
         );
     }

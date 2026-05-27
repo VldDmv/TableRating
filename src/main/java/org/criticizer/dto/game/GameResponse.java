@@ -2,7 +2,6 @@ package org.criticizer.dto.game;
 
 import org.criticizer.dto.tag.TagResponse;
 import org.criticizer.entity.Game;
-import org.criticizer.entity.MediaStatus;
 
 import java.util.List;
 
@@ -16,17 +15,15 @@ public class GameResponse {
     private final String coverUrl;
     private final int score;
     private final boolean completed;
-    private final MediaStatus status;
     private final List<TagResponse> tags;
 
     public GameResponse(int id, String name, String coverUrl, int score,
-                        boolean completed, MediaStatus status, List<TagResponse> tags) {
+                        boolean completed, List<TagResponse> tags) {
         this.id = id;
         this.name = name;
         this.coverUrl = coverUrl;
         this.score = score;
         this.completed = completed;
-        this.status = status == null ? MediaStatus.NONE : status;
         this.tags = tags != null ? List.copyOf(tags) : List.of();
     }
 
@@ -37,7 +34,6 @@ public class GameResponse {
                 game.getCoverUrl(),
                 game.getScore(),
                 game.isCompleted(),
-                game.getStatus(),
                 game.getTags().stream()
                         .map(tag -> new TagResponse(tag.getId(), tag.getName()))
                         .toList()
@@ -62,10 +58,6 @@ public class GameResponse {
 
     public boolean isCompleted() {
         return completed;
-    }
-
-    public MediaStatus getStatus() {
-        return status;
     }
 
     public List<TagResponse> getTags() {

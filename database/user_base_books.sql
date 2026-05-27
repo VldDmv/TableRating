@@ -24,7 +24,6 @@ CREATE TABLE `books` (
   `user_id` int NOT NULL,
   `score` int DEFAULT '0',
   `completed` tinyint(1) DEFAULT '0',
-  `status` varchar(20) NOT NULL DEFAULT 'NONE',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`name`),
   CONSTRAINT `books_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
@@ -37,7 +36,7 @@ CREATE TABLE `books` (
 
 LOCK TABLES `books` WRITE;
 /*!40000 ALTER TABLE `books` DISABLE KEYS */;
-INSERT INTO `books` (`id`, `name`, `cover_url`, `user_id`, `score`, `completed`) VALUES (5,'1',NULL,2,3,0),(19,'War and Peace','https://m.media-amazon.com/images/I/81W6BFaJJWL._AC_UF1000,1000_QL80_.jpg',5,66,1),(29,'33fd',NULL,39,11,0),(67,'David Copperfield','https://covers.openlibrary.org/b/id/1048892-M.jpg',5,44,0),(71,'On Stokes Flow about a Torus; NBS Report 6546',NULL,5,77,0),(72,'\"6y@\"4554 `\'`s','',40,3,0),(73,'Tarzan of the Apes','https://covers.openlibrary.org/b/id/6608849-M.jpg',5,66,1),(75,'The Fellowship of the Ring','https://covers.openlibrary.org/b/id/14627060-M.jpg',5,33,1),(76,'64','',5,44,0),(80,'Vincent van Gogh','https://covers.openlibrary.org/b/id/4703873-M.jpg',5,65,0);
+INSERT INTO `books` VALUES (5,'1',NULL,2,3,0),(19,'War and Peace','https://m.media-amazon.com/images/I/81W6BFaJJWL._AC_UF1000,1000_QL80_.jpg',5,66,1),(29,'33fd',NULL,39,11,0),(67,'David Copperfield','https://covers.openlibrary.org/b/id/1048892-M.jpg',5,44,0),(71,'On Stokes Flow about a Torus; NBS Report 6546',NULL,5,77,0),(72,'\"6y@\"4554 `\'`s','',40,3,0),(73,'Tarzan of the Apes','https://covers.openlibrary.org/b/id/6608849-M.jpg',5,66,1),(75,'The Fellowship of the Ring','https://covers.openlibrary.org/b/id/14627060-M.jpg',5,33,1),(76,'64','',5,44,0),(80,'Vincent van Gogh','https://covers.openlibrary.org/b/id/4703873-M.jpg',5,65,0);
 /*!40000 ALTER TABLE `books` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
