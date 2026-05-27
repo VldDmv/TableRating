@@ -87,11 +87,19 @@
             </select>
         </label>
 
-        <label>Score:
-            <span class="score-range">
-                <input type="number" id="minScore" min="1" max="100" placeholder="1" class="score-input">
-                <span class="score-range-dash">–</span>
-                <input type="number" id="maxScore" min="1" max="100" placeholder="100" class="score-input">
+        <label class="score-filter">Score:
+            <span class="score-slider">
+                <span class="score-slider-label">
+                    <span id="minScoreVal">1</span>–<span id="maxScoreVal">100</span>
+                </span>
+                <span class="score-slider-track">
+                    <span class="score-slider-rail"></span>
+                    <span class="score-slider-fill" id="scoreFill"></span>
+                    <input type="range" id="minScore" min="1" max="100" value="1" step="1"
+                           aria-label="Minimum score">
+                    <input type="range" id="maxScore" min="1" max="100" value="100" step="1"
+                           aria-label="Maximum score">
+                </span>
             </span>
         </label>
 

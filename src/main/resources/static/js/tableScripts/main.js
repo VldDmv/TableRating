@@ -8,6 +8,7 @@ import { PaginationManager } from './features/table/tablePagination.js';
 import { SortManager } from './features/table/tableSorting.js';
 import { SearchManager } from './features/table/tableSearch.js';
 import { FilterManager } from './features/table/tableFiltering.js';
+import { initScoreRange } from './features/table/scoreRangeFilter.js';
 import { ColumnManager } from './features/table/columnManager.js';
 import { InlineEditManager } from './features/table/tableInlineEdit.js';
 import { TableRenderer } from './features/table/tableRenderer.js';
@@ -42,8 +43,6 @@ class CategoryPageController {
         this.elements = {
             tableBody:         document.querySelector(this.config.selectors.tableBody),
             tagFilter:         document.querySelector('#tagFilter'),
-            minScoreInput:     document.querySelector('#minScore'),
-            maxScoreInput:     document.querySelector('#maxScore'),
             searchInput:       document.querySelector(this.config.selectors.searchBox),
             rowsPerPageSelect: document.querySelector(this.config.selectors.rowsPerPageSelect),
             sortableHeaders:   document.querySelectorAll('thead th'),
@@ -72,8 +71,8 @@ class CategoryPageController {
                 : CONSTANTS.DEFAULT_ROWS_PER_PAGE,
             searchTerm: this.elements.searchInput?.value ?? '',
             filterId:   this.elements.tagFilter?.value   ?? 'all',
-            minScore:   this.elements.minScoreInput?.value ?? '',
-            maxScore:   this.elements.maxScoreInput?.value ?? '',
+            minScore:   '',
+            maxScore:   '',
             sortBy:    'name',
             sortOrder: 'asc'
         });
@@ -165,26 +164,9 @@ class CategoryPageController {
                 .init();
         }
 
-        // ── Score range + completion filter ─────────────────────────────────────
-        const clampScore = (v) => {
-            if (v === '') return '';
-            const n = Math.max(1, Math.min(100, parseInt(v, 10) || 0));
-            return String(n);
-        };
-        if (this.elements.minScoreInput) {
-            this.elements.minScoreInput.addEventListener('change', (e) => {
-                const minScore = clampScore(e.target.value.trim());
-                e.target.value = minScore;
-                this.stateManager.setState({ minScore, currentPage: 1 });
-            });
-        }
-        if (this.elements.maxScoreInput) {
-            this.elements.maxScoreInput.addEventListener('change', (e) => {
-                const maxScore = clampScore(e.target.value.trim());
-                e.target.value = maxScore;
-                this.stateManager.setState({ maxScore, currentPage: 1 });
-            });
-        }
+        // ── Score range slider ──────────────────────────────────────────────────
+        initScoreRange(({ minScore, maxScore }) =>
+            this.stateManager.setState({ minScore, maxScore, currentPage: 1 }));
 
         // ── Columns ───────────────────────────────────────────────────────────
         this.columnManager = new ColumnManager(this.config);
