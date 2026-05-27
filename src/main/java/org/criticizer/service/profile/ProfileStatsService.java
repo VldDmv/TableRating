@@ -100,16 +100,16 @@ public class ProfileStatsService {
 
     private List<Item> loadItems(String category, Integer userId) {
         return switch (validateCategory(category)) {
-            case "games" -> gameRepository.findByUserId(userId).stream()
+            case "games" -> gameRepository.findByUserIdWithTags(userId).stream()
                     .map(g -> new Item(g.getScore(), g.isCompleted(), tagNames(g.getTags())))
                     .toList();
-            case "movies" -> movieRepository.findByUserId(userId).stream()
+            case "movies" -> movieRepository.findByUserIdWithGenres(userId).stream()
                     .map(m -> new Item(m.getScore(), m.isCompleted(), genreNames(m.getGenres())))
                     .toList();
-            case "books" -> bookRepository.findByUserId(userId).stream()
+            case "books" -> bookRepository.findByUserIdWithGenres(userId).stream()
                     .map(b -> new Item(b.getScore(), b.isCompleted(), genreNames(b.getGenres())))
                     .toList();
-            case "shows" -> showRepository.findByUserId(userId).stream()
+            case "shows" -> showRepository.findByUserIdWithGenres(userId).stream()
                     .map(s -> new Item(s.getScore(), s.isCompleted(), genreNames(s.getGenres())))
                     .toList();
             default -> List.of();

@@ -44,7 +44,6 @@ class CategoryPageController {
             tagFilter:         document.querySelector('#tagFilter'),
             minScoreInput:     document.querySelector('#minScore'),
             maxScoreInput:     document.querySelector('#maxScore'),
-            completedFilter:   document.querySelector('#completedFilter'),
             searchInput:       document.querySelector(this.config.selectors.searchBox),
             rowsPerPageSelect: document.querySelector(this.config.selectors.rowsPerPageSelect),
             sortableHeaders:   document.querySelectorAll('thead th'),
@@ -75,7 +74,6 @@ class CategoryPageController {
             filterId:   this.elements.tagFilter?.value   ?? 'all',
             minScore:   this.elements.minScoreInput?.value ?? '',
             maxScore:   this.elements.maxScoreInput?.value ?? '',
-            completed:  this.elements.completedFilter?.value ?? 'all',
             sortBy:    'name',
             sortOrder: 'asc'
         });
@@ -185,11 +183,6 @@ class CategoryPageController {
                 const maxScore = clampScore(e.target.value.trim());
                 e.target.value = maxScore;
                 this.stateManager.setState({ maxScore, currentPage: 1 });
-            });
-        }
-        if (this.elements.completedFilter) {
-            this.elements.completedFilter.addEventListener('change', (e) => {
-                this.stateManager.setState({ completed: e.target.value, currentPage: 1 });
             });
         }
 
@@ -303,7 +296,6 @@ class CategoryPageController {
                 oldState.filterId    !== newState.filterId    ||
                 oldState.minScore    !== newState.minScore    ||
                 oldState.maxScore    !== newState.maxScore    ||
-                oldState.completed   !== newState.completed   ||
                 oldState.sortBy      !== newState.sortBy      ||
                 oldState.sortOrder   !== newState.sortOrder;
 
