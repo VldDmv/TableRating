@@ -323,7 +323,7 @@ class MovieServiceTest {
                     PageRequest.of(0, 10),
                     2
             );
-            when(movieRepository.findItemIds(eq(TEST_USER_ID), isNull(), isNull(), any()))
+            when(movieRepository.findItemIds(eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any(), any()))
                     .thenReturn(movieIds);
 
             Movie movie1 = new Movie(1, "Movie 1", TEST_USER_ID, 80, false);
@@ -358,7 +358,7 @@ class MovieServiceTest {
                     1
             );
             when(movieRepository.findItemIds(
-                    eq(TEST_USER_ID), eq(1), isNull(), any()))
+                    eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any(), any()))
                     .thenReturn(movieIds);
 
             when(movieRepository.findByIdsWithCategories(List.of(1)))
@@ -371,7 +371,7 @@ class MovieServiceTest {
 
             // Then
             assertThat(result.getItems()).hasSize(1);
-            verify(movieRepository).findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any());
+            verify(movieRepository).findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any(), any());
         }
     }
 

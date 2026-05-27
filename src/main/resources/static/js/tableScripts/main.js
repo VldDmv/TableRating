@@ -27,7 +27,6 @@ import { ItemFormManager } from './items/itemForm.js';
 import { UniversalAutocomplete } from './features/forms/categoryAutocomplete.js';
 import { CollapsibleForm } from './features/forms/collapsibleForm.js';
 import { TagChipsManager } from './features/forms/tagchipsManager.js';
-import { initImportExport } from './features/importExport.js';
 
 class CategoryPageController {
     constructor(config) {
@@ -43,6 +42,9 @@ class CategoryPageController {
         this.elements = {
             tableBody:         document.querySelector(this.config.selectors.tableBody),
             tagFilter:         document.querySelector('#tagFilter'),
+            minScoreInput:     document.querySelector('#minScore'),
+            maxScoreInput:     document.querySelector('#maxScore'),
+            completedFilter:   document.querySelector('#completedFilter'),
             searchInput:       document.querySelector(this.config.selectors.searchBox),
             rowsPerPageSelect: document.querySelector(this.config.selectors.rowsPerPageSelect),
             sortableHeaders:   document.querySelectorAll('thead th'),
@@ -71,6 +73,9 @@ class CategoryPageController {
                 : CONSTANTS.DEFAULT_ROWS_PER_PAGE,
             searchTerm: this.elements.searchInput?.value ?? '',
             filterId:   this.elements.tagFilter?.value   ?? 'all',
+            minScore:   this.elements.minScoreInput?.value ?? '',
+            maxScore:   this.elements.maxScoreInput?.value ?? '',
+            completed:  this.elements.completedFilter?.value ?? 'all',
             sortBy:    'name',
             sortOrder: 'asc'
         });
@@ -160,6 +165,32 @@ class CategoryPageController {
             this.filterManager
                 .onChange((filterId) => this.stateManager.setState({ filterId, currentPage: 1 }))
                 .init();
+        }
+
+        // ── Score range + completion filter ─────────────────────────────────────
+        const clampScore = (v) => {
+            if (v === '') return '';
+            const n = Math.max(1, Math.min(100, parseInt(v, 10) || 0));
+            return String(n);
+        };
+        if (this.elements.minScoreInput) {
+            this.elements.minScoreInput.addEventListener('change', (e) => {
+                const minScore = clampScore(e.target.value.trim());
+                e.target.value = minScore;
+                this.stateManager.setState({ minScore, currentPage: 1 });
+            });
+        }
+        if (this.elements.maxScoreInput) {
+            this.elements.maxScoreInput.addEventListener('change', (e) => {
+                const maxScore = clampScore(e.target.value.trim());
+                e.target.value = maxScore;
+                this.stateManager.setState({ maxScore, currentPage: 1 });
+            });
+        }
+        if (this.elements.completedFilter) {
+            this.elements.completedFilter.addEventListener('change', (e) => {
+                this.stateManager.setState({ completed: e.target.value, currentPage: 1 });
+            });
         }
 
         // ── Columns ───────────────────────────────────────────────────────────
@@ -270,6 +301,9 @@ class CategoryPageController {
                 oldState.rowsPerPage !== newState.rowsPerPage ||
                 oldState.searchTerm  !== newState.searchTerm  ||
                 oldState.filterId    !== newState.filterId    ||
+                oldState.minScore    !== newState.minScore    ||
+                oldState.maxScore    !== newState.maxScore    ||
+                oldState.completed   !== newState.completed   ||
                 oldState.sortBy      !== newState.sortBy      ||
                 oldState.sortOrder   !== newState.sortOrder;
 
@@ -548,7 +582,6 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         const app = new CategoryPageController(config);
         app.init();
-        initImportExport();
 
     } catch (error) {
         ErrorHandler.handle(error, 'Application initialization failed');

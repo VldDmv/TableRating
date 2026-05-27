@@ -22,11 +22,17 @@ public interface BookRepository extends MediaRepository<Book> {
             "WHERE b.userId = :userId " +
             "AND (:categoryId IS NULL OR g.id = :categoryId) " +
             "AND (:searchTerm IS NULL OR LOWER(b.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
+            "AND (:minScore IS NULL OR b.score >= :minScore) " +
+            "AND (:maxScore IS NULL OR b.score <= :maxScore) " +
+            "AND (:completed IS NULL OR b.completed = :completed) " +
             "GROUP BY b.id")
     Page<Integer> findItemIds(
             @Param("userId") Integer userId,
             @Param("categoryId") Integer categoryId,
             @Param("searchTerm") String searchTerm,
+            @Param("minScore") Integer minScore,
+            @Param("maxScore") Integer maxScore,
+            @Param("completed") Boolean completed,
             Pageable pageable
     );
 

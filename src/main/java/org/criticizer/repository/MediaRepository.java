@@ -36,6 +36,9 @@ public interface MediaRepository<T> extends JpaRepository<T, Integer> {
             @Param("userId") Integer userId,
             @Param("categoryId") Integer categoryId,
             @Param("searchTerm") String searchTerm,
+            @Param("minScore") Integer minScore,
+            @Param("maxScore") Integer maxScore,
+            @Param("completed") Boolean completed,
             Pageable pageable
     );
 
