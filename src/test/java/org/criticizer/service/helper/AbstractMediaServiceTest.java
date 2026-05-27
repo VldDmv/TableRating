@@ -76,7 +76,7 @@ class AbstractMediaServiceTest {
 
             List<Integer> itemIds = List.of(1, 2, 3);
             Page<Integer> idsPage = new PageImpl<>(itemIds, PageRequest.of(0, 10), 3);
-            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(), any(), any(), any(Pageable.class)))
                     .thenReturn(idsPage);
 
             List<TestMediaEntity> entities = List.of(
@@ -97,7 +97,7 @@ class AbstractMediaServiceTest {
             assertThat(result.getCurrentPage()).isEqualTo(1);
             assertThat(result.getTotalItems()).isEqualTo(3);
 
-            verify(repository).findItemIds(eq(USER_ID), isNull(), isNull(), any(Pageable.class));
+            verify(repository).findItemIds(eq(USER_ID), isNull(), isNull(), any(), any(), any(), any(Pageable.class));
             verify(repository).findByIdsWithCategories(itemIds);
         }
 
@@ -110,7 +110,7 @@ class AbstractMediaServiceTest {
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
             Page<Integer> idsPage = new PageImpl<>(List.of(1), PageRequest.of(0, 10), 1);
-            when(repository.findItemIds(eq(USER_ID), eq(5), isNull(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), eq(5), isNull(), any(), any(), any(), any(Pageable.class)))
                     .thenReturn(idsPage);
 
             List<TestMediaEntity> entities = List.of(createEntity(1, "FilteredItem", 90));
@@ -120,7 +120,7 @@ class AbstractMediaServiceTest {
             service.getUserItemsPage(USER_ID, 1, 10, 5, null, "name", "asc");
 
             // Then
-            verify(repository).findItemIds(eq(USER_ID), eq(5), isNull(), any(Pageable.class));
+            verify(repository).findItemIds(eq(USER_ID), eq(5), isNull(), any(), any(), any(), any(Pageable.class));
         }
 
         @Test
@@ -132,7 +132,7 @@ class AbstractMediaServiceTest {
             when(validator.sanitizeSearchTerm("dark")).thenReturn("dark");
 
             Page<Integer> idsPage = new PageImpl<>(List.of(1), PageRequest.of(0, 10), 1);
-            when(repository.findItemIds(eq(USER_ID), isNull(), eq("dark"), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), isNull(), eq("dark"), any(), any(), any(), any(Pageable.class)))
                     .thenReturn(idsPage);
 
             List<TestMediaEntity> entities = List.of(createEntity(1, "Dark Souls", 95));
@@ -142,7 +142,7 @@ class AbstractMediaServiceTest {
             service.getUserItemsPage(USER_ID, 1, 10, null, "dark", "name", "asc");
 
             // Then
-            verify(repository).findItemIds(eq(USER_ID), isNull(), eq("dark"), any(Pageable.class));
+            verify(repository).findItemIds(eq(USER_ID), isNull(), eq("dark"), any(), any(), any(), any(Pageable.class));
             verify(validator).sanitizeSearchTerm("dark");
         }
 
@@ -155,7 +155,7 @@ class AbstractMediaServiceTest {
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
             Page<Integer> emptyPage = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
-            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(), any(), any(), any(Pageable.class)))
                     .thenReturn(emptyPage);
 
             // When
@@ -180,7 +180,7 @@ class AbstractMediaServiceTest {
             List<Integer> sortedItemIds = List.of(2, 3, 1);
             Page<Integer> idsPage = new PageImpl<>(sortedItemIds, PageRequest.of(0, 10), 3);
 
-            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(), any(), any(), any(Pageable.class)))
                     .thenReturn(idsPage);
 
             List<TestMediaEntity> entities = List.of(
@@ -212,7 +212,7 @@ class AbstractMediaServiceTest {
             List<Integer> sortedItemIds = List.of(2, 3, 1);
             Page<Integer> idsPage = new PageImpl<>(sortedItemIds, PageRequest.of(0, 10), 3);
 
-            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(), any(), any(), any(Pageable.class)))
                     .thenReturn(idsPage);
 
             List<TestMediaEntity> entities = List.of(
@@ -242,7 +242,7 @@ class AbstractMediaServiceTest {
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
             Page<Integer> idsPage = new PageImpl<>(List.of(1), PageRequest.of(0, 10), 1);
-            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(), any(), any(), any(Pageable.class)))
                     .thenReturn(idsPage);
 
             List<TestMediaEntity> entities = List.of(createEntity(1, "Item", 80));

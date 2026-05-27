@@ -120,7 +120,7 @@ class RepositoryIntegrationTest {
 
         // Two-step query update
         Page<Integer> ids = gameRepository.findItemIds(
-                user.getId(), null, null, PageRequest.of(0, 10)
+                user.getId(), null, null, null, null, null, PageRequest.of(0, 10)
         );
         List<Game> results = gameRepository.findByIdsWithCategories(ids.getContent());
 
@@ -143,7 +143,7 @@ class RepositoryIntegrationTest {
 
         // Two-step query update
         Page<Integer> ids = gameRepository.findItemIds(
-                user.getId(), rpg.getId(), null, PageRequest.of(0, 10)
+                user.getId(), rpg.getId(), null, null, null, null, PageRequest.of(0, 10)
         );
         List<Game> rpgGames = gameRepository.findByIdsWithCategories(ids.getContent());
 
@@ -162,7 +162,7 @@ class RepositoryIntegrationTest {
 
         // Two-step query update
         Page<Integer> ids = gameRepository.findItemIds(
-                user.getId(), null, "dark", PageRequest.of(0, 10)
+                user.getId(), null, "dark", null, null, null, PageRequest.of(0, 10)
         );
         List<Game> results = gameRepository.findByIdsWithCategories(ids.getContent());
 
@@ -204,7 +204,7 @@ class RepositoryIntegrationTest {
 
         // Two-step query update
         Page<Integer> ids = movieRepository.findItemIds(
-                user.getId(), action.getId(), null, PageRequest.of(0, 10)
+                user.getId(), action.getId(), null, null, null, null, PageRequest.of(0, 10)
         );
         List<Movie> actionMovies = movieRepository.findByIdsWithCategories(ids.getContent());
 
@@ -322,11 +322,11 @@ class RepositoryIntegrationTest {
 
         // Two-step query update
         Page<Integer> ascIds = gameRepository.findItemIds(
-                user.getId(), null, null,
+                user.getId(), null, null, null, null, null,
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "score"))
         );
         Page<Integer> descIds = gameRepository.findItemIds(
-                user.getId(), null, null,
+                user.getId(), null, null, null, null, null,
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "score"))
         );
 

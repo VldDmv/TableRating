@@ -22,11 +22,17 @@ public interface ShowRepository extends MediaRepository<Show> {
             "WHERE s.userId = :userId " +
             "AND (:categoryId IS NULL OR g.id = :categoryId) " +
             "AND (:searchTerm IS NULL OR LOWER(s.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
+            "AND (:minScore IS NULL OR s.score >= :minScore) " +
+            "AND (:maxScore IS NULL OR s.score <= :maxScore) " +
+            "AND (:completed IS NULL OR s.completed = :completed) " +
             "GROUP BY s.id")
     Page<Integer> findItemIds(
             @Param("userId") Integer userId,
             @Param("categoryId") Integer categoryId,
             @Param("searchTerm") String searchTerm,
+            @Param("minScore") Integer minScore,
+            @Param("maxScore") Integer maxScore,
+            @Param("completed") Boolean completed,
             Pageable pageable
     );
 

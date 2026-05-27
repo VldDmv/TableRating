@@ -43,7 +43,10 @@ public class CategoryDataController {
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortOrder) {
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) Integer minScore,
+            @RequestParam(required = false) Integer maxScore,
+            @RequestParam(required = false) Boolean completed) {
 
         User currentUser = securityUtil.getCurrentUser();
         ContentCategory category = ContentCategory.fromString(type);
@@ -54,7 +57,8 @@ public class CategoryDataController {
         AbstractMediaService<?, ?> service = mediaTypeResolver.resolve(category);
 
         PageResponse<?> result = service.getUserItemsPageAsDto(
-                currentUser.getId(), page, rows, categoryId, search, sortBy, sortOrder);
+                currentUser.getId(), page, rows, categoryId, search, sortBy, sortOrder,
+                minScore, maxScore, completed);
 
         return ResponseEntity.ok(result);
     }

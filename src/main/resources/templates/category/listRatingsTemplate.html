@@ -87,20 +87,28 @@
             </select>
         </label>
 
+        <label>Score:
+            <span class="score-range">
+                <input type="number" id="minScore" min="1" max="100" placeholder="1" class="score-input">
+                <span class="score-range-dash">–</span>
+                <input type="number" id="maxScore" min="1" max="100" placeholder="100" class="score-input">
+            </span>
+        </label>
+
+        <label>Status:
+            <select id="completedFilter">
+                <option value="all">All</option>
+                <option value="true">Completed</option>
+                <option value="false">Not completed</option>
+            </select>
+        </label>
+
         <div id="column-toggle-container"></div>
 
         <div class="io-controls">
-            <a class="btn btn--secondary"
+            <a class="btn btn--secondary io-export"
                th:href="@{|/api/export/${entityType}.csv|}"
-               th:title="|Export ${entityNamePlural} as CSV|">Export CSV</a>
-            <a class="btn btn--secondary"
-               th:href="@{|/api/export/${entityType}.json|}"
-               th:title="|Export ${entityNamePlural} as JSON|">Export JSON</a>
-            <label class="btn btn--secondary" th:for="|importFile-${entityType}|">
-                Import
-                <input type="file" th:id="|importFile-${entityType}|" class="import-file-input"
-                       accept=".csv,.json" th:data-category="${entityType}" hidden>
-            </label>
+               th:title="|Export ${entityNamePlural} to CSV|">Export</a>
         </div>
     </div>
 
