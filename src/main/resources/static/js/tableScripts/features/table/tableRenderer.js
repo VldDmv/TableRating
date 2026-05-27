@@ -77,7 +77,6 @@ export class TableRenderer {
         row.appendChild(this._createScoreCell(item.score));
         row.appendChild(this._createTagsCell(tagsOrGenres));
         row.appendChild(this._createCompletedCell(escapedName, completedIcon));
-        row.appendChild(this._createStatusCell(item));
         row.appendChild(this._createActionsCell(escapedName, editIcon, deleteIcon));
 
         return row;
@@ -144,24 +143,6 @@ export class TableRenderer {
                 ${completedIcon}
             </button>
         `;
-        return cell;
-    }
-
-    _createStatusCell(item) {
-        const cell = document.createElement('td');
-        cell.className = 'col-status';
-        const current = item.status || 'NONE';
-        const safeName = htmlUtils.escape(item.name);
-        cell.innerHTML = `
-            <select class="status-select status-${current.toLowerCase()}"
-                    data-item-name="${safeName}">
-                <option value="NONE">—</option>
-                <option value="WISHLIST">Wishlist</option>
-                <option value="BACKLOG">Backlog</option>
-                <option value="DROPPED">Dropped</option>
-            </select>
-        `;
-        cell.querySelector('select').value = current;
         return cell;
     }
 

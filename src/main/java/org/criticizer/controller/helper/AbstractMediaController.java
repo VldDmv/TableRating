@@ -167,25 +167,6 @@ public abstract class AbstractMediaController<
         boolean exists = service.isItemExists(name, currentUser.getId());
         return ResponseEntity.ok(new ExistsResponse(exists));
     }
-
-    /**
-     * Updates pipeline status (NONE / WISHLIST / BACKLOG / DROPPED).
-     * PATCH /api/{entityType}/{name}/pipeline
-     */
-    @PatchMapping("/{name}/pipeline")
-    public ResponseEntity<MessageResponse> updatePipelineStatus(
-            @PathVariable String name,
-            @RequestBody Map<String, String> request) {
-
-        User currentUser = securityUtil.getCurrentUser();
-        String status = request.get("status");
-        log.info("User {} setting status of {} '{}' to {}",
-                currentUser.getName(), getEntityName(), name, status);
-
-        service.updateStatus(name, status, currentUser.getId());
-        return ResponseEntity.ok(
-                new MessageResponse(getEntityName() + " status updated"));
-    }
     /**
      * Updates cover URL for an item.
      * PATCH /api/{entityType}/{name}/cover

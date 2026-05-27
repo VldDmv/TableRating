@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.criticizer.dto.ioport.ExportRow;
 import org.criticizer.dto.ioport.ImportResult;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.User;
 import org.criticizer.security.SecurityUtil;
 import org.criticizer.service.ioport.ImportExportService;
@@ -41,8 +40,7 @@ public class ImportExportController {
 
     private static final Logger log = LoggerFactory.getLogger(ImportExportController.class);
 
-    private static final String[] HEADERS =
-            {"name", "score", "completed", "status", "coverUrl", "categories"};
+    private static final String[] HEADERS = {"name", "score", "completed", "coverUrl", "categories"};
 
     private final ImportExportService service;
     private final SecurityUtil securityUtil;
@@ -78,7 +76,6 @@ public class ImportExportController {
             sb.append(csvField(row.name())).append(',')
                     .append(row.score() == null ? "" : row.score()).append(',')
                     .append(row.completed()).append(',')
-                    .append(row.status() == null ? MediaStatus.NONE : row.status()).append(',')
                     .append(csvField(row.coverUrl())).append(',')
                     .append(csvField(String.join(";", row.categories())))
                     .append('\n');
@@ -130,13 +127,12 @@ public class ImportExportController {
                 String itemName = cols.get(0);
                 Integer score = parseIntOrNull(cols.get(1));
                 boolean completed = "true".equalsIgnoreCase(cols.get(2).trim());
-                MediaStatus status = parseStatus(cols.size() > 3 ? cols.get(3) : null);
-                String coverUrl = cols.size() > 4 ? cols.get(4) : null;
-                List<String> cats = cols.size() > 5 && !cols.get(5).isBlank()
-                        ? Arrays.stream(cols.get(5).split(";"))
+                String coverUrl = cols.size() > 3 ? cols.get(3) : null;
+                List<String> cats = cols.size() > 4 && !cols.get(4).isBlank()
+                        ? Arrays.stream(cols.get(4).split(";"))
                                 .map(String::trim).filter(s -> !s.isEmpty()).toList()
                         : List.of();
-                rows.add(new ExportRow(itemName, score, completed, status,
+                rows.add(new ExportRow(itemName, score, completed,
                         coverUrl == null || coverUrl.isBlank() ? null : coverUrl, cats));
             }
         }
@@ -172,15 +168,6 @@ public class ImportExportController {
             return Integer.parseInt(s.trim());
         } catch (NumberFormatException e) {
             return null;
-        }
-    }
-
-    private MediaStatus parseStatus(String s) {
-        if (s == null || s.isBlank()) return MediaStatus.NONE;
-        try {
-            return MediaStatus.valueOf(s.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return MediaStatus.NONE;
         }
     }
 

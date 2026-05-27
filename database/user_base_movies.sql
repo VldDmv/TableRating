@@ -25,7 +25,6 @@ CREATE TABLE `movies` (
   `user_id` int NOT NULL,
   `score` int DEFAULT '0',
   `completed` tinyint(1) DEFAULT '0',
-  `status` varchar(20) NOT NULL DEFAULT 'NONE',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`name`),
   CONSTRAINT `movies_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
@@ -38,7 +37,7 @@ CREATE TABLE `movies` (
 
 LOCK TABLES `movies` WRITE;
 /*!40000 ALTER TABLE `movies` DISABLE KEYS */;
-INSERT INTO `movies` (`id`, `name`, `cover_url`, `user_id`, `score`, `completed`) VALUES (16,'Interstellar',NULL,5,77,1),(38,'Gone with the Wind',NULL,5,81,1),(47,'45',NULL,39,12,0),(51,'wrfw',NULL,40,66,0),(53,'eted',NULL,49,45,1),(54,'adas','',50,34,1),(55,'453','',51,11,0),(56,'13',NULL,5,5,0),(57,'dvx','',5,55,0);
+INSERT INTO `movies` VALUES (16,'Interstellar',NULL,5,77,1),(38,'Gone with the Wind',NULL,5,81,1),(47,'45',NULL,39,12,0),(51,'wrfw',NULL,40,66,0),(53,'eted',NULL,49,45,1),(54,'adas','',50,34,1),(55,'453','',51,11,0),(56,'13',NULL,5,5,0),(57,'dvx','',5,55,0);
 /*!40000 ALTER TABLE `movies` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
