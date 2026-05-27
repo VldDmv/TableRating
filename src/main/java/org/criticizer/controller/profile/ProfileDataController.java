@@ -6,6 +6,7 @@ import org.criticizer.security.SecurityUtil;
 import org.criticizer.service.helper.AbstractMediaService;
 import org.criticizer.service.helper.MediaTypeResolver;
 import org.criticizer.service.profile.ProfileAccessService;
+import org.criticizer.service.profile.ProfileStatsService;
 import org.criticizer.service.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,17 +30,45 @@ public class ProfileDataController {
     private final SecurityUtil securityUtil;
     private final ProfileAccessService accessService;
     private final MediaTypeResolver mediaTypeResolver;
+    private final ProfileStatsService statsService;
 
     public ProfileDataController(
             UserService userService,
             SecurityUtil securityUtil,
             ProfileAccessService accessService,
-            MediaTypeResolver mediaTypeResolver
+            MediaTypeResolver mediaTypeResolver,
+            ProfileStatsService statsService
     ) {
         this.userService = userService;
         this.securityUtil = securityUtil;
         this.accessService = accessService;
         this.mediaTypeResolver = mediaTypeResolver;
+        this.statsService = statsService;
+    }
+
+    /**
+     * GET /profile-stats
+     * Per-category rating statistics for a user's profile.
+     */
+    @GetMapping("/profile-stats")
+    public ResponseEntity<?> getProfileStats(
+            @RequestParam String username,
+            @RequestParam String category) {
+
+        try {
+            User profileOwner = userService.getUser(username);
+            String currentUsername = securityUtil.getCurrentUsername();
+
+            if (!accessService.canViewProfile(profileOwner, currentUsername)) {
+                return ResponseEntity.status(403).body(Map.of("error", "Profile is private"));
+            }
+
+            return ResponseEntity.ok(statsService.getStats(category, profileOwner.getId()));
+        } catch (Exception e) {
+            log.error("Error fetching profile stats for {} / {}", username, category, e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Failed to fetch profile stats"));
+        }
     }
 
     /**
