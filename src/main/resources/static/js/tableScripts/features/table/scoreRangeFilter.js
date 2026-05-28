@@ -29,6 +29,10 @@ export function initScoreRange(onChange) {
             fill.style.left = `${left}%`;
             fill.style.width = `${right - left}%`;
         }
+        // When max is pinned at the top, both thumbs stack at the right edge and
+        // the max thumb (later in the DOM) covers the min one. Raise the min thumb
+        // so it stays grabbable and the range can be narrowed again.
+        minInput.style.zIndex = hi === MAX ? '5' : '';
     }
 
     function clamp() {
