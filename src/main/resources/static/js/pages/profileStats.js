@@ -15,6 +15,7 @@ function destroyChart(key) {
 }
 
 async function loadStats(category) {
+    if (typeof Chart === 'undefined') return;
     const username = window.profileConfig?.username;
     if (!username) return;
 
@@ -125,7 +126,6 @@ function renderCategoryAverages(rows) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof Chart === 'undefined') return;
     loadStats(window.profileConfig?.entityType || 'games');
 });
 
