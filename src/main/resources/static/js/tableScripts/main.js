@@ -8,6 +8,7 @@ import { PaginationManager } from './features/table/tablePagination.js';
 import { SortManager } from './features/table/tableSorting.js';
 import { SearchManager } from './features/table/tableSearch.js';
 import { FilterManager } from './features/table/tableFiltering.js';
+import { initScoreRange } from './features/table/scoreRangeFilter.js';
 import { ColumnManager } from './features/table/columnManager.js';
 import { InlineEditManager } from './features/table/tableInlineEdit.js';
 import { TableRenderer } from './features/table/tableRenderer.js';
@@ -70,6 +71,8 @@ class CategoryPageController {
                 : CONSTANTS.DEFAULT_ROWS_PER_PAGE,
             searchTerm: this.elements.searchInput?.value ?? '',
             filterId:   this.elements.tagFilter?.value   ?? 'all',
+            minScore:   '',
+            maxScore:   '',
             sortBy:    'name',
             sortOrder: 'asc'
         });
@@ -160,6 +163,10 @@ class CategoryPageController {
                 .onChange((filterId) => this.stateManager.setState({ filterId, currentPage: 1 }))
                 .init();
         }
+
+        // ── Score range slider ──────────────────────────────────────────────────
+        initScoreRange(({ minScore, maxScore }) =>
+            this.stateManager.setState({ minScore, maxScore, currentPage: 1 }));
 
         // ── Columns ───────────────────────────────────────────────────────────
         this.columnManager = new ColumnManager(this.config);
@@ -269,6 +276,8 @@ class CategoryPageController {
                 oldState.rowsPerPage !== newState.rowsPerPage ||
                 oldState.searchTerm  !== newState.searchTerm  ||
                 oldState.filterId    !== newState.filterId    ||
+                oldState.minScore    !== newState.minScore    ||
+                oldState.maxScore    !== newState.maxScore    ||
                 oldState.sortBy      !== newState.sortBy      ||
                 oldState.sortOrder   !== newState.sortOrder;
 

@@ -389,7 +389,7 @@ class GameServiceTest {
                     PageRequest.of(0, 10),
                     2
             );
-            when(gameRepository.findItemIds(eq(TEST_USER_ID), isNull(), isNull(), any()))
+            when(gameRepository.findItemIds(eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
                     .thenReturn(gameIds);
 
             // Mock fetching full entities
@@ -426,7 +426,7 @@ class GameServiceTest {
                     1
             );
             when(gameRepository.findItemIds(
-                    eq(TEST_USER_ID), isNull(), eq("witcher"), any()))
+                    eq(TEST_USER_ID), isNull(), eq("witcher"), any(), any(), any()))
                     .thenReturn(gameIds);
 
             when(gameRepository.findByIdsWithCategories(List.of(1)))
@@ -458,7 +458,7 @@ class GameServiceTest {
                     1
             );
             when(gameRepository.findItemIds(
-                    eq(TEST_USER_ID), eq(1), isNull(), any()))
+                    eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any()))
                     .thenReturn(gameIds);
 
             when(gameRepository.findByIdsWithCategories(List.of(1)))
@@ -471,7 +471,7 @@ class GameServiceTest {
 
             // Then
             assertThat(result.getItems()).hasSize(1);
-            verify(gameRepository).findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any());
+            verify(gameRepository).findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any());
         }
     }
 

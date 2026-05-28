@@ -12,19 +12,56 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
+    private final RateLimitFilter rateLimitFilter;
+
+    public SecurityConfig(RateLimitFilter rateLimitFilter) {
+        this.rateLimitFilter = rateLimitFilter;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/.well-known/**")
+                        .ignoringRequestMatchers("/.well-known/**", "/actuator/**")
+                )
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame
+                                .sameOrigin()
+                        )
+                        .referrerPolicy(ref -> ref
+                                .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                        )
+                        .xssProtection(xss -> xss
+                                .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
+                        )
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives(
+                                        "default-src 'self'; "
+                                                + "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+                                                + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+                                                + "font-src 'self' https://fonts.gstatic.com data:; "
+                                                + "img-src 'self' data: https:; "
+                                                + "connect-src 'self' https://openlibrary.org https://api.rawg.io https://api.themoviedb.org https://cdn.jsdelivr.net; "
+                                                + "frame-ancestors 'self'; "
+                                                + "base-uri 'self'; "
+                                                + "form-action 'self'"
+                                )
+                        )
+                        .permissionsPolicy(perm -> perm
+                                .policy("geolocation=(), microphone=(), camera=(), payment=()")
+                        )
                 )
                 .authorizeHttpRequests(auth -> auth
 
@@ -39,6 +76,10 @@ public class SecurityConfig {
 
                         // Public API endpoints
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+
+                        // Actuator health probes & OpenAPI docs
+                        .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
                         // Only username-exists check is public (needed for registration form)
                         .requestMatchers("/api/users/*/exists").permitAll()
 

@@ -306,7 +306,7 @@ class BookServiceTest {
                     PageRequest.of(0, 10),
                     2
             );
-            when(bookRepository.findItemIds(eq(TEST_USER_ID), isNull(), isNull(), any()))
+            when(bookRepository.findItemIds(eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
                     .thenReturn(bookIds);
 
             Book book1 = new Book(1, "Book 1", TEST_USER_ID, 80, false);
@@ -341,7 +341,7 @@ class BookServiceTest {
                     1
             );
             when(bookRepository.findItemIds(
-                    eq(TEST_USER_ID), eq(1), isNull(), any()))
+                    eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any()))
                     .thenReturn(bookIds);
 
             when(bookRepository.findByIdsWithCategories(List.of(1)))
@@ -354,7 +354,7 @@ class BookServiceTest {
 
             // Then
             assertThat(result.getItems()).hasSize(1);
-            verify(bookRepository).findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any());
+            verify(bookRepository).findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any());
         }
     }
 

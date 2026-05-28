@@ -64,7 +64,7 @@ class CategoryDataControllerTest {
         PageResponse pageResponse = TestDataBuilder.createPageResponse(Collections.emptyList(), 1, 10);
 
         when(mediaServiceMock.getUserItemsPageAsDto(
-                eq(testUser.getId()), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc")))
+                eq(testUser.getId()), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"), isNull(), isNull()))
                 .thenReturn(pageResponse);
 
         mockMvc.perform(get("/api/category/games")
@@ -74,7 +74,7 @@ class CategoryDataControllerTest {
                 .andExpect(status().isOk());
 
         verify(mediaServiceMock).getUserItemsPageAsDto(
-                eq(testUser.getId()), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"));
+                eq(testUser.getId()), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"), isNull(), isNull());
     }
 
     @Test
@@ -86,7 +86,7 @@ class CategoryDataControllerTest {
 
         PageResponse pageResponse = TestDataBuilder.createEmptyPageResponse(1, 10);
         when(mediaServiceMock.getUserItemsPageAsDto(
-                eq(testUser.getId()), eq(1), eq(10), eq(1), isNull(), eq("name"), eq("asc")))
+                eq(testUser.getId()), eq(1), eq(10), eq(1), isNull(), eq("name"), eq("asc"), isNull(), isNull()))
                 .thenReturn(pageResponse);
 
         mockMvc.perform(get("/api/category/games")
@@ -97,7 +97,7 @@ class CategoryDataControllerTest {
                 .andExpect(status().isOk());
 
         verify(mediaServiceMock).getUserItemsPageAsDto(
-                eq(testUser.getId()), eq(1), eq(10), eq(1), isNull(), eq("name"), eq("asc"));
+                eq(testUser.getId()), eq(1), eq(10), eq(1), isNull(), eq("name"), eq("asc"), isNull(), isNull());
     }
 
     @Test
@@ -108,13 +108,13 @@ class CategoryDataControllerTest {
         when(mediaTypeResolver.resolve(ContentCategory.MOVIES)).thenReturn(mediaServiceMock);
 
         PageResponse pageResponse = TestDataBuilder.createEmptyPageResponse(1, 10);
-        when(mediaServiceMock.getUserItemsPageAsDto(anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc")))
+        when(mediaServiceMock.getUserItemsPageAsDto(anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"), isNull(), isNull()))
                 .thenReturn(pageResponse);
 
         mockMvc.perform(get("/api/category/movies")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(mediaServiceMock).getUserItemsPageAsDto(anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"));
+        verify(mediaServiceMock).getUserItemsPageAsDto(anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"), isNull(), isNull());
     }
 }

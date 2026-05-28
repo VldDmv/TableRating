@@ -87,7 +87,29 @@
             </select>
         </label>
 
+        <label class="score-filter">Score:
+            <span class="score-slider">
+                <span class="score-slider-label">
+                    <span id="minScoreVal">1</span>–<span id="maxScoreVal">100</span>
+                </span>
+                <span class="score-slider-track">
+                    <span class="score-slider-rail"></span>
+                    <span class="score-slider-fill" id="scoreFill"></span>
+                    <input type="range" id="minScore" min="1" max="100" value="1" step="1"
+                           aria-label="Minimum score">
+                    <input type="range" id="maxScore" min="1" max="100" value="100" step="1"
+                           aria-label="Maximum score">
+                </span>
+            </span>
+        </label>
+
         <div id="column-toggle-container"></div>
+
+        <div class="io-controls">
+            <a class="btn btn--secondary io-export"
+               th:href="@{|/api/export/${entityType}.csv|}"
+               th:title="|Export ${entityNamePlural} to CSV|">Export</a>
+        </div>
     </div>
 
     <table th:data-entity-type="${entityType}">

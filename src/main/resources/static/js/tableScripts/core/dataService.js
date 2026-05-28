@@ -79,6 +79,14 @@ export class DataService {
             url.searchParams.set('search', state.searchTerm);
         }
 
+        if (state.minScore != null && state.minScore !== '') {
+            url.searchParams.set('minScore', state.minScore);
+        }
+
+        if (state.maxScore != null && state.maxScore !== '') {
+            url.searchParams.set('maxScore', state.maxScore);
+        }
+
         return url;
     }
 

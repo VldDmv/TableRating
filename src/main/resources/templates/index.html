@@ -19,13 +19,18 @@
             Invalid username or password
         </div>
 
+        <!-- Rate Limit Message -->
+        <div th:if="${param.ratelimit}" class="flash-error-message">
+            Too many attempts. Please wait a minute and try again.
+        </div>
+
         <!-- Logout Message -->
         <div th:if="${param.logout}" class="flash-success-message">
             You have been logged out
         </div>
 
         <label for="login-name">Name:</label>
-        <input type="text" name="username" id="login-name" required>
+        <input type="text" name="username" id="login-name" required autocomplete="username">
 
         <label for="login-password">Password:</label>
         <input type="password" name="password" id="login-password" required minlength="6" autocomplete="current-password">
@@ -46,7 +51,7 @@
 
         <label for="register-name">Name:</label>
         <div class="input-with-indicator">
-            <input type="text" name="username" id="register-name" required>
+            <input type="text" name="username" id="register-name" required autocomplete="username">
             <!-- Username availability indicator -->
             <span id="username-indicator" class="username-indicator"></span>
         </div>

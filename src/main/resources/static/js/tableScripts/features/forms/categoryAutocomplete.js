@@ -3,6 +3,15 @@
  */
 
 import { htmlUtils } from '../../core/utils.js';
+import { ToastService } from '../../../shared/toast.js';
+
+const notifiedDisabled = new Set();
+const notifiedError = new Set();
+let toastService = null;
+function getToast() {
+    if (!toastService) toastService = new ToastService();
+    return toastService;
+}
 
 export class UniversalAutocomplete {
     constructor(inputElement, entityType, options = {}) {
@@ -238,7 +247,19 @@ export class UniversalAutocomplete {
             const response = await fetch(url);
 
             if (response.status === 503) {
+                if (!notifiedDisabled.has(this.entityType)) {
+                    notifiedDisabled.add(this.entityType);
+                    getToast().show(
+                        `Autocomplete for ${this.entityType} is temporarily unavailable.`,
+                        'warning'
+                    );
+                }
+                this.close();
+                return;
+            }
 
+            if (response.status === 429) {
+                getToast().show('Too many requests. Please wait a moment.', 'warning');
                 this.close();
                 return;
             }
@@ -250,7 +271,10 @@ export class UniversalAutocomplete {
             const data = await response.json();
 
             if (data.error) {
-
+                if (!notifiedDisabled.has(this.entityType)) {
+                    notifiedDisabled.add(this.entityType);
+                    getToast().show(data.error, 'warning');
+                }
                 this.close();
                 return;
             }
@@ -266,7 +290,14 @@ export class UniversalAutocomplete {
             }
 
         } catch (error) {
-
+            console.error(`[Autocomplete:${this.entityType}]`, error);
+            if (!notifiedError.has(this.entityType)) {
+                notifiedError.add(this.entityType);
+                getToast().show(
+                    `Could not load ${this.entityType} suggestions. Check your connection.`,
+                    'error'
+                );
+            }
             this.close();
         }
     }
