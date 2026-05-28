@@ -6,7 +6,6 @@ describe('PaginationManager', () => {
     let elements;
 
     beforeEach(() => {
-
         const container = document.createElement('div');
         container.className = 'pagination-controls-container';
         document.body.appendChild(container);
@@ -16,10 +15,10 @@ describe('PaginationManager', () => {
             nextButton: document.createElement('button'),
             rowsPerPageSelect: document.createElement('select'),
             pageDropdown: document.createElement('div'),
-            pageList: document.createElement('ul')
+            pageList: document.createElement('ul'),
         };
 
-        [10, 25, 50].forEach(val => {
+        [10, 25, 50].forEach((val) => {
             const option = document.createElement('option');
             option.value = val;
             option.textContent = val;
@@ -57,7 +56,9 @@ describe('PaginationManager', () => {
 
         test('should find pagination container', () => {
             expect(paginationManager.paginationContainer).toBeTruthy();
-            expect(paginationManager.paginationContainer.className).toContain('pagination-controls-container');
+            expect(paginationManager.paginationContainer.className).toContain(
+                'pagination-controls-container'
+            );
         });
     });
 
@@ -191,7 +192,7 @@ describe('PaginationManager', () => {
                 nextButton: elements.nextButton,
                 rowsPerPageSelect: elements.rowsPerPageSelect,
                 pageDropdown: elements.pageDropdown,
-                pageList: elements.pageList
+                pageList: elements.pageList,
             });
 
             expect(() => manager.init()).not.toThrow();
@@ -231,7 +232,7 @@ describe('PaginationManager', () => {
                 nextButton: null,
                 rowsPerPageSelect: elements.rowsPerPageSelect,
                 pageDropdown: elements.pageDropdown,
-                pageList: elements.pageList
+                pageList: elements.pageList,
             });
 
             expect(() => manager.init()).not.toThrow();
@@ -268,7 +269,7 @@ describe('PaginationManager', () => {
                 nextButton: elements.nextButton,
                 rowsPerPageSelect: null,
                 pageDropdown: elements.pageDropdown,
-                pageList: elements.pageList
+                pageList: elements.pageList,
             });
 
             expect(() => manager.init()).not.toThrow();
@@ -349,7 +350,7 @@ describe('PaginationManager', () => {
         test('should update current page and total pages', () => {
             const pageResult = {
                 currentPage: 3,
-                totalPages: 10
+                totalPages: 10,
             };
 
             paginationManager.update(pageResult);
@@ -363,7 +364,7 @@ describe('PaginationManager', () => {
 
             const pageResult = {
                 currentPage: 1,
-                totalPages: 1
+                totalPages: 1,
             };
 
             paginationManager.update(pageResult);
@@ -376,7 +377,7 @@ describe('PaginationManager', () => {
 
             const pageResult = {
                 currentPage: 1,
-                totalPages: 5
+                totalPages: 5,
             };
 
             paginationManager.update(pageResult);
@@ -387,7 +388,7 @@ describe('PaginationManager', () => {
         test('should disable prev button on first page', () => {
             const pageResult = {
                 currentPage: 1,
-                totalPages: 5
+                totalPages: 5,
             };
 
             paginationManager.update(pageResult);
@@ -398,7 +399,7 @@ describe('PaginationManager', () => {
         test('should enable prev button when not on first page', () => {
             const pageResult = {
                 currentPage: 2,
-                totalPages: 5
+                totalPages: 5,
             };
 
             paginationManager.update(pageResult);
@@ -409,7 +410,7 @@ describe('PaginationManager', () => {
         test('should disable next button on last page', () => {
             const pageResult = {
                 currentPage: 5,
-                totalPages: 5
+                totalPages: 5,
             };
 
             paginationManager.update(pageResult);
@@ -420,7 +421,7 @@ describe('PaginationManager', () => {
         test('should enable next button when not on last page', () => {
             const pageResult = {
                 currentPage: 2,
-                totalPages: 5
+                totalPages: 5,
             };
 
             paginationManager.update(pageResult);
@@ -431,7 +432,7 @@ describe('PaginationManager', () => {
         test('should update dropdown text', () => {
             const pageResult = {
                 currentPage: 3,
-                totalPages: 7
+                totalPages: 7,
             };
 
             paginationManager.update(pageResult);
@@ -442,7 +443,7 @@ describe('PaginationManager', () => {
         test('should update page list', () => {
             const pageResult = {
                 currentPage: 2,
-                totalPages: 5
+                totalPages: 5,
             };
 
             paginationManager.update(pageResult);
@@ -453,7 +454,7 @@ describe('PaginationManager', () => {
         test('should mark current page as active', () => {
             const pageResult = {
                 currentPage: 3,
-                totalPages: 5
+                totalPages: 5,
             };
 
             paginationManager.update(pageResult);
@@ -462,21 +463,21 @@ describe('PaginationManager', () => {
             expect(links[2].classList.contains('active-page')).toBe(true);
         });
 
-     test('should handle single page', () => {
-                 paginationManager.init();
+        test('should handle single page', () => {
+            paginationManager.init();
 
-                 const pageResult = {
-                     currentPage: 1,
-                     totalPages: 1
-                 };
+            const pageResult = {
+                currentPage: 1,
+                totalPages: 1,
+            };
 
-                 paginationManager.update(pageResult);
+            paginationManager.update(pageResult);
 
-                 expect(elements.prevButton.disabled).toBe(true);
-                 expect(elements.nextButton.disabled).toBe(true);
-                 expect(paginationManager.paginationContainer.style.display).toBe('none');
-             });
-         });
+            expect(elements.prevButton.disabled).toBe(true);
+            expect(elements.nextButton.disabled).toBe(true);
+            expect(paginationManager.paginationContainer.style.display).toBe('none');
+        });
+    });
 
     describe('updatePageList', () => {
         test('should create correct number of page links', () => {
@@ -518,7 +519,7 @@ describe('PaginationManager', () => {
                 nextButton: elements.nextButton,
                 rowsPerPageSelect: elements.rowsPerPageSelect,
                 pageDropdown: elements.pageDropdown,
-                pageList: null
+                pageList: null,
             });
 
             expect(() => manager.updatePageList()).not.toThrow();
@@ -537,7 +538,7 @@ describe('PaginationManager', () => {
 
             paginationManager.update({
                 currentPage: 1,
-                totalPages: 5
+                totalPages: 5,
             });
 
             elements.nextButton.click();

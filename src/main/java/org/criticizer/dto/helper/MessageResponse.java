@@ -1,4 +1,3 @@
 package org.criticizer.dto.helper;
 
-public record MessageResponse(String message) {
-}
+public record MessageResponse(String message) {}

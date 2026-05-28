@@ -4,12 +4,10 @@ import org.criticizer.exceptions.ApplicationException;
 
 public class InvalidCredentialsException extends ApplicationException {
     public InvalidCredentialsException() {
-        super("Invalid username or password",
-                "Authentication failed - credentials do not match");
+        super("Invalid username or password", "Authentication failed - credentials do not match");
     }
 
     public InvalidCredentialsException(String username) {
-        super("Invalid username or password",
-                "Authentication failed for user: " + username);
+        super("Invalid username or password", "Authentication failed for user: " + username);
     }
 }

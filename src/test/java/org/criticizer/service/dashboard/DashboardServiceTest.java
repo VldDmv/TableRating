@@ -1,5 +1,9 @@
 package org.criticizer.service.dashboard;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.Mockito.*;
+
 import org.criticizer.dto.admin.AdminStats;
 import org.criticizer.repository.*;
 import org.junit.jupiter.api.DisplayName;
@@ -10,34 +14,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.Mockito.*;
-
-/**
- * Unit tests for DashboardService.
- */
+/** Unit tests for DashboardService. */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("DashboardService Tests")
 class DashboardServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
+    @Mock private UserRepository userRepository;
 
-    @Mock
-    private GameRepository gameRepository;
+    @Mock private GameRepository gameRepository;
 
-    @Mock
-    private MovieRepository movieRepository;
+    @Mock private MovieRepository movieRepository;
 
-    @Mock
-    private BookRepository bookRepository;
+    @Mock private BookRepository bookRepository;
 
-    @Mock
-    private ShowRepository showRepository;
+    @Mock private ShowRepository showRepository;
 
-    @InjectMocks
-    private DashboardService dashboardService;
+    @InjectMocks private DashboardService dashboardService;
 
     @Nested
     @DisplayName("getAdminDashboardStats() Tests")
@@ -219,8 +211,11 @@ class DashboardServiceTest {
             assertThat(result.getTotalUsers()).isEqualTo(1000L);
 
             // Total items: 20000
-            long totalItems = result.getTotalGames() + result.getTotalMovies()
-                    + result.getTotalBooks() + result.getTotalShows();
+            long totalItems =
+                    result.getTotalGames()
+                            + result.getTotalMovies()
+                            + result.getTotalBooks()
+                            + result.getTotalShows();
             assertThat(totalItems).isEqualTo(20000L);
 
             // Average items per user: 20
@@ -263,8 +258,11 @@ class DashboardServiceTest {
             // Then - One user with test data
             assertThat(result.getTotalUsers()).isEqualTo(1L);
 
-            long totalItems = result.getTotalGames() + result.getTotalMovies()
-                    + result.getTotalBooks() + result.getTotalShows();
+            long totalItems =
+                    result.getTotalGames()
+                            + result.getTotalMovies()
+                            + result.getTotalBooks()
+                            + result.getTotalShows();
             assertThat(totalItems).isEqualTo(38L);
         }
     }
@@ -303,8 +301,11 @@ class DashboardServiceTest {
 
             // Then
             assertThat(result.getTotalUsers()).isEqualTo(100L);
-            long totalItems = result.getTotalGames() + result.getTotalMovies()
-                    + result.getTotalBooks() + result.getTotalShows();
+            long totalItems =
+                    result.getTotalGames()
+                            + result.getTotalMovies()
+                            + result.getTotalBooks()
+                            + result.getTotalShows();
             assertThat(totalItems).isZero();
         }
 
@@ -323,8 +324,12 @@ class DashboardServiceTest {
 
             // Then - No modifications attempted, just reads
             assertThat(result).isNotNull();
-            verifyNoMoreInteractions(userRepository, gameRepository,
-                    movieRepository, bookRepository, showRepository);
+            verifyNoMoreInteractions(
+                    userRepository,
+                    gameRepository,
+                    movieRepository,
+                    bookRepository,
+                    showRepository);
         }
     }
 }

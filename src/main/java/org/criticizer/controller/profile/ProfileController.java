@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * REST Controller for user profiles.
- */
+/** REST Controller for user profiles. */
 @RestController
 @RequestMapping("/api/profiles")
 public class ProfileController {
@@ -30,17 +28,13 @@ public class ProfileController {
     public ProfileController(
             UserService userService,
             SecurityUtil securityUtil,
-            ProfileAccessService accessService
-    ) {
+            ProfileAccessService accessService) {
         this.userService = userService;
         this.securityUtil = securityUtil;
         this.accessService = accessService;
     }
 
-    /**
-     * GET /api/profiles/{username}
-     * Get user profile information.
-     */
+    /** GET /api/profiles/{username} Get user profile information. */
     @GetMapping("/{username}")
     public ResponseEntity<ProfileResponse> getProfile(@PathVariable String username) {
         log.debug("Profile request for user: {}", username);
@@ -55,17 +49,15 @@ public class ProfileController {
             return ResponseEntity.status(403).build();
         }
 
-        ProfileResponse response = context.isOwner()
-                ? ProfileResponse.forOwner(profileOwner)
-                : ProfileResponse.forViewer(profileOwner, context.canView());
+        ProfileResponse response =
+                context.isOwner()
+                        ? ProfileResponse.forOwner(profileOwner)
+                        : ProfileResponse.forViewer(profileOwner, context.canView());
 
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * GET /api/profiles/me
-     * Get current user's profile.
-     */
+    /** GET /api/profiles/me Get current user's profile. */
     @GetMapping("/me")
     public ResponseEntity<ProfileResponse> getCurrentUserProfile() {
         User currentUser = securityUtil.getCurrentUser();
@@ -73,30 +65,22 @@ public class ProfileController {
         return ResponseEntity.ok(ProfileResponse.forOwner(currentUser));
     }
 
-    /**
-     * PUT /api/profiles/me/privacy
-     * Update current user's privacy setting.
-     */
+    /** PUT /api/profiles/me/privacy Update current user's privacy setting. */
     @PutMapping("/me/privacy")
     public ResponseEntity<PrivacyUpdateResponse> updatePrivacy(
             @Valid @RequestBody UpdatePrivacyRequest request) {
 
         User currentUser = securityUtil.getCurrentUser();
-        log.info("User {} updating privacy to: {}",
-                currentUser.getName(), request.isPublic());
+        log.info("User {} updating privacy to: {}", currentUser.getName(), request.isPublic());
 
         userService.updateUserPrivacy(currentUser.getId(), request.isPublic());
 
-        return ResponseEntity.ok(new PrivacyUpdateResponse(
-                "Privacy setting updated successfully",
-                request.isPublic()
-        ));
+        return ResponseEntity.ok(
+                new PrivacyUpdateResponse(
+                        "Privacy setting updated successfully", request.isPublic()));
     }
 
-    /**
-     * GET /api/profiles/{username}/games
-     * Get user's games (respects privacy).
-     */
+    /** GET /api/profiles/{username}/games Get user's games (respects privacy). */
     @GetMapping("/{username}/games")
     public ResponseEntity<MessageResponse> getUserGames(
             @PathVariable String username,
@@ -112,8 +96,7 @@ public class ProfileController {
             return ResponseEntity.status(403).build();
         }
 
-        return ResponseEntity.ok(new MessageResponse(
-                "Use /api/games endpoint with authentication"
-        ));
+        return ResponseEntity.ok(
+                new MessageResponse("Use /api/games endpoint with authentication"));
     }
 }

@@ -1,15 +1,13 @@
-
-
 import { jest } from '@jest/globals';
 
 jest.unstable_mockModule('@/tableScripts/core/utils.js', () => ({
     htmlUtils: { escape: (s) => s, decode: (s) => s },
     ICONS: {
-        COMPLETED:     '✅',
+        COMPLETED: '✅',
         NOT_COMPLETED: '❌',
-        EDIT:          '✏️',
-        DELETE:        '🗑️'
-    }
+        EDIT: '✏️',
+        DELETE: '🗑️',
+    },
 }));
 
 const { CardRenderer } = await import('@/tableScripts/features/cards/cardRenderer.js');
@@ -18,21 +16,21 @@ const { CardRenderer } = await import('@/tableScripts/features/cards/cardRendere
 
 function makeConfig(overrides = {}) {
     return {
-        entityType:        'games',
-        hideActions:        false,
-        applyScoreStyling:  jest.fn(),
-        ...overrides
+        entityType: 'games',
+        hideActions: false,
+        applyScoreStyling: jest.fn(),
+        ...overrides,
     };
 }
 
 function makeItem(overrides = {}) {
     return {
-        name:      'Witcher 3',
-        score:     95,
+        name: 'Witcher 3',
+        score: 95,
         completed: false,
-        coverUrl:  '',
-        tags:      [],
-        ...overrides
+        coverUrl: '',
+        tags: [],
+        ...overrides,
     };
 }
 
@@ -41,7 +39,9 @@ function setup(configOverrides = {}) {
     return new CardRenderer(makeConfig(configOverrides));
 }
 
-afterEach(() => { document.body.innerHTML = ''; });
+afterEach(() => {
+    document.body.innerHTML = '';
+});
 
 // ─── render ───────────────────────────────────────────────────────────────────
 
@@ -71,7 +71,7 @@ describe('CardRenderer.render()', () => {
     });
 
     test('calls onRender callback when registered', () => {
-        const r  = setup();
+        const r = setup();
         const cb = jest.fn();
         r.onRender(cb);
         r.render([makeItem()]);
@@ -79,7 +79,7 @@ describe('CardRenderer.render()', () => {
     });
 
     test('calls onRender callback even on empty state', () => {
-        const r  = setup();
+        const r = setup();
         const cb = jest.fn();
         r.onRender(cb);
         r.render([]);
@@ -92,7 +92,7 @@ describe('CardRenderer.render()', () => {
 describe('CardRenderer.renderLoading()', () => {
     test('renders loading state into the container', () => {
         const r = setup();
-        r.render([]);           // ensures container reference is set
+        r.render([]); // ensures container reference is set
         r.renderLoading();
         expect(document.getElementById('cards-container').innerHTML).toContain('Loading');
     });
@@ -102,7 +102,9 @@ describe('CardRenderer.renderLoading()', () => {
 
 describe('CardRenderer.createCard()', () => {
     let renderer;
-    beforeEach(() => { renderer = setup(); });
+    beforeEach(() => {
+        renderer = setup();
+    });
 
     test('returns a DIV with class media-card', () => {
         const card = renderer.createCard(makeItem());
@@ -111,8 +113,9 @@ describe('CardRenderer.createCard()', () => {
     });
 
     test('stores originalName in dataset', () => {
-        expect(renderer.createCard(makeItem({ name: 'Bloodborne' })).dataset.originalName)
-            .toBe('Bloodborne');
+        expect(renderer.createCard(makeItem({ name: 'Bloodborne' })).dataset.originalName).toBe(
+            'Bloodborne'
+        );
     });
 
     test('stores originalScore in dataset', () => {
@@ -134,20 +137,27 @@ describe('CardRenderer.createCard()', () => {
     });
 
     test('renders cover image when coverUrl is set', () => {
-        const img = renderer.createCard(makeItem({ coverUrl: 'https://cover.jpg' }))
+        const img = renderer
+            .createCard(makeItem({ coverUrl: 'https://cover.jpg' }))
             .querySelector('.card-cover-image');
         expect(img).not.toBeNull();
         expect(img.src).toContain('cover.jpg');
     });
 
     test('renders cover placeholder when no coverUrl', () => {
-        expect(renderer.createCard(makeItem({ coverUrl: '' }))
-            .querySelector('.card-cover-placeholder')).not.toBeNull();
+        expect(
+            renderer.createCard(makeItem({ coverUrl: '' })).querySelector('.card-cover-placeholder')
+        ).not.toBeNull();
     });
 
     test('renders tag names from item.tags', () => {
         const card = renderer.createCard(
-            makeItem({ tags: [{ id: 1, name: 'Action' }, { id: 2, name: 'RPG' }] })
+            makeItem({
+                tags: [
+                    { id: 1, name: 'Action' },
+                    { id: 2, name: 'RPG' },
+                ],
+            })
         );
         expect(card.innerHTML).toContain('Action');
         expect(card.innerHTML).toContain('RPG');
@@ -162,7 +172,12 @@ describe('CardRenderer.createCard()', () => {
 
     test('stores originalTagIds as comma-separated IDs', () => {
         const card = renderer.createCard(
-            makeItem({ tags: [{ id: 10, name: 'X' }, { id: 20, name: 'Y' }] })
+            makeItem({
+                tags: [
+                    { id: 10, name: 'X' },
+                    { id: 20, name: 'Y' },
+                ],
+            })
         );
         expect(card.dataset.originalTagIds).toBe('10,20');
     });
@@ -177,19 +192,26 @@ describe('CardRenderer.createCard()', () => {
     });
 
     test('hides action buttons when hideActions is true', () => {
-        const r    = new CardRenderer(makeConfig({ hideActions: true }));
+        const r = new CardRenderer(makeConfig({ hideActions: true }));
         const card = r.createCard(makeItem());
         expect(card.querySelector('.card-actions')).toBeNull();
     });
 
     test('shows .card-no-tags span when tags array is empty', () => {
-        expect(renderer.createCard(makeItem({ tags: [] })).querySelector('.card-no-tags'))
-            .not.toBeNull();
+        expect(
+            renderer.createCard(makeItem({ tags: [] })).querySelector('.card-no-tags')
+        ).not.toBeNull();
     });
 
     test('renders a .tag-badge for each tag', () => {
         const card = renderer.createCard(
-            makeItem({ tags: [{ id: 1, name: 'A' }, { id: 2, name: 'B' }, { id: 3, name: 'C' }] })
+            makeItem({
+                tags: [
+                    { id: 1, name: 'A' },
+                    { id: 2, name: 'B' },
+                    { id: 3, name: 'C' },
+                ],
+            })
         );
         expect(card.querySelectorAll('.tag-badge').length).toBe(3);
     });

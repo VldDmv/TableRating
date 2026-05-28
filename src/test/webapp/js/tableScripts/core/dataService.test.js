@@ -1,19 +1,17 @@
-
-
 import { jest } from '@jest/globals';
 
 jest.unstable_mockModule('@/tableScripts/core/utils.js', () => ({
     CONSTANTS: {
-        AJAX_HEADER:       'X-Requested-With',
-        AJAX_HEADER_VALUE: 'XMLHttpRequest'
-    }
+        AJAX_HEADER: 'X-Requested-With',
+        AJAX_HEADER_VALUE: 'XMLHttpRequest',
+    },
 }));
 
 jest.unstable_mockModule('@/tableScripts/core/errorHandler.js', () => ({
     ErrorHandler: {
         parseErrorResponse: jest.fn(async () => 'Error 500'),
-        handle:             jest.fn()
-    }
+        handle: jest.fn(),
+    },
 }));
 
 const { DataService } = await import('@/tableScripts/core/dataService.js');
@@ -28,18 +26,18 @@ function makeState(overrides = {}) {
     return {
         currentPage: 1,
         rowsPerPage: 25,
-        sortBy:      'name',
-        sortOrder:   'asc',
-        filterId:    'all',
-        searchTerm:  '',
-        ...overrides
+        sortBy: 'name',
+        sortOrder: 'asc',
+        filterId: 'all',
+        searchTerm: '',
+        ...overrides,
     };
 }
 
 beforeEach(() => {
     Object.defineProperty(window, 'location', {
         value: { origin: 'http://localhost' },
-        writable: true
+        writable: true,
     });
 });
 
@@ -52,8 +50,9 @@ describe('DataService.buildUrl', () => {
     });
 
     test('includes page, rows, sortBy, sortOrder params', () => {
-        const url = new DataService(makeConfig())
-            .buildUrl(makeState({ currentPage: 3, rowsPerPage: 10, sortBy: 'score', sortOrder: 'desc' }));
+        const url = new DataService(makeConfig()).buildUrl(
+            makeState({ currentPage: 3, rowsPerPage: 10, sortBy: 'score', sortOrder: 'desc' })
+        );
         expect(url.searchParams.get('page')).toBe('3');
         expect(url.searchParams.get('rows')).toBe('10');
         expect(url.searchParams.get('sortBy')).toBe('score');
@@ -71,8 +70,9 @@ describe('DataService.buildUrl', () => {
     });
 
     test('uses config.filterParamName for the filter key (genre_id)', () => {
-        const url = new DataService(makeConfig({ filterParamName: 'genre_id' }))
-            .buildUrl(makeState({ filterId: '3' }));
+        const url = new DataService(makeConfig({ filterParamName: 'genre_id' })).buildUrl(
+            makeState({ filterId: '3' })
+        );
         expect(url.searchParams.get('genre_id')).toBe('3');
         expect(url.searchParams.has('tag_id')).toBe(false);
     });
@@ -88,7 +88,9 @@ describe('DataService.buildUrl', () => {
     });
 
     test('combines filter and search together', () => {
-        const url = new DataService(makeConfig()).buildUrl(makeState({ filterId: '7', searchTerm: 'rpg' }));
+        const url = new DataService(makeConfig()).buildUrl(
+            makeState({ filterId: '7', searchTerm: 'rpg' })
+        );
         expect(url.searchParams.get('tag_id')).toBe('7');
         expect(url.searchParams.get('search')).toBe('rpg');
     });
@@ -97,8 +99,12 @@ describe('DataService.buildUrl', () => {
 // ─── fetchData ────────────────────────────────────────────────────────────────
 
 describe('DataService.fetchData', () => {
-    beforeEach(() => { global.fetch = jest.fn(); });
-    afterEach(() => { jest.resetAllMocks(); });
+    beforeEach(() => {
+        global.fetch = jest.fn();
+    });
+    afterEach(() => {
+        jest.resetAllMocks();
+    });
 
     test('returns data.data when response has success:true', async () => {
         const payload = { success: true, data: { items: [{ name: 'Witcher' }], totalPages: 1 } };
@@ -116,8 +122,9 @@ describe('DataService.fetchData', () => {
 
     test('throws when response is not ok', async () => {
         global.fetch.mockResolvedValue({ ok: false, status: 500 });
-        await expect(new DataService(makeConfig()).fetchData(makeState()))
-            .rejects.toThrow('Failed to fetch data');
+        await expect(new DataService(makeConfig()).fetchData(makeState())).rejects.toThrow(
+            'Failed to fetch data'
+        );
     });
 
     test('sends AJAX header X-Requested-With: XMLHttpRequest', async () => {
@@ -126,7 +133,7 @@ describe('DataService.fetchData', () => {
         expect(global.fetch).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({
-                headers: expect.objectContaining({ 'X-Requested-With': 'XMLHttpRequest' })
+                headers: expect.objectContaining({ 'X-Requested-With': 'XMLHttpRequest' }),
             })
         );
     });
@@ -137,7 +144,6 @@ describe('DataService.fetchData', () => {
         const data = await new DataService(makeConfig()).fetchData(makeState());
         expect(data).toBeNull();
     });
-
 
     test('aborts previous AbortController when a new request starts', () => {
         // fetchData returns a never-resolving promise so the first call stays in-flight
@@ -168,8 +174,12 @@ describe('DataService.fetchData', () => {
 // ─── postData ─────────────────────────────────────────────────────────────────
 
 describe('DataService.postData', () => {
-    beforeEach(() => { global.fetch = jest.fn(); });
-    afterEach(() => { jest.resetAllMocks(); });
+    beforeEach(() => {
+        global.fetch = jest.fn();
+    });
+    afterEach(() => {
+        jest.resetAllMocks();
+    });
 
     test('sends POST with application/x-www-form-urlencoded', async () => {
         global.fetch.mockResolvedValue({ ok: true, json: async () => ({ success: true }) });
@@ -179,8 +189,8 @@ describe('DataService.postData', () => {
             expect.objectContaining({
                 method: 'POST',
                 headers: expect.objectContaining({
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                })
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }),
             })
         );
     });
@@ -194,7 +204,8 @@ describe('DataService.postData', () => {
 
     test('throws on non-ok response', async () => {
         global.fetch.mockResolvedValue({ ok: false, status: 400 });
-        await expect(new DataService(makeConfig()).postData('/api/games', {}))
-            .rejects.toThrow('Failed to post data');
+        await expect(new DataService(makeConfig()).postData('/api/games', {})).rejects.toThrow(
+            'Failed to post data'
+        );
     });
 });

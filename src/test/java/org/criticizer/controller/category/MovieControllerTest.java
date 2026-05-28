@@ -1,5 +1,7 @@
 package org.criticizer.controller.category;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.criticizer.dto.movie.MovieResponse;
 import org.criticizer.entity.Movie;
 import org.criticizer.security.SecurityUtil;
@@ -12,20 +14,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("MovieController Tests")
 class MovieControllerTest {
 
-    @Mock
-    private MovieService movieService;
+    @Mock private MovieService movieService;
 
-    @Mock
-    private SecurityUtil securityUtil;
+    @Mock private SecurityUtil securityUtil;
 
-    @InjectMocks
-    private MovieController controller;
+    @InjectMocks private MovieController controller;
 
     @Test
     @DisplayName("Should return correct entity name")

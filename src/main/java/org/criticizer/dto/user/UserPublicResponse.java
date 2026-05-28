@@ -2,9 +2,7 @@ package org.criticizer.dto.user;
 
 import java.time.LocalDateTime;
 
-/**
- * Public user profile response with statistics.
- */
+/** Public user profile response with statistics. */
 public class UserPublicResponse {
 
     private final String name;
@@ -16,9 +14,15 @@ public class UserPublicResponse {
     private final boolean profileIsPublic;
     private final LocalDateTime createdAt;
 
-    public UserPublicResponse(String name, int gamesCount, int moviesCount,
-                              int booksCount, int showsCount, int totalItems,
-                              boolean profileIsPublic, LocalDateTime createdAt) {
+    public UserPublicResponse(
+            String name,
+            int gamesCount,
+            int moviesCount,
+            int booksCount,
+            int showsCount,
+            int totalItems,
+            boolean profileIsPublic,
+            LocalDateTime createdAt) {
         this.name = name;
         this.gamesCount = gamesCount;
         this.moviesCount = moviesCount;

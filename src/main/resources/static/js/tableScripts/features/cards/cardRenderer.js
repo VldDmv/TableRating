@@ -5,14 +5,14 @@
 import { htmlUtils, ICONS } from '../../core/utils.js';
 
 export class CardRenderer {
-  /**
-  * @param {Object} config
-  * @param {Object|null} coverModal — a CoverModal instance (or null if not needed)
-  */
+    /**
+     * @param {Object} config
+     * @param {Object|null} coverModal — a CoverModal instance (or null if not needed)
+     */
     constructor(config, coverModal = null) {
-        this.config          = config;
-        this.coverModal      = coverModal;
-        this.cardsContainer  = null;
+        this.config = config;
+        this.coverModal = coverModal;
+        this.cardsContainer = null;
         this.onRenderCallback = null;
     }
 
@@ -40,12 +40,11 @@ export class CardRenderer {
         }
 
         const fragment = document.createDocumentFragment();
-        items.forEach(item => fragment.appendChild(this.createCard(item)));
+        items.forEach((item) => fragment.appendChild(this.createCard(item)));
         this.cardsContainer.appendChild(fragment);
 
         this.config.applyScoreStyling?.(this.cardsContainer);
         this.onRenderCallback?.(this.cardsContainer);
-
     }
 
     renderLoading() {
@@ -67,17 +66,17 @@ export class CardRenderer {
 
         const tagsOrGenres = item.tags || item.genres || [];
 
-        card.dataset.originalName     = item.name;
-        card.dataset.originalScore    = item.score;
-        card.dataset.originalTagIds   = tagsOrGenres.map(t => t.id).join(',');
-        card.dataset.initialTagIds    = card.dataset.originalTagIds;
+        card.dataset.originalName = item.name;
+        card.dataset.originalScore = item.score;
+        card.dataset.originalTagIds = tagsOrGenres.map((t) => t.id).join(',');
+        card.dataset.initialTagIds = card.dataset.originalTagIds;
         card.dataset.originalCoverUrl = item.coverUrl || '';
-        card.dataset.completed        = item.completed ? 'true' : 'false';
+        card.dataset.completed = item.completed ? 'true' : 'false';
 
-        const escapedName   = htmlUtils.escape(item.name);
-        const completedIcon = item.completed ? ICONS.COMPLETED  : ICONS.NOT_COMPLETED;
-        const editIcon      = ICONS.EDIT     ?? '✏️';
-        const deleteIcon    = ICONS.DELETE   ?? '🗑️';
+        const escapedName = htmlUtils.escape(item.name);
+        const completedIcon = item.completed ? ICONS.COMPLETED : ICONS.NOT_COMPLETED;
+        const editIcon = ICONS.EDIT ?? '✏️';
+        const deleteIcon = ICONS.DELETE ?? '🗑️';
 
         card.innerHTML = `
             <div class="card-cover">
@@ -91,7 +90,10 @@ export class CardRenderer {
                 <div class="card-tags">
                     ${this._createTagsHtml(tagsOrGenres)}
                 </div>
-                ${this.config.hideActions ? '' : `
+                ${
+                    this.config.hideActions
+                        ? ''
+                        : `
                 <div class="card-status">
                     <button class="status-button" data-item-name="${escapedName}">
                         ${completedIcon}
@@ -109,7 +111,8 @@ export class CardRenderer {
                         ${deleteIcon} Delete
                     </button>
                 </div>
-                `}
+                `
+                }
             </div>
         `;
 
@@ -144,17 +147,19 @@ export class CardRenderer {
         if (!tags || tags.length === 0) {
             return '<span class="card-no-tags">No tags</span>';
         }
-        return tags.map(tag => {
-            const name = htmlUtils.decode(tag.name || 'Unknown');
-            return `<span class="tag-badge" data-tag-id="${tag.id}">${name}</span>`;
-        }).join(' ');
+        return tags
+            .map((tag) => {
+                const name = htmlUtils.decode(tag.name || 'Unknown');
+                return `<span class="tag-badge" data-tag-id="${tag.id}">${name}</span>`;
+            })
+            .join(' ');
     }
 
-  /**
-  * Attaches a click handler to the card cover.
-  * Ctrl+Click → coverClickHandler intercepts via delegation to the tbody.
-  * Regular click → opens the view modal via the injected coverModal.
-  */
+    /**
+     * Attaches a click handler to the card cover.
+     * Ctrl+Click → coverClickHandler intercepts via delegation to the tbody.
+     * Regular click → opens the view modal via the injected coverModal.
+     */
     _attachCoverClickListener(card, item) {
         const coverEl = card.querySelector('.card-cover-image, .card-cover-placeholder');
         if (!coverEl) return;

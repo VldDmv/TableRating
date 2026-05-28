@@ -63,7 +63,6 @@ export class CoverModal {
 
         this.modal.style.display = 'block';
         document.body.style.overflow = 'hidden'; // Prevent body scroll
-
     }
 
     /**
@@ -77,8 +76,8 @@ export class CoverModal {
         const event = new CustomEvent('coverEditRequested', {
             detail: {
                 itemName: this.currentItemName,
-                currentUrl: this.currentCoverUrl
-            }
+                currentUrl: this.currentCoverUrl,
+            },
         });
         document.dispatchEvent(event);
     }
@@ -89,6 +88,5 @@ export class CoverModal {
     close() {
         this.modal.style.display = 'none';
         document.body.style.overflow = ''; // Restore body scroll
-
     }
 }

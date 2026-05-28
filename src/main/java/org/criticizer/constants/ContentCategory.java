@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
- * Centralized enumeration for all media types in the system.
- * Named ContentCategory to avoid conflict with org.springframework.http.MediaType.
+ * Centralized enumeration for all media types in the system. Named ContentCategory to avoid
+ * conflict with org.springframework.http.MediaType.
  */
 public enum ContentCategory {
     GAMES("games", "game", "Game", "Games"),
@@ -67,8 +67,7 @@ public enum ContentCategory {
         }
 
         throw new IllegalArgumentException(
-                "Invalid content category: '" + value + "'. Valid types: " + getValidTypesString()
-        );
+                "Invalid content category: '" + value + "'. Valid types: " + getValidTypesString());
     }
 
     public static boolean isValid(String value) {

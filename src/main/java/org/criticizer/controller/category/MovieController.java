@@ -12,11 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/movies")
-public class MovieController extends AbstractMediaController<
-        Movie,
-        MovieResponse,
-        CreateMovieRequest,
-        UpdateMovieRequest> {
+public class MovieController
+        extends AbstractMediaController<
+                Movie, MovieResponse, CreateMovieRequest, UpdateMovieRequest> {
 
     public MovieController(MovieService movieService, SecurityUtil securityUtil) {
         super(movieService, securityUtil);
@@ -26,7 +24,6 @@ public class MovieController extends AbstractMediaController<
     protected String getEntityName() {
         return "Movie";
     }
-
 
     @Override
     protected MovieResponse convertToResponse(Movie entity) {

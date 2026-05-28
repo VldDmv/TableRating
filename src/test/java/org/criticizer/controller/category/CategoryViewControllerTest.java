@@ -1,5 +1,11 @@
 package org.criticizer.controller.category;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
 import org.criticizer.constants.ContentCategory;
 import org.criticizer.dto.helper.PageResponse;
 import org.criticizer.entity.Game;
@@ -21,34 +27,21 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CategoryViewController Tests")
 class CategoryViewControllerTest {
 
-    @Mock
-    private MediaTypeResolver mediaTypeResolver;
+    @Mock private MediaTypeResolver mediaTypeResolver;
 
-    @Mock
-    private TagService tagService;
+    @Mock private TagService tagService;
 
-    @Mock
-    private GenreService genreService;
+    @Mock private GenreService genreService;
 
-    @Mock
-    private SecurityUtil securityUtil;
+    @Mock private SecurityUtil securityUtil;
 
-    @Mock
-    private GameService gameService;
+    @Mock private GameService gameService;
 
-    @InjectMocks
-    private CategoryViewController controller;
+    @InjectMocks private CategoryViewController controller;
 
     private MockMvc mockMvc;
     private User testUser;
@@ -59,10 +52,8 @@ class CategoryViewControllerTest {
         viewResolver.setPrefix("/WEB-INF/views/");
         viewResolver.setSuffix(".jsp");
 
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .setViewResolvers(viewResolver)
-                .build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver).build();
 
         testUser = TestDataBuilder.createRegularUser();
     }
@@ -78,7 +69,7 @@ class CategoryViewControllerTest {
         List<Game> games = TestDataBuilder.createGames(5, testUser.getId());
         PageResponse<Game> pageResponse = TestDataBuilder.createPageResponse(games, 1, 10);
         when(gameService.getUserItemsPage(
-                anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc")))
+                        anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc")))
                 .thenReturn(pageResponse);
 
         // When & Then
@@ -90,8 +81,9 @@ class CategoryViewControllerTest {
                 .andExpect(model().attributeExists("allTags"));
 
         verify(tagService).getAllTags();
-        verify(gameService).getUserItemsPage(
-                anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"));
+        verify(gameService)
+                .getUserItemsPage(
+                        anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"));
     }
 
     @Test
@@ -104,7 +96,7 @@ class CategoryViewControllerTest {
 
         PageResponse<Game> pageResponse = TestDataBuilder.createEmptyPageResponse(1, 10);
         when(gameService.getUserItemsPage(
-                anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc")))
+                        anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc")))
                 .thenReturn(pageResponse);
 
         // When & Then
@@ -127,7 +119,7 @@ class CategoryViewControllerTest {
 
         PageResponse<Game> pageResponse = TestDataBuilder.createEmptyPageResponse(1, 10);
         when(gameService.getUserItemsPage(
-                anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc")))
+                        anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc")))
                 .thenReturn(pageResponse);
 
         // When & Then
@@ -148,7 +140,7 @@ class CategoryViewControllerTest {
 
         PageResponse<Game> pageResponse = TestDataBuilder.createEmptyPageResponse(1, 10);
         when(gameService.getUserItemsPage(
-                anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc")))
+                        anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc")))
                 .thenReturn(pageResponse);
 
         // When & Then

@@ -1,6 +1,13 @@
 package org.criticizer.controller.admin;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.criticizer.config.GlobalExceptionHandler;
 import org.criticizer.dto.admin.AdminStats;
 import org.criticizer.dto.admin.ChangeRoleRequest;
@@ -23,27 +30,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AdminController Tests")
 class AdminControllerTest {
 
-    @Mock
-    private UserService userService;
-    @Mock
-    private DashboardService dashboardService;
-    @Mock
-    private SecurityUtil securityUtil;
+    @Mock private UserService userService;
+    @Mock private DashboardService dashboardService;
+    @Mock private SecurityUtil securityUtil;
 
-    @InjectMocks
-    private AdminController controller;
+    @InjectMocks private AdminController controller;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
@@ -51,10 +46,10 @@ class AdminControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .setControllerAdvice(new GlobalExceptionHandler())
-                .build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(controller)
+                        .setControllerAdvice(new GlobalExceptionHandler())
+                        .build();
         objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
         adminUser = TestDataBuilder.createAdminUser();
@@ -77,16 +72,18 @@ class AdminControllerTest {
     @Test
     @DisplayName("GET /api/admin/users - Should return paginated users")
     void shouldGetUsers() throws Exception {
-        List<User> users = List.of(
-                TestDataBuilder.createUser(1, "user1", Role.USER),
-                TestDataBuilder.createUser(2, "user2", Role.USER)
-        );
+        List<User> users =
+                List.of(
+                        TestDataBuilder.createUser(1, "user1", Role.USER),
+                        TestDataBuilder.createUser(2, "user2", Role.USER));
         PageResponse<User> pageResponse = TestDataBuilder.createPageResponse(users, 1, 10);
         when(userService.getUsersPage(any(), eq(1), eq(10), eq(false))).thenReturn(pageResponse);
 
-        mockMvc.perform(get("/api/admin/users")
-                        .param("page", "0").param("size", "10")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/api/admin/users")
+                                .param("page", "0")
+                                .param("size", "10")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items").isArray())
                 .andExpect(jsonPath("$.items.length()").value(2));
@@ -99,11 +96,15 @@ class AdminControllerTest {
     void shouldGetUsersWithSearch() throws Exception {
         List<User> users = List.of(TestDataBuilder.createUser(1, "john", Role.USER));
         PageResponse<User> pageResponse = TestDataBuilder.createPageResponse(users, 1, 10);
-        when(userService.getUsersPage(eq("john"), eq(1), eq(10), eq(false))).thenReturn(pageResponse);
+        when(userService.getUsersPage(eq("john"), eq(1), eq(10), eq(false)))
+                .thenReturn(pageResponse);
 
-        mockMvc.perform(get("/api/admin/users")
-                        .param("page", "0").param("size", "10").param("search", "john")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/api/admin/users")
+                                .param("page", "0")
+                                .param("size", "10")
+                                .param("search", "john")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items.length()").value(1));
 
@@ -118,9 +119,10 @@ class AdminControllerTest {
 
         ChangeRoleRequest request = new ChangeRoleRequest(Role.ADMIN);
 
-        mockMvc.perform(put("/api/admin/users/2/role")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+                        put("/api/admin/users/2/role")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("User role updated successfully"));
 

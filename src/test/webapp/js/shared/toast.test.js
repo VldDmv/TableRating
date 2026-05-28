@@ -1,8 +1,7 @@
-
 import { jest } from '@jest/globals';
 
 jest.unstable_mockModule('@/tableScripts/core/utils.js', () => ({
-    htmlUtils: { escape: (s) => s.replace(/</g, '&lt;').replace(/>/g, '&gt;') }
+    htmlUtils: { escape: (s) => s.replace(/</g, '&lt;').replace(/>/g, '&gt;') },
 }));
 
 const { ToastService } = await import('@/shared/toast.js');
@@ -41,7 +40,7 @@ describe('ToastService.show', () => {
 
     beforeEach(() => {
         container = setupContainer();
-        service   = new ToastService('toastContainer');
+        service = new ToastService('toastContainer');
         jest.useFakeTimers();
     });
 
@@ -110,9 +109,9 @@ describe('ToastService.show', () => {
     });
 
     test('multiple toasts stack', () => {
-        service.show('First',  'info');
+        service.show('First', 'info');
         service.show('Second', 'success');
-        service.show('Third',  'error');
+        service.show('Third', 'error');
         expect(container.querySelectorAll('.toast').length).toBe(3);
     });
 });
@@ -126,7 +125,7 @@ describe('ToastService._decodeParam (via checkUrlMessages)', () => {
 
     beforeEach(() => {
         container = setupContainer();
-        service   = new ToastService('toastContainer');
+        service = new ToastService('toastContainer');
         jest.useFakeTimers();
     });
 
@@ -138,9 +137,9 @@ describe('ToastService._decodeParam (via checkUrlMessages)', () => {
         Object.defineProperty(window, 'location', {
             value: {
                 search: '?success=Item+saved+successfully',
-                href:   'http://localhost/?success=Item+saved+successfully'
+                href: 'http://localhost/?success=Item+saved+successfully',
             },
-            writable: true
+            writable: true,
         });
 
         service.checkUrlMessages();
@@ -153,9 +152,9 @@ describe('ToastService._decodeParam (via checkUrlMessages)', () => {
         Object.defineProperty(window, 'location', {
             value: {
                 search: '?error=Not%20found',
-                href:   'http://localhost/?error=Not%20found'
+                href: 'http://localhost/?error=Not%20found',
             },
-            writable: true
+            writable: true,
         });
 
         service.checkUrlMessages();
@@ -168,9 +167,9 @@ describe('ToastService._decodeParam (via checkUrlMessages)', () => {
         Object.defineProperty(window, 'location', {
             value: {
                 search: '?success=Saved',
-                href:   'http://localhost/?success=Saved'
+                href: 'http://localhost/?success=Saved',
             },
-            writable: true
+            writable: true,
         });
 
         service.checkUrlMessages();
@@ -183,9 +182,9 @@ describe('ToastService._decodeParam (via checkUrlMessages)', () => {
         Object.defineProperty(window, 'location', {
             value: {
                 search: '?error=Failed',
-                href:   'http://localhost/?error=Failed'
+                href: 'http://localhost/?error=Failed',
             },
-            writable: true
+            writable: true,
         });
 
         service.checkUrlMessages();
@@ -198,9 +197,9 @@ describe('ToastService._decodeParam (via checkUrlMessages)', () => {
         Object.defineProperty(window, 'location', {
             value: {
                 search: '?success=OK&error=Also+bad',
-                href:   'http://localhost/?success=OK&error=Also+bad'
+                href: 'http://localhost/?success=OK&error=Also+bad',
             },
-            writable: true
+            writable: true,
         });
 
         service.checkUrlMessages();
@@ -212,9 +211,9 @@ describe('ToastService._decodeParam (via checkUrlMessages)', () => {
         Object.defineProperty(window, 'location', {
             value: {
                 search: '',
-                href:   'http://localhost/'
+                href: 'http://localhost/',
             },
-            writable: true
+            writable: true,
         });
 
         service.checkUrlMessages();
@@ -231,7 +230,7 @@ describe('ToastService XSS protection', () => {
 
     beforeEach(() => {
         container = setupContainer();
-        service   = new ToastService('toastContainer');
+        service = new ToastService('toastContainer');
         jest.useFakeTimers();
     });
 

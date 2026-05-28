@@ -5,11 +5,12 @@
 export const htmlUtils = {
     escape(str) {
         if (typeof str !== 'string' || !str) return '';
-        return str.replace(/&/g, '&amp;')
-                  .replace(/</g, '&lt;')
-                  .replace(/>/g, '&gt;')
-                  .replace(/"/g, '&quot;')
-                  .replace(/'/g, '&#39;');
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     },
 
     decode(html) {
@@ -17,14 +18,14 @@ export const htmlUtils = {
         const txt = document.createElement('textarea');
         txt.innerHTML = html;
         return txt.value;
-    }
+    },
 };
 
 export const stringUtils = {
     capitalize(str) {
         if (!str) return '';
         return str.charAt(0).toUpperCase() + str.slice(1);
-    }
+    },
 };
 
 export const domUtils = {
@@ -48,7 +49,7 @@ export const domUtils = {
         if (typeof children === 'string') {
             element.textContent = children;
         } else if (Array.isArray(children)) {
-            children.forEach(child => {
+            children.forEach((child) => {
                 if (typeof child === 'string') {
                     element.appendChild(document.createTextNode(child));
                 } else if (child instanceof Node) {
@@ -58,7 +59,7 @@ export const domUtils = {
         }
 
         return element;
-    }
+    },
 };
 
 /**
@@ -117,9 +118,9 @@ export const securityUtils = {
         const token = this.getCsrfToken();
         return {
             'X-XSRF-TOKEN': token,
-            ...additionalHeaders
+            ...additionalHeaders,
         };
-    }
+    },
 };
 
 export const entityUtils = {
@@ -139,10 +140,10 @@ export const entityUtils = {
             games: 'Game',
             movies: 'Movie',
             books: 'Book',
-            shows: 'Show'
+            shows: 'Show',
         };
         return names[entityType] || entityType;
-    }
+    },
 };
 
 export const ICONS = {
@@ -153,7 +154,7 @@ export const ICONS = {
     SAVE: '💾',
     CANCEL: '❌',
     ARROW_UP: '▲',
-    ARROW_DOWN: '▼'
+    ARROW_DOWN: '▼',
 };
 
 export const CONSTANTS = {
@@ -165,6 +166,6 @@ export const CONSTANTS = {
         GAMES: { low: 49, medium: 74 },
         MOVIES: { low: 39, medium: 60 },
         SHOWS: { low: 39, medium: 60 },
-        BOOKS: { low: 49, medium: 79 }
-    }
+        BOOKS: { low: 49, medium: 79 },
+    },
 };

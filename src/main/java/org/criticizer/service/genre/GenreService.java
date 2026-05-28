@@ -1,5 +1,9 @@
 package org.criticizer.service.genre;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.criticizer.dto.genre.CreateGenreRequest;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.dto.genre.UpdateGenreRequest;
@@ -14,15 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-/**
- * Service for managing genres.
- * Contains all business logic related to genres.
- */
+/** Service for managing genres. Contains all business logic related to genres. */
 @Service
 @Transactional(readOnly = true)
 public class GenreService {
@@ -42,8 +38,7 @@ public class GenreService {
             GenreApplicabilityRepository applicabilityRepository,
             MovieRepository movieRepository,
             BookRepository bookRepository,
-            ShowRepository showRepository
-    ) {
+            ShowRepository showRepository) {
         this.genreRepository = genreRepository;
         this.applicabilityRepository = applicabilityRepository;
         this.movieRepository = movieRepository;
@@ -51,20 +46,14 @@ public class GenreService {
         this.showRepository = showRepository;
     }
 
-    /**
-     * Get all genres with their media types.
-     * Uses batch loading to avoid N+1 queries.
-     */
+    /** Get all genres with their media types. Uses batch loading to avoid N+1 queries. */
     public List<GenreResponse> getAllGenres() {
         log.debug("Fetching all genres");
         List<Genre> genres = genreRepository.findAllByOrderByNameAsc();
         return buildResponsesWithBatchedMediaTypes(genres);
     }
 
-    /**
-     * Get genres available for a specific media type.
-     * Uses batch loading to avoid N+1 queries.
-     */
+    /** Get genres available for a specific media type. Uses batch loading to avoid N+1 queries. */
     public List<GenreResponse> getAvailableGenresFor(String mediaType) {
         validateMediaType(mediaType);
         log.debug("Fetching available genres for media type: {}", mediaType);
@@ -74,24 +63,21 @@ public class GenreService {
 
     public List<GenreResponse> getGenresForMovie(Integer movieId) {
         log.debug("Fetching genres for movie ID: {}", movieId);
-        return genreRepository.findByMovieId(movieId)
-                .stream()
+        return genreRepository.findByMovieId(movieId).stream()
                 .map(this::toSimpleResponse)
                 .collect(Collectors.toList());
     }
 
     public List<GenreResponse> getGenresForBook(Integer bookId) {
         log.debug("Fetching genres for book ID: {}", bookId);
-        return genreRepository.findByBookId(bookId)
-                .stream()
+        return genreRepository.findByBookId(bookId).stream()
                 .map(this::toSimpleResponse)
                 .collect(Collectors.toList());
     }
 
     public List<GenreResponse> getGenresForShow(Integer showId) {
         log.debug("Fetching genres for show ID: {}", showId);
-        return genreRepository.findByShowId(showId)
-                .stream()
+        return genreRepository.findByShowId(showId).stream()
                 .map(this::toSimpleResponse)
                 .collect(Collectors.toList());
     }
@@ -111,8 +97,11 @@ public class GenreService {
 
         saveMediaTypeApplicability(saved.getId(), validatedMediaTypes);
 
-        log.info("Created genre: {} with ID: {} for media types: {}",
-                saved.getName(), saved.getId(), validatedMediaTypes);
+        log.info(
+                "Created genre: {} with ID: {} for media types: {}",
+                saved.getName(),
+                saved.getId(),
+                validatedMediaTypes);
 
         return toResponseWithMediaTypes(saved);
     }
@@ -122,15 +111,22 @@ public class GenreService {
         String trimmedName = validateAndTrimName(request.getName());
         List<String> validatedMediaTypes = validateMediaTypes(request.getMediaTypes());
 
-        Genre genre = genreRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Genre", "ID: " + request.getId()));
+        Genre genre =
+                genreRepository
+                        .findById(request.getId())
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "Genre", "ID: " + request.getId()));
 
-        genreRepository.findByNameIgnoreCase(trimmedName)
-                .ifPresent(existingGenre -> {
-                    if (!existingGenre.getId().equals(genre.getId())) {
-                        throw new ItemAlreadyExistsException("Genre", trimmedName);
-                    }
-                });
+        genreRepository
+                .findByNameIgnoreCase(trimmedName)
+                .ifPresent(
+                        existingGenre -> {
+                            if (!existingGenre.getId().equals(genre.getId())) {
+                                throw new ItemAlreadyExistsException("Genre", trimmedName);
+                            }
+                        });
 
         List<String> oldMediaTypes = applicabilityRepository.findMediaTypesByGenreId(genre.getId());
 
@@ -142,19 +138,23 @@ public class GenreService {
 
         removeGenreFromRemovedMediaTypes(genre, oldMediaTypes, validatedMediaTypes);
 
-        log.info("Updated genre ID {} to name: {} with media types: {}",
-                updated.getId(), updated.getName(), validatedMediaTypes);
+        log.info(
+                "Updated genre ID {} to name: {} with media types: {}",
+                updated.getId(),
+                updated.getName(),
+                validatedMediaTypes);
 
         return toResponseWithMediaTypes(updated);
     }
 
-    /**
-     * Delete a genre and cascade-remove it from all associated media items.
-     */
+    /** Delete a genre and cascade-remove it from all associated media items. */
     @Transactional
     public void deleteGenre(Integer genreId) {
-        Genre genre = genreRepository.findById(genreId)
-                .orElseThrow(() -> new ResourceNotFoundException("Genre", "ID: " + genreId));
+        Genre genre =
+                genreRepository
+                        .findById(genreId)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException("Genre", "ID: " + genreId));
 
         removeGenreFromAllItems(genre);
 
@@ -164,10 +164,7 @@ public class GenreService {
         log.info("Deleted genre with ID: {} and removed from all associated media", genreId);
     }
 
-    /**
-     * Check if a genre is in use by any media.
-     * Uses early exit to avoid unnecessary queries.
-     */
+    /** Check if a genre is in use by any media. Uses early exit to avoid unnecessary queries. */
     public boolean isGenreInUse(Integer genreId) {
         if (genreRepository.countMoviesWithGenre(genreId) > 0) return true;
         if (genreRepository.countBooksWithGenre(genreId) > 0) return true;
@@ -187,23 +184,22 @@ public class GenreService {
             return List.of();
         }
 
-        List<Integer> genreIds = genres.stream()
-                .map(Genre::getId)
-                .collect(Collectors.toList());
+        List<Integer> genreIds = genres.stream().map(Genre::getId).collect(Collectors.toList());
 
-        Map<Integer, List<String>> mediaTypesByGenreId = applicabilityRepository
-                .findMediaTypesByGenreIds(genreIds)
-                .stream()
-                .collect(Collectors.groupingBy(
-                        row -> (Integer) row[0],
-                        Collectors.mapping(row -> (String) row[1], Collectors.toList())
-                ));
+        Map<Integer, List<String>> mediaTypesByGenreId =
+                applicabilityRepository.findMediaTypesByGenreIds(genreIds).stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        row -> (Integer) row[0],
+                                        Collectors.mapping(
+                                                row -> (String) row[1], Collectors.toList())));
 
         return genres.stream()
-                .map(genre -> GenreResponse.from(
-                        genre,
-                        mediaTypesByGenreId.getOrDefault(genre.getId(), List.of())
-                ))
+                .map(
+                        genre ->
+                                GenreResponse.from(
+                                        genre,
+                                        mediaTypesByGenreId.getOrDefault(genre.getId(), List.of())))
                 .collect(Collectors.toList());
     }
 
@@ -215,9 +211,8 @@ public class GenreService {
         log.debug("Removed genre '{}' from all associated media items", genre.getName());
     }
 
-    private void removeGenreFromRemovedMediaTypes(Genre genre,
-                                                  List<String> oldTypes,
-                                                  List<String> newTypes) {
+    private void removeGenreFromRemovedMediaTypes(
+            Genre genre, List<String> oldTypes, List<String> newTypes) {
         boolean wasShared = oldTypes.contains("shared");
         boolean isShared = newTypes.contains("shared");
 
@@ -261,33 +256,29 @@ public class GenreService {
 
         for (String mediaType : mediaTypes) {
             if (!VALID_MEDIA_TYPES.contains(mediaType.toLowerCase())) {
-                throw new InvalidInputException("mediaType",
-                        "must be one of: " + String.join(", ", VALID_MEDIA_TYPES));
+                throw new InvalidInputException(
+                        "mediaType", "must be one of: " + String.join(", ", VALID_MEDIA_TYPES));
             }
         }
 
-        return mediaTypes.stream()
-                .map(String::toLowerCase)
-                .distinct()
-                .collect(Collectors.toList());
+        return mediaTypes.stream().map(String::toLowerCase).distinct().collect(Collectors.toList());
     }
 
     private void validateMediaType(String mediaType) {
         if (mediaType == null || !VALID_MEDIA_TYPES.contains(mediaType.toLowerCase())) {
-            throw new InvalidInputException("mediaType",
-                    "must be one of: " + String.join(", ", VALID_MEDIA_TYPES));
+            throw new InvalidInputException(
+                    "mediaType", "must be one of: " + String.join(", ", VALID_MEDIA_TYPES));
         }
     }
 
     private void saveMediaTypeApplicability(Integer genreId, List<String> mediaTypes) {
-        mediaTypes.forEach(mediaType ->
-                applicabilityRepository.insertApplicability(genreId, mediaType));
+        mediaTypes.forEach(
+                mediaType -> applicabilityRepository.insertApplicability(genreId, mediaType));
     }
 
     // Used only for single-genre responses (create/update result)
     private GenreResponse toResponseWithMediaTypes(Genre genre) {
-        List<String> mediaTypes = applicabilityRepository
-                .findMediaTypesByGenreId(genre.getId());
+        List<String> mediaTypes = applicabilityRepository.findMediaTypesByGenreId(genre.getId());
         return GenreResponse.from(genre, mediaTypes);
     }
 

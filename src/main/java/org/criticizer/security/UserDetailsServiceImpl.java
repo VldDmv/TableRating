@@ -9,9 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
- * Spring Security UserDetailsService implementation.
- * Returns AuthenticatedUser which holds the full User entity,
- * allowing SecurityUtil to retrieve the user without an extra DB query.
+ * Spring Security UserDetailsService implementation. Returns AuthenticatedUser which holds the full
+ * User entity, allowing SecurityUtil to retrieve the user without an extra DB query.
  */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

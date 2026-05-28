@@ -3,7 +3,7 @@ import { jest, describe, test, expect, beforeEach, afterEach } from '@jest/globa
 // ─── Mock Chart.js ────────────────────────────────────────────────────────────
 
 const chartInstances = [];
-const MockChart = jest.fn(function(ctx, config) {
+const MockChart = jest.fn(function (ctx, config) {
     chartInstances.push({ ctx, config });
 });
 global.Chart = MockChart;
@@ -15,11 +15,16 @@ const { Dashboard } = await import('@/pages/admin/dashboard.js');
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function setupStatCards(values = [42, 100]) {
-    document.body.innerHTML = values.map(v => `
+    document.body.innerHTML =
+        values
+            .map(
+                (v) => `
         <div class="dashboard-stat-card">
             <span class="stat-value">${v}</span>
         </div>
-    `).join('') + '<canvas id="mediaDistributionChart"></canvas>';
+    `
+            )
+            .join('') + '<canvas id="mediaDistributionChart"></canvas>';
 }
 
 function setupCanvas() {
@@ -50,8 +55,7 @@ describe('Dashboard.animateValue', () => {
         const el = document.createElement('span');
         el.textContent = '0';
 
-
-        jest.spyOn(window, 'requestAnimationFrame').mockImplementation(cb => {
+        jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
             // progress=1 → elapsed >= duration
             jest.spyOn(performance, 'now').mockReturnValue(1001);
             cb(1001);
@@ -65,9 +69,8 @@ describe('Dashboard.animateValue', () => {
     test('uses easeOutQuart — at 50% time, value exceeds linear midpoint', () => {
         const el = document.createElement('span');
 
-
         jest.spyOn(performance, 'now').mockReturnValue(0);
-        jest.spyOn(window, 'requestAnimationFrame').mockImplementationOnce(cb => {
+        jest.spyOn(window, 'requestAnimationFrame').mockImplementationOnce((cb) => {
             jest.spyOn(performance, 'now').mockReturnValue(500);
             cb(500);
         });
@@ -82,7 +85,7 @@ describe('Dashboard.animateValue', () => {
         const el = document.createElement('span');
 
         jest.spyOn(performance, 'now').mockReturnValue(0);
-        jest.spyOn(window, 'requestAnimationFrame').mockImplementationOnce(cb => {
+        jest.spyOn(window, 'requestAnimationFrame').mockImplementationOnce((cb) => {
             jest.spyOn(performance, 'now').mockReturnValue(333);
             cb(333);
         });
@@ -94,7 +97,7 @@ describe('Dashboard.animateValue', () => {
     test('works with start === end (zero range)', () => {
         const el = document.createElement('span');
 
-        jest.spyOn(window, 'requestAnimationFrame').mockImplementation(cb => {
+        jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
             jest.spyOn(performance, 'now').mockReturnValue(1001);
             cb(1001);
         });
@@ -127,7 +130,7 @@ describe('Dashboard.animateStatCards', () => {
 
         jest.runAllTimers();
 
-        document.querySelectorAll('.dashboard-stat-card').forEach(card => {
+        document.querySelectorAll('.dashboard-stat-card').forEach((card) => {
             expect(card.style.opacity).toBe('0');
         });
     });
@@ -233,9 +236,9 @@ describe('Dashboard.createMediaDistributionChart', () => {
 
         const tooltipFn = chartInstances[0].config.options.plugins.tooltip.callbacks.label;
         const result = tooltipFn({
-            label:   '🎮 Games',
-            parsed:  10,
-            dataset: { data: [10, 10, 10, 10] }
+            label: '🎮 Games',
+            parsed: 10,
+            dataset: { data: [10, 10, 10, 10] },
         });
         expect(result).toBe('🎮 Games: 10 (25.0%)');
     });
@@ -246,9 +249,9 @@ describe('Dashboard.createMediaDistributionChart', () => {
 
         const tooltipFn = chartInstances[0].config.options.plugins.tooltip.callbacks.label;
         const result = tooltipFn({
-            label:   '📚 Books',
-            parsed:  7,
-            dataset: { data: [0, 0, 7, 0] }
+            label: '📚 Books',
+            parsed: 7,
+            dataset: { data: [0, 0, 7, 0] },
         });
         expect(result).toBe('📚 Books: 7 (100.0%)');
     });

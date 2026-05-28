@@ -1,12 +1,9 @@
-
 import { jest } from '@jest/globals';
 
 // ─── Mock window.categoryConfig ───────────────────────────────────────────────
 beforeEach(() => {
     delete global.window.categoryConfig;
 });
-
-
 
 describe('COMMON_VALIDATORS.validateScore', () => {
     // Extract the validator logic as used in each entity config
@@ -57,20 +54,20 @@ describe('createScoreStyling', () => {
     // Replicate the factory function
     const createScoreStyling = (thresholds) => (tableBody) => {
         if (!tableBody) return;
-        tableBody.querySelectorAll('.score-cell').forEach(cell => {
+        tableBody.querySelectorAll('.score-cell').forEach((cell) => {
             cell.classList.remove('score-low', 'score-medium', 'score-high');
             const score = parseInt(cell.textContent.trim(), 10);
             if (!isNaN(score)) {
-                if      (score <= thresholds.low)    cell.classList.add('score-low');
+                if (score <= thresholds.low) cell.classList.add('score-low');
                 else if (score <= thresholds.medium) cell.classList.add('score-medium');
-                else                                  cell.classList.add('score-high');
+                else cell.classList.add('score-high');
             }
         });
     };
 
     function makeContainer(scores) {
         const div = document.createElement('div');
-        scores.forEach(s => {
+        scores.forEach((s) => {
             const span = document.createElement('span');
             span.className = 'score-cell';
             span.textContent = String(s);

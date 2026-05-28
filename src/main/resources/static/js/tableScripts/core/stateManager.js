@@ -38,7 +38,7 @@ export class StateManager {
     subscribe(listener) {
         this.listeners.push(listener);
         return () => {
-            this.listeners = this.listeners.filter(l => l !== listener);
+            this.listeners = this.listeners.filter((l) => l !== listener);
         };
     }
 
@@ -48,7 +48,7 @@ export class StateManager {
      * @param {Object} newState - New state.
      */
     notifyListeners(oldState, newState) {
-        this.listeners.forEach(listener => {
+        this.listeners.forEach((listener) => {
             try {
                 listener(oldState, newState);
             } catch (error) {

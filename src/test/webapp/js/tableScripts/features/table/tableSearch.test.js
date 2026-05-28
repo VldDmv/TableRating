@@ -1,4 +1,3 @@
-
 import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals';
 import { SearchManager } from '@/tableScripts/features/table/tableSearch.js';
 
@@ -363,7 +362,6 @@ describe('SearchManager', () => {
             const callback = jest.fn();
             searchManager.onSearch(callback).init();
 
-
             searchInput.value = 'mario';
             searchInput.dispatchEvent(new Event('input'));
 
@@ -407,7 +405,6 @@ describe('SearchManager', () => {
             searchInput.value = 'typing...';
             searchInput.dispatchEvent(new Event('input'));
 
-
             expect(searchManager.getValue()).toBe('typing...');
 
             jest.advanceTimersByTime(500);
@@ -431,23 +428,23 @@ describe('SearchManager', () => {
             expect(callback).toHaveBeenCalledWith(longTerm);
         });
 
-    test('should handle multiple rapid clears and sets', () => {
-               const callback = jest.fn();
-               searchManager.onSearch(callback);
-               searchManager.init();
+        test('should handle multiple rapid clears and sets', () => {
+            const callback = jest.fn();
+            searchManager.onSearch(callback);
+            searchManager.init();
 
-               for (let i = 0; i < 5; i++) {
-                   searchInput.value = `test${i}`;
-                   searchInput.dispatchEvent(new Event('input'));
+            for (let i = 0; i < 5; i++) {
+                searchInput.value = `test${i}`;
+                searchInput.dispatchEvent(new Event('input'));
 
-                   jest.advanceTimersByTime(50);
-                   searchManager.clear();
-               }
+                jest.advanceTimersByTime(50);
+                searchManager.clear();
+            }
 
-               jest.advanceTimersByTime(500);
+            jest.advanceTimersByTime(500);
 
-               expect(callback).toHaveBeenCalledWith('');
-           });
+            expect(callback).toHaveBeenCalledWith('');
+        });
 
         test('should handle zero debounce delay', () => {
             const callback = jest.fn();
@@ -473,7 +470,6 @@ describe('SearchManager', () => {
             searchInput.dispatchEvent(new Event('input'));
 
             jest.advanceTimersByTime(0);
-
 
             expect(callback).toHaveBeenCalled();
         });

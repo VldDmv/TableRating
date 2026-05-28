@@ -1,5 +1,11 @@
 package org.criticizer.config;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.criticizer.security.SecurityUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,21 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @WebMvcTest(TestController.class)
 @Import({GlobalExceptionHandler.class, TestSecurityConfig.class})
 class GlobalExceptionHandlerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @MockBean
-    private SecurityUtil securityUtil;
+    @MockBean private SecurityUtil securityUtil;
 
     @Test
     @WithMockUser
@@ -90,16 +88,19 @@ class GlobalExceptionHandlerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.status").value(500))
                 .andExpect(jsonPath("$.error").value("Internal Server Error"))
-                .andExpect(jsonPath("$.message").value("An unexpected error occurred. Please try again later."));
+                .andExpect(
+                        jsonPath("$.message")
+                                .value("An unexpected error occurred. Please try again later."));
     }
 
     @Test
     @WithMockUser
     void handleMethodArgumentNotValidException_Returns400WithFieldErrors() throws Exception {
-        mockMvc.perform(post("/test/validate")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}")
-                        .with(csrf()))
+        mockMvc.perform(
+                        post("/test/validate")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{}")
+                                .with(csrf()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Validation Failed"))

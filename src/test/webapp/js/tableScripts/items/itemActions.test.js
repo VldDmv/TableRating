@@ -1,5 +1,3 @@
-
-
 import { jest } from '@jest/globals';
 
 // ─── Mock dependencies ────────────────────────────────────────────────────────
@@ -7,18 +5,18 @@ import { jest } from '@jest/globals';
 jest.unstable_mockModule('@/tableScripts/core/errorHandler.js', () => ({
     ErrorHandler: {
         parseErrorResponse: jest.fn(async () => 'Server Error'),
-        handle:             jest.fn()
-    }
+        handle: jest.fn(),
+    },
 }));
 
 jest.unstable_mockModule('@/tableScripts/core/utils.js', () => ({
     securityUtils: { getCsrfToken: jest.fn(() => 'mock-csrf-token') },
-    ICONS:         { COMPLETED: '✅', NOT_COMPLETED: '❌' }
+    ICONS: { COMPLETED: '✅', NOT_COMPLETED: '❌' },
 }));
 
 const { ItemActionsManager } = await import('@/tableScripts/items/itemActions.js');
-const { ErrorHandler }       = await import('@/tableScripts/core/errorHandler.js');
-const { securityUtils }      = await import('@/tableScripts/core/utils.js');
+const { ErrorHandler } = await import('@/tableScripts/core/errorHandler.js');
+const { securityUtils } = await import('@/tableScripts/core/utils.js');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -26,10 +24,10 @@ function makeConfig() {
     return {
         entityType: 'games',
         selectors: {
-            statusButtonClass:     '.status-button',
-            editIconButtonClass:   '.edit-button',
-            deleteIconButtonClass: '.delete-button'
-        }
+            statusButtonClass: '.status-button',
+            editIconButtonClass: '.edit-button',
+            deleteIconButtonClass: '.delete-button',
+        },
     };
 }
 
@@ -45,9 +43,9 @@ function makeRow(options = {}) {
 
     const td = document.createElement('td');
     const btn = document.createElement('button');
-    btn.className       = options.btnClass || 'status-button';
+    btn.className = options.btnClass || 'status-button';
     btn.dataset.itemName = options.itemName || 'Test Game';
-    btn.innerHTML       = options.icon || '✅';
+    btn.innerHTML = options.icon || '✅';
     td.appendChild(btn);
     tr.appendChild(td);
     return { tr, btn };
@@ -61,7 +59,7 @@ describe('ItemActionsManager.setButtonLoading', () => {
 
     beforeEach(() => {
         tableBody = makeTableBody();
-        manager   = new ItemActionsManager(tableBody, makeConfig(), null);
+        manager = new ItemActionsManager(tableBody, makeConfig(), null);
     });
 
     afterEach(() => {
@@ -81,14 +79,14 @@ describe('ItemActionsManager.setButtonLoading', () => {
     });
 
     test('enables button when loading=false', () => {
-        const btn    = document.createElement('button');
+        const btn = document.createElement('button');
         btn.disabled = true;
         manager.setButtonLoading(btn, false);
         expect(btn.disabled).toBe(false);
     });
 
     test('restores opacity to 1 when not loading', () => {
-        const btn         = document.createElement('button');
+        const btn = document.createElement('button');
         btn.style.opacity = '0.5';
         manager.setButtonLoading(btn, false);
         expect(btn.style.opacity).toBe('1');
@@ -103,7 +101,7 @@ describe('ItemActionsManager.handleToggleStatus', () => {
 
     beforeEach(() => {
         tableBody = makeTableBody();
-        manager   = new ItemActionsManager(tableBody, makeConfig(), null);
+        manager = new ItemActionsManager(tableBody, makeConfig(), null);
         global.fetch = jest.fn();
         securityUtils.getCsrfToken.mockReturnValue('mock-csrf');
     });
@@ -135,8 +133,8 @@ describe('ItemActionsManager.handleToggleStatus', () => {
         const { tr, btn } = makeRow({ itemName: 'Witcher 3' });
         tableBody.appendChild(tr);
         global.fetch.mockResolvedValue({
-            ok:   true,
-            json: async () => ({ completed: true })
+            ok: true,
+            json: async () => ({ completed: true }),
         });
 
         await manager.handleToggleStatus(btn);
@@ -151,8 +149,8 @@ describe('ItemActionsManager.handleToggleStatus', () => {
         const { tr, btn } = makeRow({ itemName: 'Game' });
         tableBody.appendChild(tr);
         global.fetch.mockResolvedValue({
-            ok:   true,
-            json: async () => ({ completed: false })
+            ok: true,
+            json: async () => ({ completed: false }),
         });
 
         await manager.handleToggleStatus(btn);
@@ -160,7 +158,7 @@ describe('ItemActionsManager.handleToggleStatus', () => {
         expect(global.fetch).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({
-                headers: expect.objectContaining({ 'X-XSRF-TOKEN': 'mock-csrf' })
+                headers: expect.objectContaining({ 'X-XSRF-TOKEN': 'mock-csrf' }),
             })
         );
     });
@@ -169,8 +167,8 @@ describe('ItemActionsManager.handleToggleStatus', () => {
         const { tr, btn } = makeRow({ itemName: 'Game', icon: '❌' });
         tableBody.appendChild(tr);
         global.fetch.mockResolvedValue({
-            ok:   true,
-            json: async () => ({ completed: true })
+            ok: true,
+            json: async () => ({ completed: true }),
         });
 
         await manager.handleToggleStatus(btn);
@@ -182,8 +180,8 @@ describe('ItemActionsManager.handleToggleStatus', () => {
         const { tr, btn } = makeRow({ itemName: 'Game', icon: '✅' });
         tableBody.appendChild(tr);
         global.fetch.mockResolvedValue({
-            ok:   true,
-            json: async () => ({ completed: false })
+            ok: true,
+            json: async () => ({ completed: false }),
         });
 
         await manager.handleToggleStatus(btn);
@@ -210,8 +208,8 @@ describe('ItemActionsManager.handleDeleteConfirmation', () => {
 
     beforeEach(() => {
         tableBody = makeTableBody();
-        manager   = new ItemActionsManager(tableBody, makeConfig(), null);
-        global.fetch   = jest.fn();
+        manager = new ItemActionsManager(tableBody, makeConfig(), null);
+        global.fetch = jest.fn();
         global.confirm = jest.fn(() => true);
         securityUtils.getCsrfToken.mockReturnValue('mock-csrf');
     });
@@ -282,9 +280,7 @@ describe('ItemActionsManager.handleDeleteConfirmation', () => {
 
         await manager.handleDeleteConfirmation(btn);
 
-        expect(global.confirm).toHaveBeenCalledWith(
-            expect.stringContaining('My Game')
-        );
+        expect(global.confirm).toHaveBeenCalledWith(expect.stringContaining('My Game'));
     });
 });
 
@@ -300,7 +296,7 @@ describe('ItemActionsManager.handleEditClick', () => {
         const inlineEditMock = { toggleRowEdit: jest.fn() };
         const manager = new ItemActionsManager(tableBody, makeConfig(), inlineEditMock);
 
-        const tr  = document.createElement('tr');
+        const tr = document.createElement('tr');
         const btn = document.createElement('button');
         tr.appendChild(btn);
         tableBody.appendChild(tr);
@@ -312,8 +308,8 @@ describe('ItemActionsManager.handleEditClick', () => {
 
     test('does nothing when inlineEditManager is null', () => {
         const tableBody = makeTableBody();
-        const manager   = new ItemActionsManager(tableBody, makeConfig(), null);
-        const btn       = document.createElement('button');
+        const manager = new ItemActionsManager(tableBody, makeConfig(), null);
+        const btn = document.createElement('button');
 
         expect(() => manager.handleEditClick(btn)).not.toThrow();
     });
@@ -327,7 +323,7 @@ describe('ItemActionsManager.init event delegation', () => {
 
     beforeEach(() => {
         tableBody = makeTableBody();
-        manager   = new ItemActionsManager(tableBody, makeConfig(), null);
+        manager = new ItemActionsManager(tableBody, makeConfig(), null);
         manager.init();
     });
 
@@ -338,9 +334,9 @@ describe('ItemActionsManager.init event delegation', () => {
     test('delegates status button click to handleToggleStatus', () => {
         const spy = jest.spyOn(manager, 'handleToggleStatus').mockResolvedValue();
 
-        const tr  = document.createElement('tr');
+        const tr = document.createElement('tr');
         const btn = document.createElement('button');
-        btn.className        = 'status-button';
+        btn.className = 'status-button';
         btn.dataset.itemName = 'Game';
         tr.appendChild(btn);
         tableBody.appendChild(tr);
@@ -353,9 +349,9 @@ describe('ItemActionsManager.init event delegation', () => {
     test('delegates delete button click to handleDeleteConfirmation', () => {
         const spy = jest.spyOn(manager, 'handleDeleteConfirmation').mockResolvedValue();
 
-        const tr  = document.createElement('tr');
+        const tr = document.createElement('tr');
         const btn = document.createElement('button');
-        btn.className        = 'delete-button';
+        btn.className = 'delete-button';
         btn.dataset.itemName = 'Game';
         tr.appendChild(btn);
         tableBody.appendChild(tr);
@@ -368,9 +364,9 @@ describe('ItemActionsManager.init event delegation', () => {
     test('delegates edit button click to handleEditClick', () => {
         const spy = jest.spyOn(manager, 'handleEditClick').mockImplementation(() => {});
 
-        const tr  = document.createElement('tr');
+        const tr = document.createElement('tr');
         const btn = document.createElement('button');
-        btn.className        = 'edit-button';
+        btn.className = 'edit-button';
         btn.dataset.itemName = 'Game';
         tr.appendChild(btn);
         tableBody.appendChild(tr);

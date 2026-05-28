@@ -127,7 +127,7 @@ describe('ItemFormManager', () => {
 
             formManager.handleSubmit();
 
-              expect(validateScore).toHaveBeenCalledWith('85')
+            expect(validateScore).toHaveBeenCalledWith('85');
         });
     });
 
@@ -207,20 +207,20 @@ describe('ItemFormManager', () => {
             formManager.setDisabled(true);
 
             const inputs = formElement.querySelectorAll('input, button');
-            inputs.forEach(input => {
+            inputs.forEach((input) => {
                 expect(input.disabled).toBe(true);
             });
         });
 
         test('should enable all form elements', () => {
-            formElement.querySelectorAll('input, button').forEach(el => {
+            formElement.querySelectorAll('input, button').forEach((el) => {
                 el.disabled = true;
             });
 
             formManager.setDisabled(false);
 
             const inputs = formElement.querySelectorAll('input, button');
-            inputs.forEach(input => {
+            inputs.forEach((input) => {
                 expect(input.disabled).toBe(false);
             });
         });
@@ -257,43 +257,43 @@ describe('ItemFormManager', () => {
             formManager.init();
 
             const validScores = ['1', '50', '100'];
-            validScores.forEach(score => {
+            validScores.forEach((score) => {
                 scoreInput.value = score;
                 expect(formManager.handleSubmit()).toBe(true);
             });
         });
 
-       test('should reject scores outside valid range', () => {
-                  formManager.init();
+        test('should reject scores outside valid range', () => {
+            formManager.init();
 
-                  const invalidScores = ['0', '-1', '101', '1000'];
-                  invalidScores.forEach(score => {
-                      scoreInput.value = score;
-                      const result = formManager.handleSubmit();
-                      expect(result).toBe(false);
-                  });
-              });
+            const invalidScores = ['0', '-1', '101', '1000'];
+            invalidScores.forEach((score) => {
+                scoreInput.value = score;
+                const result = formManager.handleSubmit();
+                expect(result).toBe(false);
+            });
+        });
 
-              test('should reject non-numeric scores', () => {
-                  formManager.init();
+        test('should reject non-numeric scores', () => {
+            formManager.init();
 
-                  const invalidScores = ['abc', 'test', 'NaN'];
-                  invalidScores.forEach(score => {
-                      scoreInput.value = score;
-                      expect(formManager.handleSubmit()).toBe(false);
-                  });
-              });
+            const invalidScores = ['abc', 'test', 'NaN'];
+            invalidScores.forEach((score) => {
+                scoreInput.value = score;
+                expect(formManager.handleSubmit()).toBe(false);
+            });
+        });
 
-   test('should use custom validator function', () => {
-              const customValidator = jest.fn(() => true);
-              const manager = new ItemFormManager(formElement, scoreInput, customValidator);
+        test('should use custom validator function', () => {
+            const customValidator = jest.fn(() => true);
+            const manager = new ItemFormManager(formElement, scoreInput, customValidator);
 
-              scoreInput.value = 'anything';
-              manager.handleSubmit();
+            scoreInput.value = 'anything';
+            manager.handleSubmit();
 
-              expect(customValidator).toHaveBeenCalledWith('anything');
-          });
-      });
+            expect(customValidator).toHaveBeenCalledWith('anything');
+        });
+    });
 
     describe('Integration', () => {
         test('should handle complete form submission flow', () => {
@@ -351,7 +351,7 @@ describe('ItemFormManager', () => {
 
             const inputs = formElement.querySelectorAll('input');
             expect(inputs.length).toBeGreaterThan(100);
-            inputs.forEach(input => {
+            inputs.forEach((input) => {
                 expect(input.disabled).toBe(true);
             });
         });
@@ -384,7 +384,7 @@ describe('ItemFormManager', () => {
             }
 
             const inputs = formElement.querySelectorAll('input, button');
-            inputs.forEach(input => {
+            inputs.forEach((input) => {
                 expect(input.disabled).toBe(false);
             });
         });
@@ -422,8 +422,6 @@ describe('ItemFormManager', () => {
             expect(end - start).toBeLessThan(2000);
         });
     });
-
-
 
     describe('Accessibility', () => {
         test('should maintain focus on score input after validation failure', () => {

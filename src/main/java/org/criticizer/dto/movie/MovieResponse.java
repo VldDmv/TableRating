@@ -1,13 +1,10 @@
 package org.criticizer.dto.movie;
 
+import java.util.List;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.entity.Movie;
 
-import java.util.List;
-
-/**
- * Response DTO for a movie.
- */
+/** Response DTO for a movie. */
 public class MovieResponse {
 
     private final int id;
@@ -17,8 +14,13 @@ public class MovieResponse {
     private final boolean completed;
     private final List<GenreResponse> genres;
 
-    public MovieResponse(int id, String name, String coverUrl, int score,
-                         boolean completed, List<GenreResponse> genres) {
+    public MovieResponse(
+            int id,
+            String name,
+            String coverUrl,
+            int score,
+            boolean completed,
+            List<GenreResponse> genres) {
         this.id = id;
         this.name = name;
         this.coverUrl = coverUrl;
@@ -34,10 +36,7 @@ public class MovieResponse {
                 movie.getCoverUrl(),
                 movie.getScore(),
                 movie.isCompleted(),
-                movie.getGenres().stream()
-                        .map(GenreResponse::from)
-                        .toList()
-        );
+                movie.getGenres().stream().map(GenreResponse::from).toList());
     }
 
     public int getId() {

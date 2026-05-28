@@ -1,9 +1,7 @@
 package org.criticizer.exceptions;
 
 /**
- * Basic application exception.
- * Contains two messages:
- * - userMessage: a secure message for the user
+ * Basic application exception. Contains two messages: - userMessage: a secure message for the user
  * - technicalMessage: a detailed message for logs
  */
 public class ApplicationException extends RuntimeException {
@@ -23,5 +21,3 @@ public class ApplicationException extends RuntimeException {
         return userMessage;
     }
 }
-
-

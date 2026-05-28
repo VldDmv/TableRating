@@ -30,109 +30,142 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/.well-known/**", "/actuator/**")
-                )
-                .headers(headers -> headers
-                        .frameOptions(frame -> frame
-                                .sameOrigin()
-                        )
-                        .referrerPolicy(ref -> ref
-                                .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-                        )
-                        .xssProtection(xss -> xss
-                                .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
-                        )
-                        .contentSecurityPolicy(csp -> csp
-                                .policyDirectives(
-                                        "default-src 'self'; "
-                                                + "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-                                                + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-                                                + "font-src 'self' https://fonts.gstatic.com data:; "
-                                                + "img-src 'self' data: https:; "
-                                                + "connect-src 'self' https://openlibrary.org https://api.rawg.io https://api.themoviedb.org https://cdn.jsdelivr.net; "
-                                                + "frame-ancestors 'self'; "
-                                                + "base-uri 'self'; "
-                                                + "form-action 'self'"
-                                )
-                        )
-                        .permissionsPolicy(perm -> perm
-                                .policy("geolocation=(), microphone=(), camera=(), payment=()")
-                        )
-                )
-                .authorizeHttpRequests(auth -> auth
+        http.addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf(
+                        csrf ->
+                                csrf.csrfTokenRepository(
+                                                CookieCsrfTokenRepository.withHttpOnlyFalse())
+                                        .ignoringRequestMatchers("/.well-known/**", "/actuator/**"))
+                .headers(
+                        headers ->
+                                headers.frameOptions(frame -> frame.sameOrigin())
+                                        .referrerPolicy(
+                                                ref ->
+                                                        ref.policy(
+                                                                ReferrerPolicyHeaderWriter
+                                                                        .ReferrerPolicy
+                                                                        .STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                                        .xssProtection(
+                                                xss ->
+                                                        xss.headerValue(
+                                                                XXssProtectionHeaderWriter
+                                                                        .HeaderValue
+                                                                        .ENABLED_MODE_BLOCK))
+                                        .contentSecurityPolicy(
+                                                csp ->
+                                                        csp.policyDirectives(
+                                                                "default-src 'self'; script-src"
+                                                                    + " 'self' 'unsafe-inline'"
+                                                                    + " https://cdn.jsdelivr.net;"
+                                                                    + " style-src 'self'"
+                                                                    + " 'unsafe-inline'"
+                                                                    + " https://fonts.googleapis.com;"
+                                                                    + " font-src 'self'"
+                                                                    + " https://fonts.gstatic.com"
+                                                                    + " data:; img-src 'self' data:"
+                                                                    + " https:; connect-src 'self'"
+                                                                    + " https://openlibrary.org"
+                                                                    + " https://api.rawg.io"
+                                                                    + " https://api.themoviedb.org"
+                                                                    + " https://cdn.jsdelivr.net;"
+                                                                    + " frame-ancestors 'self';"
+                                                                    + " base-uri 'self';"
+                                                                    + " form-action 'self'"))
+                                        .permissionsPolicy(
+                                                perm ->
+                                                        perm.policy(
+                                                                "geolocation=(), microphone=(),"
+                                                                    + " camera=(), payment=()")))
+                .authorizeHttpRequests(
+                        auth ->
+                                auth.dispatcherTypeMatchers(
+                                                DispatcherType.FORWARD, DispatcherType.INCLUDE)
+                                        .permitAll()
 
-                        .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
+                                        // public pages
+                                        .requestMatchers("/", "/index", "/login", "/register")
+                                        .permitAll()
+                                        .requestMatchers("/auth/register", "/auth/check-username")
+                                        .permitAll()
+                                        // Static resources
+                                        .requestMatchers(
+                                                "/css/**", "/js/**", "/images/**", "/favicon.ico")
+                                        .permitAll()
+                                        .requestMatchers("/error")
+                                        .permitAll()
 
-                        // public pages
-                        .requestMatchers("/", "/index", "/login", "/register").permitAll()
-                        .requestMatchers("/auth/register", "/auth/check-username").permitAll()
-                        // Static resources
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                        .requestMatchers("/error").permitAll()
+                                        // Public API endpoints
+                                        .requestMatchers("/api/auth/login", "/api/auth/register")
+                                        .permitAll()
 
-                        // Public API endpoints
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                                        // Actuator health probes & OpenAPI docs
+                                        .requestMatchers("/actuator/health/**", "/actuator/info")
+                                        .permitAll()
+                                        .requestMatchers(
+                                                "/v3/api-docs/**",
+                                                "/swagger-ui.html",
+                                                "/swagger-ui/**")
+                                        .permitAll()
+                                        // Only username-exists check is public (needed for
+                                        // registration form)
+                                        .requestMatchers("/api/users/*/exists")
+                                        .permitAll()
 
-                        // Actuator health probes & OpenAPI docs
-                        .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
-                        // Only username-exists check is public (needed for registration form)
-                        .requestMatchers("/api/users/*/exists").permitAll()
+                                        // Admin endpoints
+                                        .requestMatchers("/admin/**", "/api/admin/**")
+                                        .hasRole("ADMIN")
 
-                        // Admin endpoints
-                        .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
-
-                        // Authenticated endpoints
-                        .requestMatchers("/dashboard", "/games", "/movies", "/books", "/shows").authenticated()
-                        .requestMatchers("/api/**").authenticated()
-
-                        .anyRequest().authenticated()
-                )
-
-                .formLogin(form -> form
-                        .loginPage("/index")
-                        .loginProcessingUrl("/login")
-                        .usernameParameter("username")
-                        .passwordParameter("password")
-                        .defaultSuccessUrl("/dashboard", true)
-                        .failureUrl("/index?error=true")
-                        .permitAll()
-                )
-
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/index?logout=true")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .permitAll()
-                )
-
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(false)
-                )
-
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendRedirect("/index");
-                        })
-                );
+                                        // Authenticated endpoints
+                                        .requestMatchers(
+                                                "/dashboard",
+                                                "/games",
+                                                "/movies",
+                                                "/books",
+                                                "/shows")
+                                        .authenticated()
+                                        .requestMatchers("/api/**")
+                                        .authenticated()
+                                        .anyRequest()
+                                        .authenticated())
+                .formLogin(
+                        form ->
+                                form.loginPage("/index")
+                                        .loginProcessingUrl("/login")
+                                        .usernameParameter("username")
+                                        .passwordParameter("password")
+                                        .defaultSuccessUrl("/dashboard", true)
+                                        .failureUrl("/index?error=true")
+                                        .permitAll())
+                .logout(
+                        logout ->
+                                logout.logoutUrl("/logout")
+                                        .logoutSuccessUrl("/index?logout=true")
+                                        .invalidateHttpSession(true)
+                                        .deleteCookies("JSESSIONID")
+                                        .permitAll())
+                .sessionManagement(
+                        session ->
+                                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                                        .maximumSessions(1)
+                                        .maxSessionsPreventsLogin(false))
+                .exceptionHandling(
+                        exception ->
+                                exception.authenticationEntryPoint(
+                                        (request, response, authException) -> {
+                                            response.sendRedirect("/index");
+                                        }));
 
         return http.build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authConfig) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
+            throws Exception {
         return authConfig.getAuthenticationManager();
     }
 }

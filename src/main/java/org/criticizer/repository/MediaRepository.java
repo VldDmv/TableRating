@@ -1,5 +1,9 @@
 package org.criticizer.repository;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,14 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-/**
- * Base repository interface for all media entities.
- */
+/** Base repository interface for all media entities. */
 @NoRepositoryBean
 public interface MediaRepository<T> extends JpaRepository<T, Integer> {
 
@@ -29,35 +26,32 @@ public interface MediaRepository<T> extends JpaRepository<T, Integer> {
     @Query("SELECT COUNT(e) FROM #{#entityName} e")
     long countTotal();
 
-    /**
-     * Two-step pagination — must be implemented in each concrete repository.
-     */
+    /** Two-step pagination — must be implemented in each concrete repository. */
     Page<Integer> findItemIds(
             @Param("userId") Integer userId,
             @Param("categoryId") Integer categoryId,
             @Param("searchTerm") String searchTerm,
             @Param("minScore") Integer minScore,
             @Param("maxScore") Integer maxScore,
-            Pageable pageable
-    );
+            Pageable pageable);
 
     List<T> findByIdsWithCategories(@Param("ids") List<Integer> ids);
 
     @Query("SELECT COUNT(e) FROM #{#entityName} e WHERE e.userId = :userId")
     long countByUserId(@Param("userId") Integer userId);
 
-    /**
-     * Batch count per user — avoids N+1 on public users list.
-     */
-    @Query("SELECT e.userId, COUNT(e) FROM #{#entityName} e WHERE e.userId IN :userIds GROUP BY e.userId")
+    /** Batch count per user — avoids N+1 on public users list. */
+    @Query(
+            "SELECT e.userId, COUNT(e) FROM #{#entityName} e WHERE e.userId IN :userIds GROUP BY"
+                    + " e.userId")
     List<Object[]> countByUserIdsRaw(@Param("userIds") List<Integer> userIds);
 
     default Map<Integer, Long> countByUserIds(List<Integer> userIds) {
         return countByUserIdsRaw(userIds).stream()
-                .collect(Collectors.toMap(
-                        row -> ((Number) row[0]).intValue(),
-                        row -> ((Number) row[1]).longValue()
-                ));
+                .collect(
+                        Collectors.toMap(
+                                row -> ((Number) row[0]).intValue(),
+                                row -> ((Number) row[1]).longValue()));
     }
 
     // ── Kept for any callers outside DashboardService ─────────────────────────
@@ -74,7 +68,8 @@ public interface MediaRepository<T> extends JpaRepository<T, Integer> {
     @Query("SELECT COUNT(e) FROM #{#entityName} e WHERE e.userId = :userId AND e.completed = true")
     long countCompletedByUserId(@Param("userId") Integer userId);
 
-    @Query("""
+    @Query(
+            """
             SELECT
                 COUNT(e),
                 COALESCE(AVG(e.score), 0.0),

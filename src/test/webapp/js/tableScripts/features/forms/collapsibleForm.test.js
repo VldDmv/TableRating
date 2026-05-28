@@ -82,12 +82,18 @@ describe('CollapsibleForm', () => {
 
         test('should add expanded class to wrapper', () => {
             collapsible.expand(false);
-            expect(document.querySelector('.collapsible-form-wrapper').classList.contains('expanded')).toBe(true);
+            expect(
+                document.querySelector('.collapsible-form-wrapper').classList.contains('expanded')
+            ).toBe(true);
         });
 
         test('should add expanded class to toggle button', () => {
             collapsible.expand(false);
-            expect(document.querySelector('.collapsible-form-toggle-btn').classList.contains('expanded')).toBe(true);
+            expect(
+                document
+                    .querySelector('.collapsible-form-toggle-btn')
+                    .classList.contains('expanded')
+            ).toBe(true);
         });
     });
 
@@ -101,7 +107,9 @@ describe('CollapsibleForm', () => {
         test('should remove expanded class from wrapper', () => {
             collapsible.expand(false);
             collapsible.collapse(false);
-            expect(document.querySelector('.collapsible-form-wrapper').classList.contains('expanded')).toBe(false);
+            expect(
+                document.querySelector('.collapsible-form-wrapper').classList.contains('expanded')
+            ).toBe(false);
         });
     });
 
@@ -144,7 +152,7 @@ describe('CollapsibleForm', () => {
             const f3 = document.getElementById('f3');
             const c3 = new CollapsibleForm(f3, {
                 startCollapsed: false,
-                collapseAfterSubmit: true
+                collapseAfterSubmit: true,
             });
             c3.expand(false);
             f3.dispatchEvent(new Event('submit'));

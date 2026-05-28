@@ -1,26 +1,26 @@
 package org.criticizer.service.show;
 
+import java.util.HashSet;
+import java.util.List;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.dto.show.ShowResponse;
 import org.criticizer.entity.Genre;
 import org.criticizer.entity.Show;
 import org.criticizer.repository.GenreRepository;
 import org.criticizer.repository.ShowRepository;
-import org.criticizer.service.helper.ServiceValidator;
 import org.criticizer.service.helper.AbstractMediaService;
+import org.criticizer.service.helper.ServiceValidator;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.List;
 
 @Service
 public class ShowService extends AbstractMediaService<Show, ShowResponse> {
 
     private final GenreRepository genreRepository;
 
-    public ShowService(ShowRepository showRepository,
-                       GenreRepository genreRepository,
-                       ServiceValidator validator) {
+    public ShowService(
+            ShowRepository showRepository,
+            GenreRepository genreRepository,
+            ServiceValidator validator) {
         super(showRepository, validator);
         this.genreRepository = genreRepository;
     }
@@ -50,11 +50,10 @@ public class ShowService extends AbstractMediaService<Show, ShowResponse> {
 
     @Override
     protected ShowResponse toResponse(Show show) {
-        List<GenreResponse> genreResponses = show.getGenres() != null
-                ? show.getGenres().stream()
-                .map(GenreResponse::from)
-                .toList()
-                : List.of();
+        List<GenreResponse> genreResponses =
+                show.getGenres() != null
+                        ? show.getGenres().stream().map(GenreResponse::from).toList()
+                        : List.of();
 
         return new ShowResponse(
                 show.getId(),
@@ -62,9 +61,9 @@ public class ShowService extends AbstractMediaService<Show, ShowResponse> {
                 show.getCoverUrl(),
                 show.getScore(),
                 show.isCompleted(),
-                genreResponses
-        );
+                genreResponses);
     }
+
     @Override
     public String getMediaType() {
         return "shows";

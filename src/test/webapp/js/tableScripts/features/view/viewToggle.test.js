@@ -1,4 +1,3 @@
-
 import { jest } from '@jest/globals';
 
 const { ViewToggleManager } = await import('@/tableScripts/features/view/viewToggle.js');
@@ -18,7 +17,7 @@ function setupDOM() {
 
 function makeManager(config = makeConfig(), getItems = () => []) {
     const tableRenderer = { render: jest.fn(), renderLoading: jest.fn() };
-    const cardRenderer  = { render: jest.fn(), renderLoading: jest.fn() };
+    const cardRenderer = { render: jest.fn(), renderLoading: jest.fn() };
     return new ViewToggleManager(config, tableRenderer, cardRenderer, getItems);
 }
 
@@ -105,7 +104,7 @@ describe('ViewToggleManager.switchView', () => {
     });
 
     test('logs error and does not change view for unknown view name', () => {
-        const m      = makeManager();
+        const m = makeManager();
         const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
         m.switchView('list'); // unknown
         expect(m.getCurrentView()).toBe('table'); // unchanged
@@ -114,7 +113,7 @@ describe('ViewToggleManager.switchView', () => {
     });
 
     test('calls onViewChange callback', () => {
-        const m        = makeManager();
+        const m = makeManager();
         const onChange = jest.fn();
         m.onViewChange = onChange;
         m.switchView('cards');
@@ -157,9 +156,9 @@ describe('ViewToggleManager.applyView DOM effects', () => {
     });
 
     test('renders items via cardRenderer when switching to cards', () => {
-        const items       = [{ name: 'Game1' }, { name: 'Game2' }];
-        const tableRend   = { render: jest.fn(), renderLoading: jest.fn() };
-        const cardRend    = { render: jest.fn(), renderLoading: jest.fn() };
+        const items = [{ name: 'Game1' }, { name: 'Game2' }];
+        const tableRend = { render: jest.fn(), renderLoading: jest.fn() };
+        const cardRend = { render: jest.fn(), renderLoading: jest.fn() };
         const m = new ViewToggleManager(makeConfig(), tableRend, cardRend, () => items);
         m.switchView('cards');
 

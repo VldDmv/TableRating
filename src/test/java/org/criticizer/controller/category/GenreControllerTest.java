@@ -1,6 +1,14 @@
 package org.criticizer.controller.category;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.criticizer.dto.genre.CreateGenreRequest;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.service.genre.GenreService;
@@ -15,33 +23,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("GenreController Tests")
 class GenreControllerTest {
 
-    @Mock
-    private GenreService genreService;
+    @Mock private GenreService genreService;
 
-    @InjectMocks
-    private GenreController controller;
+    @InjectMocks private GenreController controller;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
     }
 
@@ -49,14 +44,14 @@ class GenreControllerTest {
     @DisplayName("GET /api/genres - Should return all genres")
     void shouldReturnAllGenres() throws Exception {
         // Given
-        when(genreService.getAllGenres()).thenReturn(List.of(
-                new GenreResponse(1, "Action", List.of("movie")),
-                new GenreResponse(2, "Comedy", List.of("movie", "show"))
-        ));
+        when(genreService.getAllGenres())
+                .thenReturn(
+                        List.of(
+                                new GenreResponse(1, "Action", List.of("movie")),
+                                new GenreResponse(2, "Comedy", List.of("movie", "show"))));
 
         // When & Then
-        mockMvc.perform(get("/api/genres")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/genres").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(2));
@@ -73,9 +68,10 @@ class GenreControllerTest {
         when(genreService.createGenre(any(CreateGenreRequest.class))).thenReturn(response);
 
         // When & Then
-        mockMvc.perform(post("/api/genres")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+                        post("/api/genres")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Drama"));
 
@@ -86,8 +82,7 @@ class GenreControllerTest {
     @DisplayName("DELETE /api/genres/{id} - Should delete genre")
     void shouldDeleteGenre() throws Exception {
         // When & Then
-        mockMvc.perform(delete("/api/genres/1")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(delete("/api/genres/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Genre deleted successfully"));
 

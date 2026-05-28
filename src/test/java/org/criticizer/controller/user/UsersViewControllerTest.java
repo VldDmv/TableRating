@@ -1,5 +1,9 @@
 package org.criticizer.controller.user;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,16 +14,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UsersViewController Tests")
 class UsersViewControllerTest {
 
-    @InjectMocks
-    private UsersViewController controller;
+    @InjectMocks private UsersViewController controller;
 
     private MockMvc mockMvc;
 
@@ -29,10 +28,8 @@ class UsersViewControllerTest {
         viewResolver.setPrefix("/WEB-INF/views/");
         viewResolver.setSuffix(".jsp");
 
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .setViewResolvers(viewResolver)
-                .build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver).build();
     }
 
     @Test

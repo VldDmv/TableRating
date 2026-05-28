@@ -1,24 +1,23 @@
-
 import { jest } from '@jest/globals';
 
 // ─── Mock dependencies ────────────────────────────────────────────────────────
 
 jest.unstable_mockModule('@/tableScripts/core/utils.js', () => ({
-    htmlUtils:     { escape: (s) => s, decode: (s) => s },
-    entityUtils:   {
+    htmlUtils: { escape: (s) => s, decode: (s) => s },
+    entityUtils: {
         getAvailableItems: () => [],
-        getItemTypeName:   (t) => t === 'games' ? 'Tags' : 'Genres'
+        getItemTypeName: (t) => (t === 'games' ? 'Tags' : 'Genres'),
     },
     securityUtils: { getCsrfToken: () => 'mock-csrf' },
-    ICONS:         { SAVE: '💾', EDIT: '✏️', COMPLETED: '✅', NOT_COMPLETED: '❌' },
-    CONSTANTS:     {}
+    ICONS: { SAVE: '💾', EDIT: '✏️', COMPLETED: '✅', NOT_COMPLETED: '❌' },
+    CONSTANTS: {},
 }));
 
 jest.unstable_mockModule('@/tableScripts/core/errorHandler.js', () => ({
     ErrorHandler: {
         parseErrorResponse: jest.fn(),
-        handle:             jest.fn()
-    }
+        handle: jest.fn(),
+    },
 }));
 
 const { InlineEditManager } = await import('@/tableScripts/features/table/tableInlineEdit.js');
@@ -27,31 +26,31 @@ const { InlineEditManager } = await import('@/tableScripts/features/table/tableI
 
 function makeConfig(overrides = {}) {
     return {
-        entityType:        'games',
-        entityNameSingular:'Game',
+        entityType: 'games',
+        entityNameSingular: 'Game',
         columns: {
-            cover:     { index: 0 },
-            name:      { index: 1 },
-            score:     { index: 2 },
-            tags:      { index: 3 },
+            cover: { index: 0 },
+            name: { index: 1 },
+            score: { index: 2 },
+            tags: { index: 3 },
             completed: { index: 4 },
-            actions:   { index: 5 }
+            actions: { index: 5 },
         },
         selectors: {
-            statusButtonClass:     '.status-button',
-            deleteButtonClass:     '.delete-button',
-            editIconButtonClass:   '.edit-button',
-            deleteIconButtonClass: '.delete-button'
+            statusButtonClass: '.status-button',
+            deleteButtonClass: '.delete-button',
+            editIconButtonClass: '.edit-button',
+            deleteIconButtonClass: '.delete-button',
         },
         paramNames: {
-            removeItem: 'removeGame'
+            removeItem: 'removeGame',
         },
         validateScore: (v) => {
             const s = parseInt(v, 10);
             return !isNaN(s) && s >= 1 && s <= 100;
         },
         applyScoreStyling: jest.fn(),
-        ...overrides
+        ...overrides,
     };
 }
 
@@ -87,19 +86,21 @@ describe('InlineEditManager.detectChanges', () => {
 
     test('returns false when nothing changed', () => {
         const row = makeRow();
-        row.dataset.originalName     = 'Witcher';
-        row.dataset.originalScore    = '85';
-        row.dataset.initialTagIds    = '1,2';
+        row.dataset.originalName = 'Witcher';
+        row.dataset.originalScore = '85';
+        row.dataset.initialTagIds = '1,2';
         row.dataset.originalCoverUrl = 'https://img.com/cover.jpg';
 
-        expect(manager.detectChanges(row, 'Witcher', '85', ['1', '2'], 'https://img.com/cover.jpg')).toBe(false);
+        expect(
+            manager.detectChanges(row, 'Witcher', '85', ['1', '2'], 'https://img.com/cover.jpg')
+        ).toBe(false);
     });
 
     test('returns true when name changed', () => {
         const row = makeRow();
-        row.dataset.originalName     = 'Witcher';
-        row.dataset.originalScore    = '85';
-        row.dataset.initialTagIds    = '1,2';
+        row.dataset.originalName = 'Witcher';
+        row.dataset.originalScore = '85';
+        row.dataset.initialTagIds = '1,2';
         row.dataset.originalCoverUrl = '';
 
         expect(manager.detectChanges(row, 'Witcher 2', '85', ['1', '2'], '')).toBe(true);
@@ -107,9 +108,9 @@ describe('InlineEditManager.detectChanges', () => {
 
     test('returns true when score changed', () => {
         const row = makeRow();
-        row.dataset.originalName     = 'Witcher';
-        row.dataset.originalScore    = '85';
-        row.dataset.initialTagIds    = '';
+        row.dataset.originalName = 'Witcher';
+        row.dataset.originalScore = '85';
+        row.dataset.initialTagIds = '';
         row.dataset.originalCoverUrl = '';
 
         expect(manager.detectChanges(row, 'Witcher', '90', [], '')).toBe(true);
@@ -117,9 +118,9 @@ describe('InlineEditManager.detectChanges', () => {
 
     test('returns true when tags changed', () => {
         const row = makeRow();
-        row.dataset.originalName     = 'Witcher';
-        row.dataset.originalScore    = '85';
-        row.dataset.initialTagIds    = '1,2';
+        row.dataset.originalName = 'Witcher';
+        row.dataset.originalScore = '85';
+        row.dataset.initialTagIds = '1,2';
         row.dataset.originalCoverUrl = '';
 
         expect(manager.detectChanges(row, 'Witcher', '85', ['1'], '')).toBe(true);
@@ -127,9 +128,9 @@ describe('InlineEditManager.detectChanges', () => {
 
     test('returns true when coverUrl changed', () => {
         const row = makeRow();
-        row.dataset.originalName     = 'Witcher';
-        row.dataset.originalScore    = '85';
-        row.dataset.initialTagIds    = '';
+        row.dataset.originalName = 'Witcher';
+        row.dataset.originalScore = '85';
+        row.dataset.initialTagIds = '';
         row.dataset.originalCoverUrl = '';
 
         expect(manager.detectChanges(row, 'Witcher', '85', [], 'https://new.jpg')).toBe(true);
@@ -137,10 +138,10 @@ describe('InlineEditManager.detectChanges', () => {
 
     test('returns false when tags order matches (initialTagIds used, not originalTagIds)', () => {
         const row = makeRow();
-        row.dataset.originalName     = 'Game';
-        row.dataset.originalScore    = '50';
-        row.dataset.initialTagIds    = '3,4';
-        row.dataset.originalTagIds   = '3,4';
+        row.dataset.originalName = 'Game';
+        row.dataset.originalScore = '50';
+        row.dataset.initialTagIds = '3,4';
+        row.dataset.originalTagIds = '3,4';
         row.dataset.originalCoverUrl = '';
 
         expect(manager.detectChanges(row, 'Game', '50', ['3', '4'], '')).toBe(false);
@@ -190,7 +191,7 @@ describe('InlineEditManager.storeOriginalValues', () => {
     test('stores name and score from cells', () => {
         const row = makeRow({ name: 'Elden Ring' });
         // row doesn't have dataset.originalName yet
-        const nameCell  = row.children[1];
+        const nameCell = row.children[1];
         const scoreCell = row.children[2];
 
         manager.storeOriginalValues(row, nameCell, scoreCell);
@@ -202,7 +203,7 @@ describe('InlineEditManager.storeOriginalValues', () => {
     test('does not overwrite existing originalName', () => {
         const row = makeRow();
         row.dataset.originalName = 'Already Set';
-        const nameCell  = row.children[1];
+        const nameCell = row.children[1];
         const scoreCell = row.children[2];
 
         manager.storeOriginalValues(row, nameCell, scoreCell);
@@ -323,7 +324,7 @@ describe('InlineEditManager.toggleRowEdit', () => {
 
     test('switches row to edit mode when not editing', () => {
         const row = makeRow();
-        row.dataset.originalName  = 'Witcher';
+        row.dataset.originalName = 'Witcher';
         row.dataset.originalScore = '85';
 
         // We need to spy on switchToEditRow
@@ -372,9 +373,9 @@ describe('InlineEditManager.switchToViewRow', () => {
     test('removes is-editing class', () => {
         const row = makeRow();
         row.classList.add('is-editing');
-        row.dataset.originalName     = 'Test';
-        row.dataset.originalScore    = '70';
-        row.dataset.originalTagIds   = '';
+        row.dataset.originalName = 'Test';
+        row.dataset.originalScore = '70';
+        row.dataset.originalTagIds = '';
         row.dataset.originalCoverUrl = '';
 
         manager.switchToViewRow(row);
@@ -385,9 +386,9 @@ describe('InlineEditManager.switchToViewRow', () => {
     test('restores name cell text content', () => {
         const row = makeRow();
         row.classList.add('is-editing');
-        row.dataset.originalName     = 'Restored Name';
-        row.dataset.originalScore    = '70';
-        row.dataset.originalTagIds   = '';
+        row.dataset.originalName = 'Restored Name';
+        row.dataset.originalScore = '70';
+        row.dataset.originalTagIds = '';
         row.dataset.originalCoverUrl = '';
 
         manager.switchToViewRow(row);
@@ -398,9 +399,9 @@ describe('InlineEditManager.switchToViewRow', () => {
     test('restores score cell with score-cell span', () => {
         const row = makeRow();
         row.classList.add('is-editing');
-        row.dataset.originalName     = 'Test';
-        row.dataset.originalScore    = '88';
-        row.dataset.originalTagIds   = '';
+        row.dataset.originalName = 'Test';
+        row.dataset.originalScore = '88';
+        row.dataset.originalTagIds = '';
         row.dataset.originalCoverUrl = '';
 
         manager.switchToViewRow(row);
@@ -412,9 +413,9 @@ describe('InlineEditManager.switchToViewRow', () => {
 
     test('clears currentEditRow when it matches', () => {
         const row = makeRow();
-        row.dataset.originalName     = 'Test';
-        row.dataset.originalScore    = '70';
-        row.dataset.originalTagIds   = '';
+        row.dataset.originalName = 'Test';
+        row.dataset.originalScore = '70';
+        row.dataset.originalTagIds = '';
         row.dataset.originalCoverUrl = '';
         manager.currentEditRow = row;
 
@@ -430,9 +431,9 @@ describe('InlineEditManager.switchToViewRow', () => {
         const m = new InlineEditManager(tb, config);
 
         const row = makeRow();
-        row.dataset.originalName     = 'Test';
-        row.dataset.originalScore    = '70';
-        row.dataset.originalTagIds   = '';
+        row.dataset.originalName = 'Test';
+        row.dataset.originalScore = '70';
+        row.dataset.originalTagIds = '';
         row.dataset.originalCoverUrl = '';
 
         m.switchToViewRow(row);

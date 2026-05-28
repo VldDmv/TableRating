@@ -1,5 +1,15 @@
 package org.criticizer.controller.profile;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.criticizer.dto.helper.PageResponse;
 import org.criticizer.entity.Game;
 import org.criticizer.entity.User;
@@ -22,39 +32,21 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProfileViewController Tests")
 class ProfileViewControllerTest {
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
 
-    @Mock
-    private GameService gameService;
+    @Mock private GameService gameService;
 
-    @Mock
-    private SecurityUtil securityUtil;
+    @Mock private SecurityUtil securityUtil;
 
-    @Mock
-    private ProfileAccessService accessService;
-    @Mock
-    private TagService tagService;
+    @Mock private ProfileAccessService accessService;
+    @Mock private TagService tagService;
 
-    @Mock
-    private GenreService genreService;
-    @InjectMocks
-    private ProfileViewController controller;
+    @Mock private GenreService genreService;
+    @InjectMocks private ProfileViewController controller;
 
     private MockMvc mockMvc;
     private User testUser;
@@ -65,10 +57,8 @@ class ProfileViewControllerTest {
         viewResolver.setPrefix("/WEB-INF/views/");
         viewResolver.setSuffix(".jsp");
 
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .setViewResolvers(viewResolver)
-                .build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver).build();
 
         testUser = TestDataBuilder.createRegularUser();
     }
@@ -85,17 +75,18 @@ class ProfileViewControllerTest {
         when(accessService.checkAccess(any(User.class), anyString())).thenReturn(context);
 
         // Bypass TestDataBuilder to avoid protected access reflection errors
-        List<Game> games = Stream.generate(() -> Mockito.mock(Game.class))
-                .limit(5)
-                .collect(Collectors.toList());
+        List<Game> games =
+                Stream.generate(() -> Mockito.mock(Game.class))
+                        .limit(5)
+                        .collect(Collectors.toList());
 
         PageResponse<Game> pageResponse = TestDataBuilder.createPageResponse(games, 1, 10);
-        when(gameService.getUserItemsPage(anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc")))
+        when(gameService.getUserItemsPage(
+                        anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc")))
                 .thenReturn(pageResponse);
 
         // When & Then
-        mockMvc.perform(get("/profile")
-                        .param("username", "testuser"))
+        mockMvc.perform(get("/profile").param("username", "testuser"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("users/profile"))
                 .andExpect(model().attribute("isOwnerViewing", true))
@@ -103,7 +94,9 @@ class ProfileViewControllerTest {
                 .andExpect(model().attributeExists("initialData"));
 
         verify(userService).getUser("testuser");
-        verify(gameService).getUserItemsPage(anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"));
+        verify(gameService)
+                .getUserItemsPage(
+                        anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"));
     }
 
     @Test
@@ -113,8 +106,7 @@ class ProfileViewControllerTest {
         when(securityUtil.getCurrentUser()).thenReturn(testUser);
 
         // When & Then
-        mockMvc.perform(post("/profile")
-                        .param("privacy", "public"))
+        mockMvc.perform(post("/profile").param("privacy", "public"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/profile?username=testuser"))
                 .andExpect(flash().attributeExists("flashSuccessMessage"));

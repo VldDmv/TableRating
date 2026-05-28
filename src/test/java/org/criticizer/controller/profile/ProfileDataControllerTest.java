@@ -1,5 +1,13 @@
 package org.criticizer.controller.profile;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
 import org.criticizer.dto.helper.PageResponse;
 import org.criticizer.entity.Game;
 import org.criticizer.entity.User;
@@ -22,32 +30,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProfileDataController Tests")
 class ProfileDataControllerTest {
 
-    @Mock
-    private UserService userService;
-    @Mock
-    private SecurityUtil securityUtil;
-    @Mock
-    private ProfileAccessService accessService;
-    @Mock
-    private MediaTypeResolver mediaTypeResolver;
-    @Mock
-    private GameService gameService;
+    @Mock private UserService userService;
+    @Mock private SecurityUtil securityUtil;
+    @Mock private ProfileAccessService accessService;
+    @Mock private MediaTypeResolver mediaTypeResolver;
+    @Mock private GameService gameService;
 
-    @InjectMocks
-    private ProfileDataController controller;
+    @InjectMocks private ProfileDataController controller;
 
     private MockMvc mockMvc;
     private User testUser;
@@ -69,21 +62,22 @@ class ProfileDataControllerTest {
         List<Game> games = TestDataBuilder.createGames(5, testUser.getId());
         PageResponse<Game> pageResponse = TestDataBuilder.createPageResponse(games, 1, 15);
 
-
         when(gameService.getUserItemsPageAsDto(
-                anyInt(), eq(1), eq(15), isNull(), isNull(), eq("name"), eq("asc")))
+                        anyInt(), eq(1), eq(15), isNull(), isNull(), eq("name"), eq("asc")))
                 .thenReturn((PageResponse) pageResponse);
 
-        mockMvc.perform(get("/profile-data")
-                        .param("username", "testuser")
-                        .param("category", "games")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/profile-data")
+                                .param("username", "testuser")
+                                .param("category", "games")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items").isArray())
                 .andExpect(jsonPath("$.items.length()").value(5));
 
-        verify(gameService).getUserItemsPageAsDto(
-                anyInt(), eq(1), eq(15), isNull(), isNull(), eq("name"), eq("asc"));
+        verify(gameService)
+                .getUserItemsPageAsDto(
+                        anyInt(), eq(1), eq(15), isNull(), isNull(), eq("name"), eq("asc"));
     }
 
     @Test
@@ -93,10 +87,11 @@ class ProfileDataControllerTest {
         when(securityUtil.getCurrentUsername()).thenReturn("otheruser");
         when(accessService.canViewProfile(any(User.class), anyString())).thenReturn(false);
 
-        mockMvc.perform(get("/profile-data")
-                        .param("username", "privateuser")
-                        .param("category", "games")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/profile-data")
+                                .param("username", "privateuser")
+                                .param("category", "games")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
 
         verify(accessService).canViewProfile(any(User.class), eq("otheruser"));
@@ -111,10 +106,11 @@ class ProfileDataControllerTest {
         when(mediaTypeResolver.resolve("invalid"))
                 .thenThrow(new IllegalArgumentException("Invalid category"));
 
-        mockMvc.perform(get("/profile-data")
-                        .param("username", "testuser")
-                        .param("category", "invalid")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/profile-data")
+                                .param("username", "testuser")
+                                .param("category", "invalid")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
@@ -130,35 +126,36 @@ class ProfileDataControllerTest {
 
         PageResponse emptyPage = new PageResponse<>(List.of(), 1, 1, 0L, 15);
 
-
         when(movieService.getUserItemsPageAsDto(
-                anyInt(), eq(1), eq(15), eq(10), eq("batman"), eq("score"), eq("desc")))
+                        anyInt(), eq(1), eq(15), eq(10), eq("batman"), eq("score"), eq("desc")))
                 .thenReturn(emptyPage);
 
-        mockMvc.perform(get("/profile-data")
-                        .param("username", "testuser")
-                        .param("category", "movies")
-                        .param("genre_id", "10")
-                        .param("search", "batman")
-                        .param("sortBy", "score")
-                        .param("sortOrder", "desc")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/profile-data")
+                                .param("username", "testuser")
+                                .param("category", "movies")
+                                .param("genre_id", "10")
+                                .param("search", "batman")
+                                .param("sortBy", "score")
+                                .param("sortOrder", "desc")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(movieService).getUserItemsPageAsDto(
-                anyInt(), eq(1), eq(15), eq(10), eq("batman"), eq("score"), eq("desc"));
+        verify(movieService)
+                .getUserItemsPageAsDto(
+                        anyInt(), eq(1), eq(15), eq(10), eq("batman"), eq("score"), eq("desc"));
     }
 
     @Test
     @DisplayName("GET /profile-data - Should return 500 on internal exception")
     void shouldReturn500OnInternalException() throws Exception {
-        when(userService.getUser("testuser"))
-                .thenThrow(new RuntimeException("Database down!"));
+        when(userService.getUser("testuser")).thenThrow(new RuntimeException("Database down!"));
 
-        mockMvc.perform(get("/profile-data")
-                        .param("username", "testuser")
-                        .param("category", "games")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/profile-data")
+                                .param("username", "testuser")
+                                .param("category", "games")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.error").value("Failed to fetch profile data"));
     }

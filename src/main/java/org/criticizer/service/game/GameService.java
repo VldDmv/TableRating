@@ -1,5 +1,7 @@
 package org.criticizer.service.game;
 
+import java.util.HashSet;
+import java.util.List;
 import org.criticizer.dto.game.GameResponse;
 import org.criticizer.dto.tag.TagResponse;
 import org.criticizer.entity.Game;
@@ -10,17 +12,15 @@ import org.criticizer.service.helper.AbstractMediaService;
 import org.criticizer.service.helper.ServiceValidator;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-
 @Service
 public class GameService extends AbstractMediaService<Game, GameResponse> {
 
     private final TagRepository tagRepository;
 
-    public GameService(GameRepository gameRepository,
-                       TagRepository tagRepository,
-                       ServiceValidator validator) {
+    public GameService(
+            GameRepository gameRepository,
+            TagRepository tagRepository,
+            ServiceValidator validator) {
         super(gameRepository, validator);
         this.tagRepository = tagRepository;
     }
@@ -50,11 +50,12 @@ public class GameService extends AbstractMediaService<Game, GameResponse> {
 
     @Override
     protected GameResponse toResponse(Game game) {
-        List<TagResponse> tagResponses = game.getTags() != null
-                ? game.getTags().stream()
-                .map(tag -> new TagResponse(tag.getId(), tag.getName()))
-                .toList()
-                : List.of();
+        List<TagResponse> tagResponses =
+                game.getTags() != null
+                        ? game.getTags().stream()
+                                .map(tag -> new TagResponse(tag.getId(), tag.getName()))
+                                .toList()
+                        : List.of();
 
         return new GameResponse(
                 game.getId(),
@@ -62,8 +63,7 @@ public class GameService extends AbstractMediaService<Game, GameResponse> {
                 game.getCoverUrl(),
                 game.getScore(),
                 game.isCompleted(),
-                tagResponses
-        );
+                tagResponses);
     }
 
     @Override

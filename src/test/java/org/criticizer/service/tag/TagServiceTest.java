@@ -1,5 +1,13 @@
 package org.criticizer.service.tag;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import org.criticizer.dto.tag.CreateTagRequest;
 import org.criticizer.dto.tag.TagResponse;
 import org.criticizer.dto.tag.UpdateTagRequest;
@@ -19,30 +27,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.*;
-
-/**
- * Unit tests for TagService.
- */
+/** Unit tests for TagService. */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("TagService Tests")
 class TagServiceTest {
 
-    @Mock
-    private TagRepository tagRepository;
+    @Mock private TagRepository tagRepository;
 
-    @Mock
-    private GameRepository gameRepository;
+    @Mock private GameRepository gameRepository;
 
-    @InjectMocks
-    private TagService tagService;
+    @InjectMocks private TagService tagService;
 
     private Tag testTag;
 
@@ -95,8 +89,7 @@ class TagServiceTest {
         @DisplayName("Should map Tag entity to TagResponse correctly")
         void shouldMapCorrectly() {
             // Given
-            when(tagRepository.findAllByOrderByNameAsc())
-                    .thenReturn(List.of(testTag));
+            when(tagRepository.findAllByOrderByNameAsc()).thenReturn(List.of(testTag));
 
             // When
             List<TagResponse> result = tagService.getAllTags();
@@ -122,8 +115,7 @@ class TagServiceTest {
             Tag tag1 = new Tag(1, "RPG");
             Tag tag2 = new Tag(2, "Open World");
 
-            when(tagRepository.findByGameId(1))
-                    .thenReturn(Arrays.asList(tag1, tag2));
+            when(tagRepository.findByGameId(1)).thenReturn(Arrays.asList(tag1, tag2));
 
             // When
             List<TagResponse> result = tagService.getTagsForGame(1);
@@ -152,10 +144,8 @@ class TagServiceTest {
         @DisplayName("Should handle different game IDs")
         void shouldHandleDifferentGameIds() {
             // Given
-            when(tagRepository.findByGameId(1))
-                    .thenReturn(List.of(new Tag(1, "RPG")));
-            when(tagRepository.findByGameId(2))
-                    .thenReturn(List.of(new Tag(2, "Action")));
+            when(tagRepository.findByGameId(1)).thenReturn(List.of(new Tag(1, "RPG")));
+            when(tagRepository.findByGameId(2)).thenReturn(List.of(new Tag(2, "Action")));
 
             // When
             List<TagResponse> result1 = tagService.getTagsForGame(1);
@@ -194,9 +184,7 @@ class TagServiceTest {
             assertThat(result.getName()).isEqualTo("Strategy");
 
             verify(tagRepository).existsByNameIgnoreCase("Strategy");
-            verify(tagRepository).save(argThat(tag ->
-                    tag.getName().equals("Strategy")
-            ));
+            verify(tagRepository).save(argThat(tag -> tag.getName().equals("Strategy")));
         }
 
         @Test
@@ -214,9 +202,12 @@ class TagServiceTest {
 
             // Then
             assertThat(result.getName()).isEqualTo("Action");
-            verify(tagRepository).save(argThat(tag ->
-                    tag.getName().equals("Action") && !tag.getName().contains(" ")
-            ));
+            verify(tagRepository)
+                    .save(
+                            argThat(
+                                    tag ->
+                                            tag.getName().equals("Action")
+                                                    && !tag.getName().contains(" ")));
         }
 
         @Test
@@ -300,10 +291,12 @@ class TagServiceTest {
             assertThat(result.getId()).isEqualTo(1);
             assertThat(result.getName()).isEqualTo("Action-Adventure");
 
-            verify(tagRepository).save(argThat(tag ->
-                    tag.getId().equals(1) &&
-                            tag.getName().equals("Action-Adventure")
-            ));
+            verify(tagRepository)
+                    .save(
+                            argThat(
+                                    tag ->
+                                            tag.getId().equals(1)
+                                                    && tag.getName().equals("Action-Adventure")));
         }
 
         @Test
@@ -314,8 +307,7 @@ class TagServiceTest {
             Tag updatedTag = new Tag(1, "Strategy");
 
             when(tagRepository.findById(1)).thenReturn(Optional.of(testTag));
-            when(tagRepository.findByNameIgnoreCase("Strategy"))
-                    .thenReturn(Optional.empty());
+            when(tagRepository.findByNameIgnoreCase("Strategy")).thenReturn(Optional.empty());
             when(tagRepository.save(any(Tag.class))).thenReturn(updatedTag);
 
             // When
@@ -323,9 +315,7 @@ class TagServiceTest {
 
             // Then
             assertThat(result.getName()).isEqualTo("Strategy");
-            verify(tagRepository).save(argThat(tag ->
-                    !tag.getName().contains(" ")
-            ));
+            verify(tagRepository).save(argThat(tag -> !tag.getName().contains(" ")));
         }
 
         @Test
@@ -364,8 +354,7 @@ class TagServiceTest {
             Tag existingTag = new Tag(2, "Action");
 
             when(tagRepository.findById(1)).thenReturn(Optional.of(testTag));
-            when(tagRepository.findByNameIgnoreCase("Action"))
-                    .thenReturn(Optional.of(existingTag));
+            when(tagRepository.findByNameIgnoreCase("Action")).thenReturn(Optional.of(existingTag));
 
             // When & Then
             assertThatThrownBy(() -> tagService.updateTag(request))
@@ -389,8 +378,7 @@ class TagServiceTest {
             when(tagRepository.save(any(Tag.class))).thenReturn(updatedTag);
 
             // When & Then
-            assertThatCode(() -> tagService.updateTag(request))
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> tagService.updateTag(request)).doesNotThrowAnyException();
 
             verify(tagRepository).save(any(Tag.class));
         }
@@ -532,8 +520,7 @@ class TagServiceTest {
             CreateTagRequest request = new CreateTagRequest("Sci-Fi/Fantasy");
             Tag savedTag = new Tag(1, "Sci-Fi/Fantasy");
 
-            when(tagRepository.existsByNameIgnoreCase("Sci-Fi/Fantasy"))
-                    .thenReturn(false);
+            when(tagRepository.existsByNameIgnoreCase("Sci-Fi/Fantasy")).thenReturn(false);
             when(tagRepository.save(any(Tag.class))).thenReturn(savedTag);
 
             // When
@@ -550,8 +537,7 @@ class TagServiceTest {
             CreateTagRequest request = new CreateTagRequest("4X Strategy");
             Tag savedTag = new Tag(1, "4X Strategy");
 
-            when(tagRepository.existsByNameIgnoreCase("4X Strategy"))
-                    .thenReturn(false);
+            when(tagRepository.existsByNameIgnoreCase("4X Strategy")).thenReturn(false);
             when(tagRepository.save(any(Tag.class))).thenReturn(savedTag);
 
             // When

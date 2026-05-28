@@ -135,7 +135,9 @@ describe('StateManager', () => {
 
     describe('notifyListeners', () => {
         test('should not throw if a listener throws', () => {
-            const badListener = jest.fn(() => { throw new Error('listener error'); });
+            const badListener = jest.fn(() => {
+                throw new Error('listener error');
+            });
             const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
             stateManager.subscribe(badListener);
             expect(() => stateManager.setState({ count: 1 })).not.toThrow();

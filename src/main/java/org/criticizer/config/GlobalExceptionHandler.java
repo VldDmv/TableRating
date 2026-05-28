@@ -1,5 +1,8 @@
 package org.criticizer.config;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import org.criticizer.exceptions.data.ItemAlreadyExistsException;
 import org.criticizer.exceptions.data.ItemInUseException;
 import org.criticizer.exceptions.data.ResourceNotFoundException;
@@ -18,13 +21,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Global exception handler for all REST controllers.
- * Centralizes error handling and provides consistent error responses.
+ * Global exception handler for all REST controllers. Centralizes error handling and provides
+ * consistent error responses.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -44,10 +43,21 @@ public class GlobalExceptionHandler {
             this.message = message;
         }
 
-        public LocalDateTime getTimestamp() { return timestamp; }
-        public int getStatus() { return status; }
-        public String getError() { return error; }
-        public String getMessage() { return message; }
+        public LocalDateTime getTimestamp() {
+            return timestamp;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -55,10 +65,13 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException ex) {
 
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            errors.put(fieldName, error.getDefaultMessage());
-        });
+        ex.getBindingResult()
+                .getAllErrors()
+                .forEach(
+                        error -> {
+                            String fieldName = ((FieldError) error).getField();
+                            errors.put(fieldName, error.getDefaultMessage());
+                        });
 
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
@@ -74,42 +87,58 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
         log.info("Resource not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Not Found", ex.getUserMessage()));
+                .body(
+                        new ErrorResponse(
+                                HttpStatus.NOT_FOUND.value(), "Not Found", ex.getUserMessage()));
     }
 
     @ExceptionHandler(ItemAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleItemAlreadyExists(ItemAlreadyExistsException ex) {
         log.warn("Duplicate item: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ErrorResponse(HttpStatus.CONFLICT.value(), "Conflict", ex.getUserMessage()));
+                .body(
+                        new ErrorResponse(
+                                HttpStatus.CONFLICT.value(), "Conflict", ex.getUserMessage()));
     }
 
     @ExceptionHandler(ItemInUseException.class)
     public ResponseEntity<ErrorResponse> handleItemInUse(ItemInUseException ex) {
         log.warn("Item in use: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ErrorResponse(HttpStatus.CONFLICT.value(), "Conflict", ex.getUserMessage()));
+                .body(
+                        new ErrorResponse(
+                                HttpStatus.CONFLICT.value(), "Conflict", ex.getUserMessage()));
     }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex) {
         log.warn("Validation error: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request", ex.getUserMessage()));
+                .body(
+                        new ErrorResponse(
+                                HttpStatus.BAD_REQUEST.value(),
+                                "Bad Request",
+                                ex.getUserMessage()));
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException ex) {
         log.warn("Unauthorized access: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Unauthorized", ex.getUserMessage()));
+                .body(
+                        new ErrorResponse(
+                                HttpStatus.UNAUTHORIZED.value(),
+                                "Unauthorized",
+                                ex.getUserMessage()));
     }
 
     @ExceptionHandler(InsufficientPermissionsException.class)
     public ResponseEntity<ErrorResponse> handleForbidden(InsufficientPermissionsException ex) {
         log.warn("Insufficient permissions: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Forbidden", ex.getUserMessage()));
+                .body(
+                        new ErrorResponse(
+                                HttpStatus.FORBIDDEN.value(), "Forbidden", ex.getUserMessage()));
     }
 
     /**
@@ -120,7 +149,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
         log.warn("Access denied: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Forbidden", "Access denied"));
+                .body(
+                        new ErrorResponse(
+                                HttpStatus.FORBIDDEN.value(), "Forbidden", "Access denied"));
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -128,7 +159,11 @@ public class GlobalExceptionHandler {
             HttpRequestMethodNotSupportedException ex) {
         log.warn("Method not supported: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
-                .body(new ErrorResponse(HttpStatus.METHOD_NOT_ALLOWED.value(), "Method Not Allowed", ex.getMessage()));
+                .body(
+                        new ErrorResponse(
+                                HttpStatus.METHOD_NOT_ALLOWED.value(),
+                                "Method Not Allowed",
+                                ex.getMessage()));
     }
 
     /**
@@ -139,20 +174,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException ex) {
         log.debug("Static resource not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Not Found", ex.getMessage()));
+                .body(
+                        new ErrorResponse(
+                                HttpStatus.NOT_FOUND.value(), "Not Found", ex.getMessage()));
     }
 
-    /**
-     * Catch-all for unexpected errors. Must be last.
-     */
+    /** Catch-all for unexpected errors. Must be last. */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         log.error("Unexpected error occurred", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse(
-                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        "Internal Server Error",
-                        "An unexpected error occurred. Please try again later."
-                ));
+                .body(
+                        new ErrorResponse(
+                                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                "Internal Server Error",
+                                "An unexpected error occurred. Please try again later."));
     }
 }

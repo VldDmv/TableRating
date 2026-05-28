@@ -1,5 +1,11 @@
 package org.criticizer.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import org.criticizer.entity.*;
 import org.criticizer.repository.*;
 import org.junit.jupiter.api.AfterEach;
@@ -11,33 +17,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @DataJpaTest
 @ActiveProfiles("test")
 class RepositoryIntegrationTest {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private GameRepository gameRepository;
-    @Autowired
-    private MovieRepository movieRepository;
-    @Autowired
-    private BookRepository bookRepository;
-    @Autowired
-    private ShowRepository showRepository;
-    @Autowired
-    private TagRepository tagRepository;
-    @Autowired
-    private GenreRepository genreRepository;
-    @Autowired
-    private GenreApplicabilityRepository applicabilityRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private GameRepository gameRepository;
+    @Autowired private MovieRepository movieRepository;
+    @Autowired private BookRepository bookRepository;
+    @Autowired private ShowRepository showRepository;
+    @Autowired private TagRepository tagRepository;
+    @Autowired private GenreRepository genreRepository;
+    @Autowired private GenreApplicabilityRepository applicabilityRepository;
 
     @AfterEach
     void cleanup() {
@@ -119,9 +110,9 @@ class RepositoryIntegrationTest {
         gameRepository.saveAll(List.of(game1, game2));
 
         // Two-step query update
-        Page<Integer> ids = gameRepository.findItemIds(
-                user.getId(), null, null, null, null, PageRequest.of(0, 10)
-        );
+        Page<Integer> ids =
+                gameRepository.findItemIds(
+                        user.getId(), null, null, null, null, PageRequest.of(0, 10));
         List<Game> results = gameRepository.findByIdsWithCategories(ids.getContent());
 
         assertThat(results).hasSize(2);
@@ -142,9 +133,9 @@ class RepositoryIntegrationTest {
         gameRepository.saveAll(List.of(game1, game2));
 
         // Two-step query update
-        Page<Integer> ids = gameRepository.findItemIds(
-                user.getId(), rpg.getId(), null, null, null, PageRequest.of(0, 10)
-        );
+        Page<Integer> ids =
+                gameRepository.findItemIds(
+                        user.getId(), rpg.getId(), null, null, null, PageRequest.of(0, 10));
         List<Game> rpgGames = gameRepository.findByIdsWithCategories(ids.getContent());
 
         assertThat(rpgGames).hasSize(1);
@@ -154,20 +145,21 @@ class RepositoryIntegrationTest {
     @Test
     void gameRepository_SearchByName_Success() {
         User user = userRepository.save(new User("gamer", "hash"));
-        gameRepository.saveAll(List.of(
-                new Game(null, "Dark Souls", user.getId(), 90, false),
-                new Game(null, "Dark Souls 2", user.getId(), 85, false),
-                new Game(null, "Elden Ring", user.getId(), 95, false)
-        ));
+        gameRepository.saveAll(
+                List.of(
+                        new Game(null, "Dark Souls", user.getId(), 90, false),
+                        new Game(null, "Dark Souls 2", user.getId(), 85, false),
+                        new Game(null, "Elden Ring", user.getId(), 95, false)));
 
         // Two-step query update
-        Page<Integer> ids = gameRepository.findItemIds(
-                user.getId(), null, "dark", null, null, PageRequest.of(0, 10)
-        );
+        Page<Integer> ids =
+                gameRepository.findItemIds(
+                        user.getId(), null, "dark", null, null, PageRequest.of(0, 10));
         List<Game> results = gameRepository.findByIdsWithCategories(ids.getContent());
 
         assertThat(results).hasSize(2);
-        assertThat(results).extracting("name")
+        assertThat(results)
+                .extracting("name")
                 .allMatch(name -> ((String) name).toLowerCase().contains("dark"));
     }
 
@@ -186,7 +178,9 @@ class RepositoryIntegrationTest {
         Movie found = movieRepository.findById(saved.getId()).orElseThrow();
 
         assertThat(found.getGenres()).hasSize(2);
-        assertThat(found.getGenres()).extracting("name").containsExactlyInAnyOrder("Action", "Sci-Fi");
+        assertThat(found.getGenres())
+                .extracting("name")
+                .containsExactlyInAnyOrder("Action", "Sci-Fi");
     }
 
     @Test
@@ -203,9 +197,9 @@ class RepositoryIntegrationTest {
         movieRepository.saveAll(List.of(movie1, movie2));
 
         // Two-step query update
-        Page<Integer> ids = movieRepository.findItemIds(
-                user.getId(), action.getId(), null, null, null, PageRequest.of(0, 10)
-        );
+        Page<Integer> ids =
+                movieRepository.findItemIds(
+                        user.getId(), action.getId(), null, null, null, PageRequest.of(0, 10));
         List<Movie> actionMovies = movieRepository.findByIdsWithCategories(ids.getContent());
 
         assertThat(actionMovies).hasSize(1);
@@ -220,17 +214,17 @@ class RepositoryIntegrationTest {
         Genre romance = genreRepository.save(new Genre(null, "Romance"));
         Genre drama = genreRepository.save(new Genre(null, "Drama"));
 
-        applicabilityRepository.saveAll(List.of(
-                new GenreApplicability(action.getId(), "movie"),
-                new GenreApplicability(romance.getId(), "book"),
-                new GenreApplicability(drama.getId(), "shared")
-        ));
+        applicabilityRepository.saveAll(
+                List.of(
+                        new GenreApplicability(action.getId(), "movie"),
+                        new GenreApplicability(romance.getId(), "book"),
+                        new GenreApplicability(drama.getId(), "shared")));
 
         List<Genre> movieGenres = genreRepository.findAvailableGenresFor("movie");
         List<Genre> bookGenres = genreRepository.findAvailableGenresFor("book");
 
         assertThat(movieGenres).hasSize(2); // Action + Drama (shared)
-        assertThat(bookGenres).hasSize(2);  // Romance + Drama (shared)
+        assertThat(bookGenres).hasSize(2); // Romance + Drama (shared)
         assertThat(movieGenres).extracting("name").containsExactlyInAnyOrder("Action", "Drama");
     }
 
@@ -314,21 +308,29 @@ class RepositoryIntegrationTest {
     @Test
     void gameRepository_SortByScore_Success() {
         User user = userRepository.save(new User("gamer", "hash"));
-        gameRepository.saveAll(List.of(
-                new Game(null, "Low", user.getId(), 60, false),
-                new Game(null, "High", user.getId(), 95, false),
-                new Game(null, "Medium", user.getId(), 75, false)
-        ));
+        gameRepository.saveAll(
+                List.of(
+                        new Game(null, "Low", user.getId(), 60, false),
+                        new Game(null, "High", user.getId(), 95, false),
+                        new Game(null, "Medium", user.getId(), 75, false)));
 
         // Two-step query update
-        Page<Integer> ascIds = gameRepository.findItemIds(
-                user.getId(), null, null, null, null,
-                PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "score"))
-        );
-        Page<Integer> descIds = gameRepository.findItemIds(
-                user.getId(), null, null, null, null,
-                PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "score"))
-        );
+        Page<Integer> ascIds =
+                gameRepository.findItemIds(
+                        user.getId(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "score")));
+        Page<Integer> descIds =
+                gameRepository.findItemIds(
+                        user.getId(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "score")));
 
         List<Game> ascending = gameRepository.findByIdsWithCategories(ascIds.getContent());
         List<Game> descending = gameRepository.findByIdsWithCategories(descIds.getContent());

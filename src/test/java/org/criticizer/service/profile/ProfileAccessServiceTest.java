@@ -1,5 +1,7 @@
 package org.criticizer.service.profile;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.criticizer.entity.User;
 import org.criticizer.exceptions.security.InsufficientPermissionsException;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,12 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
-
-/**
- * Unit tests for ProfileAccessService.
- * Tests profile access control logic.
- */
+/** Unit tests for ProfileAccessService. Tests profile access control logic. */
 @DisplayName("ProfileAccessService Tests")
 class ProfileAccessServiceTest {
 
@@ -43,12 +40,11 @@ class ProfileAccessServiceTest {
         @DisplayName("Should allow viewing public profile by anyone")
         void shouldAllowViewingPublicProfile() {
             // When - Anonymous user
-            boolean resultAnonymous = profileAccessService.canViewProfile(
-                    publicProfileUser, null);
+            boolean resultAnonymous = profileAccessService.canViewProfile(publicProfileUser, null);
 
             // When - Different user
-            boolean resultDifferentUser = profileAccessService.canViewProfile(
-                    publicProfileUser, "other_user");
+            boolean resultDifferentUser =
+                    profileAccessService.canViewProfile(publicProfileUser, "other_user");
 
             // Then
             assertThat(resultAnonymous).isTrue();
@@ -59,8 +55,8 @@ class ProfileAccessServiceTest {
         @DisplayName("Should allow owner to view their own private profile")
         void shouldAllowOwnerViewPrivateProfile() {
             // When
-            boolean result = profileAccessService.canViewProfile(
-                    privateProfileUser, "private_user");
+            boolean result =
+                    profileAccessService.canViewProfile(privateProfileUser, "private_user");
 
             // Then
             assertThat(result).isTrue();
@@ -70,8 +66,8 @@ class ProfileAccessServiceTest {
         @DisplayName("Should allow owner with different case to view profile")
         void shouldAllowOwnerWithDifferentCase() {
             // When
-            boolean result = profileAccessService.canViewProfile(
-                    privateProfileUser, "PRIVATE_USER");
+            boolean result =
+                    profileAccessService.canViewProfile(privateProfileUser, "PRIVATE_USER");
 
             // Then
             assertThat(result).isTrue();
@@ -81,8 +77,7 @@ class ProfileAccessServiceTest {
         @DisplayName("Should deny anonymous user from viewing private profile")
         void shouldDenyAnonymousFromPrivateProfile() {
             // When
-            boolean result = profileAccessService.canViewProfile(
-                    privateProfileUser, null);
+            boolean result = profileAccessService.canViewProfile(privateProfileUser, null);
 
             // Then
             assertThat(result).isFalse();
@@ -92,8 +87,7 @@ class ProfileAccessServiceTest {
         @DisplayName("Should deny other user from viewing private profile")
         void shouldDenyOtherUserFromPrivateProfile() {
             // When
-            boolean result = profileAccessService.canViewProfile(
-                    privateProfileUser, "other_user");
+            boolean result = profileAccessService.canViewProfile(privateProfileUser, "other_user");
 
             // Then
             assertThat(result).isFalse();
@@ -211,8 +205,7 @@ class ProfileAccessServiceTest {
                     profileAccessService.checkAccess(publicProfileUser, "any_user");
 
             // When & Then
-            assertThatCode(() -> context.requireViewAccess())
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> context.requireViewAccess()).doesNotThrowAnyException();
         }
 
         @Test
@@ -245,12 +238,10 @@ class ProfileAccessServiceTest {
         void shouldNotThrowForOwnerViewingPrivate() {
             // Given
             ProfileAccessService.ProfileAccessContext context =
-                    profileAccessService.checkAccess(
-                            privateProfileUser, "private_user");
+                    profileAccessService.checkAccess(privateProfileUser, "private_user");
 
             // When & Then
-            assertThatCode(() -> context.requireViewAccess())
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> context.requireViewAccess()).doesNotThrowAnyException();
         }
     }
 
@@ -264,8 +255,7 @@ class ProfileAccessServiceTest {
         @DisplayName("Should handle empty string as current username")
         void shouldHandleEmptyString() {
             // When
-            boolean result = profileAccessService.canViewProfile(
-                    privateProfileUser, "");
+            boolean result = profileAccessService.canViewProfile(privateProfileUser, "");
 
             // Then
             assertThat(result).isFalse();
@@ -307,10 +297,10 @@ class ProfileAccessServiceTest {
             mixedCaseUser.setProfileIsPublic(false);
 
             // When - User tries with different case
-            boolean resultLowerCase = profileAccessService.canViewProfile(
-                    mixedCaseUser, "mixedcase");
-            boolean resultUpperCase = profileAccessService.canViewProfile(
-                    mixedCaseUser, "MIXEDCASE");
+            boolean resultLowerCase =
+                    profileAccessService.canViewProfile(mixedCaseUser, "mixedcase");
+            boolean resultUpperCase =
+                    profileAccessService.canViewProfile(mixedCaseUser, "MIXEDCASE");
 
             // Then
             assertThat(resultLowerCase).isTrue();
@@ -334,8 +324,7 @@ class ProfileAccessServiceTest {
             // Then - Should see profile but not be marked as owner
             assertThat(context.canView()).isTrue();
             assertThat(context.isOwner()).isFalse();
-            assertThatCode(() -> context.requireViewAccess())
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> context.requireViewAccess()).doesNotThrowAnyException();
         }
 
         @Test
@@ -343,8 +332,7 @@ class ProfileAccessServiceTest {
         void scenarioUserViewingOwnProfile() {
             // When
             ProfileAccessService.ProfileAccessContext context =
-                    profileAccessService.checkAccess(
-                            privateProfileUser, "private_user");
+                    profileAccessService.checkAccess(privateProfileUser, "private_user");
 
             // Then - Should have full access as owner
             assertThat(context.canView()).isTrue();
@@ -357,8 +345,7 @@ class ProfileAccessServiceTest {
         void scenarioAccessingOthersPrivateProfile() {
             // When
             ProfileAccessService.ProfileAccessContext context =
-                    profileAccessService.checkAccess(
-                            privateProfileUser, "different_user");
+                    profileAccessService.checkAccess(privateProfileUser, "different_user");
 
             // Then - Should be denied
             assertThat(context.canView()).isFalse();
@@ -372,8 +359,7 @@ class ProfileAccessServiceTest {
         void scenarioBrowsingOthersPublicProfiles() {
             // When
             ProfileAccessService.ProfileAccessContext context =
-                    profileAccessService.checkAccess(
-                            publicProfileUser, "different_user");
+                    profileAccessService.checkAccess(publicProfileUser, "different_user");
 
             // Then - Should see profile but not be owner
             assertThat(context.canView()).isTrue();

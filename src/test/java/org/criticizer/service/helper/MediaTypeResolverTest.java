@@ -1,5 +1,7 @@
 package org.criticizer.service.helper;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.criticizer.constants.ContentCategory;
 import org.criticizer.service.book.BookService;
 import org.criticizer.service.game.GameService;
@@ -15,34 +17,24 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.*;
-
-/**
- * Unit tests for MediaTypeResolver.
- */
+/** Unit tests for MediaTypeResolver. */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("MediaTypeResolver Tests")
 class MediaTypeResolverTest {
 
-    @Mock
-    private GameService gameService;
+    @Mock private GameService gameService;
 
-    @Mock
-    private MovieService movieService;
+    @Mock private MovieService movieService;
 
-    @Mock
-    private BookService bookService;
+    @Mock private BookService bookService;
 
-    @Mock
-    private ShowService showService;
+    @Mock private ShowService showService;
 
     private MediaTypeResolver resolver;
 
     @BeforeEach
     void setUp() {
-        resolver = new MediaTypeResolver(
-                gameService, movieService, bookService, showService
-        );
+        resolver = new MediaTypeResolver(gameService, movieService, bookService, showService);
     }
 
     // ==================== RESOLVE BY STRING TESTS ====================
@@ -130,13 +122,14 @@ class MediaTypeResolverTest {
                     .hasMessageContaining("music")
                     .hasMessageContaining("Valid types: games, movies, books, shows");
         }
+
         @ParameterizedTest
         @ValueSource(strings = {"game", "movie", "book", "show"})
         @DisplayName("Should resolve singular forms successfully")
         void shouldResolveSingularForms(String input) {
-            assertThatCode(() -> resolver.resolve(input))
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> resolver.resolve(input)).doesNotThrowAnyException();
         }
+
         @ParameterizedTest
         @ValueSource(strings = {"games", "GAMES", "Games", "gaMES"})
         @DisplayName("Should resolve games in any case")
@@ -163,8 +156,7 @@ class MediaTypeResolverTest {
         @DisplayName("Should resolve GAMES enum")
         void shouldResolveGamesEnum() {
             // When
-            AbstractMediaService<?, ?> result =
-                    resolver.resolve(ContentCategory.GAMES);
+            AbstractMediaService<?, ?> result = resolver.resolve(ContentCategory.GAMES);
 
             // Then
             assertThat(result).isSameAs(gameService);
@@ -174,8 +166,7 @@ class MediaTypeResolverTest {
         @DisplayName("Should resolve MOVIES enum")
         void shouldResolveMoviesEnum() {
             // When
-            AbstractMediaService<?, ?> result =
-                    resolver.resolve(ContentCategory.MOVIES);
+            AbstractMediaService<?, ?> result = resolver.resolve(ContentCategory.MOVIES);
 
             // Then
             assertThat(result).isSameAs(movieService);
@@ -185,8 +176,7 @@ class MediaTypeResolverTest {
         @DisplayName("Should resolve BOOKS enum")
         void shouldResolveBooksEnum() {
             // When
-            AbstractMediaService<?, ?> result =
-                    resolver.resolve(ContentCategory.BOOKS);
+            AbstractMediaService<?, ?> result = resolver.resolve(ContentCategory.BOOKS);
 
             // Then
             assertThat(result).isSameAs(bookService);
@@ -196,8 +186,7 @@ class MediaTypeResolverTest {
         @DisplayName("Should resolve SHOWS enum")
         void shouldResolveShowsEnum() {
             // When
-            AbstractMediaService<?, ?> result =
-                    resolver.resolve(ContentCategory.SHOWS);
+            AbstractMediaService<?, ?> result = resolver.resolve(ContentCategory.SHOWS);
 
             // Then
             assertThat(result).isSameAs(showService);
@@ -208,8 +197,7 @@ class MediaTypeResolverTest {
         void shouldResolveAllEnumValues() {
             // When & Then - No exceptions should be thrown
             for (ContentCategory type : ContentCategory.values()) {
-                assertThatCode(() -> resolver.resolve(type))
-                        .doesNotThrowAnyException();
+                assertThatCode(() -> resolver.resolve(type)).doesNotThrowAnyException();
             }
         }
     }
@@ -262,6 +250,7 @@ class MediaTypeResolverTest {
         void shouldReturnFalseForWhitespace() {
             assertThat(resolver.isSupported("   ")).isFalse();
         }
+
         @ParameterizedTest
         @ValueSource(strings = {"game", "movie", "book", "show"})
         @DisplayName("Should return true for singular forms")
@@ -288,32 +277,24 @@ class MediaTypeResolverTest {
         @Test
         @DisplayName("Should parse string to enum correctly")
         void shouldParseStringToEnum() {
-            assertThat(ContentCategory.fromString("games"))
-                    .isEqualTo(ContentCategory.GAMES);
-            assertThat(ContentCategory.fromString("movies"))
-                    .isEqualTo(ContentCategory.MOVIES);
-            assertThat(ContentCategory.fromString("books"))
-                    .isEqualTo(ContentCategory.BOOKS);
-            assertThat(ContentCategory.fromString("shows"))
-                    .isEqualTo(ContentCategory.SHOWS);
+            assertThat(ContentCategory.fromString("games")).isEqualTo(ContentCategory.GAMES);
+            assertThat(ContentCategory.fromString("movies")).isEqualTo(ContentCategory.MOVIES);
+            assertThat(ContentCategory.fromString("books")).isEqualTo(ContentCategory.BOOKS);
+            assertThat(ContentCategory.fromString("shows")).isEqualTo(ContentCategory.SHOWS);
         }
 
         @Test
         @DisplayName("Should be case-insensitive when parsing")
         void shouldBeCaseInsensitiveWhenParsing() {
-            assertThat(ContentCategory.fromString("GAMES"))
-                    .isEqualTo(ContentCategory.GAMES);
-            assertThat(ContentCategory.fromString("Games"))
-                    .isEqualTo(ContentCategory.GAMES);
-            assertThat(ContentCategory.fromString("gAmEs"))
-                    .isEqualTo(ContentCategory.GAMES);
+            assertThat(ContentCategory.fromString("GAMES")).isEqualTo(ContentCategory.GAMES);
+            assertThat(ContentCategory.fromString("Games")).isEqualTo(ContentCategory.GAMES);
+            assertThat(ContentCategory.fromString("gAmEs")).isEqualTo(ContentCategory.GAMES);
         }
 
         @Test
         @DisplayName("Should throw when parsing invalid string")
         void shouldThrowWhenParsingInvalid() {
-            assertThatThrownBy(() ->
-                    ContentCategory.fromString("invalid"))
+            assertThatThrownBy(() -> ContentCategory.fromString("invalid"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("Invalid content category");
         }
@@ -321,8 +302,7 @@ class MediaTypeResolverTest {
         @Test
         @DisplayName("Should throw when parsing null")
         void shouldThrowWhenParsingNull() {
-            assertThatThrownBy(() ->
-                    ContentCategory.fromString(null))
+            assertThatThrownBy(() -> ContentCategory.fromString(null))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("cannot be null");
         }
@@ -334,6 +314,7 @@ class MediaTypeResolverTest {
                 assertThat(type.toString()).isEqualTo(type.getPlural());
             }
         }
+
         @Test
         @DisplayName("Should have exactly 4 enum values")
         void shouldHaveExactlyFourValues() {
@@ -352,8 +333,7 @@ class MediaTypeResolverTest {
         void shouldResolveSameServiceForStringAndEnum() {
             // When
             AbstractMediaService<?, ?> fromString = resolver.resolve("games");
-            AbstractMediaService<?, ?> fromEnum =
-                    resolver.resolve(ContentCategory.GAMES);
+            AbstractMediaService<?, ?> fromEnum = resolver.resolve(ContentCategory.GAMES);
 
             // Then
             assertThat(fromString).isSameAs(fromEnum);
@@ -399,8 +379,7 @@ class MediaTypeResolverTest {
             // When & Then
             for (String type : supportedTypes) {
                 assertThat(resolver.isSupported(type)).isTrue();
-                assertThatCode(() -> resolver.resolve(type))
-                        .doesNotThrowAnyException();
+                assertThatCode(() -> resolver.resolve(type)).doesNotThrowAnyException();
             }
         }
     }

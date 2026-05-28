@@ -21,9 +21,7 @@ export class TagChipsManager {
 
     init() {
         // Get all dropdown items
-        this.dropdownItems = Array.from(
-            this.dropdown.querySelectorAll('.tag-dropdown-item')
-        );
+        this.dropdownItems = Array.from(this.dropdown.querySelectorAll('.tag-dropdown-item'));
 
         // Add button click
         this.addBtn.addEventListener('click', () => this.toggleDropdown());
@@ -36,18 +34,16 @@ export class TagChipsManager {
         }
 
         // Dropdown item click
-        this.dropdownItems.forEach(item => {
+        this.dropdownItems.forEach((item) => {
             item.addEventListener('click', () => this.toggleTag(item));
         });
 
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
-            if (!this.dropdown.contains(e.target) &&
-                !this.addBtn.contains(e.target)) {
+            if (!this.dropdown.contains(e.target) && !this.addBtn.contains(e.target)) {
                 this.closeDropdown();
             }
         });
-
     }
 
     /**
@@ -91,7 +87,7 @@ export class TagChipsManager {
     filterDropdown(searchTerm) {
         const query = searchTerm.toLowerCase().trim();
 
-        this.dropdownItems.forEach(item => {
+        this.dropdownItems.forEach((item) => {
             const tagName = item.dataset.tagName.toLowerCase();
             const matches = tagName.includes(query);
             item.style.display = matches ? 'block' : 'none';
@@ -176,7 +172,7 @@ export class TagChipsManager {
      */
     getSelectedIds() {
         const chips = this.chipsDisplay.querySelectorAll('.tag-chip');
-        return Array.from(chips).map(chip => chip.dataset.chipId);
+        return Array.from(chips).map((chip) => chip.dataset.chipId);
     }
 
     /**
@@ -184,7 +180,7 @@ export class TagChipsManager {
      */
     clearAll() {
         this.chipsDisplay.innerHTML = '';
-        this.dropdownItems.forEach(item => {
+        this.dropdownItems.forEach((item) => {
             const checkbox = item.querySelector('input[type="checkbox"]');
             if (checkbox) checkbox.checked = false;
             item.classList.remove('selected');
@@ -197,7 +193,7 @@ export class TagChipsManager {
      */
     setSelectedTags(tags) {
         this.clearAll();
-        tags.forEach(tag => {
+        tags.forEach((tag) => {
             this.addChip(tag.id, tag.name);
             const item = this.dropdown.querySelector(`[data-tag-id="${tag.id}"]`);
             if (item) {
@@ -221,7 +217,6 @@ export class TagChipsManager {
 
         // Close dropdown
         this.closeDropdown();
-
     }
 }
 

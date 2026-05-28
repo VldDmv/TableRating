@@ -28,9 +28,9 @@ export class SortManager {
      * Initializes sorting functionality.
      */
     init() {
-        this.headers.forEach(header => {
+        this.headers.forEach((header) => {
             const columnKey = Object.keys(this.columnsConfig).find(
-                key => this.columnsConfig[key].index === header.cellIndex
+                (key) => this.columnsConfig[key].index === header.cellIndex
             );
 
             if (columnKey) {
@@ -56,9 +56,9 @@ export class SortManager {
         if (!columnInfo || columnInfo.sortable === false) return;
 
         const currentOrder = headerCell.dataset.sortOrder;
-        const newOrder = (currentOrder === 'asc') ? 'desc' : 'asc';
+        const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
 
-        this.listeners.forEach(callback => callback(columnKey, newOrder));
+        this.listeners.forEach((callback) => callback(columnKey, newOrder));
     }
 
     /**
@@ -67,18 +67,16 @@ export class SortManager {
      * @param {string} sortOrder - Sort order ('asc' or 'desc').
      */
     updateHeaders(sortBy, sortOrder) {
-            this.headers.forEach(th => {
-                th.dataset.sortOrder = '';
+        this.headers.forEach((th) => {
+            th.dataset.sortOrder = '';
 
+            th.textContent = th.textContent.replace(/[▲▼]/g, '').trim();
 
-                th.textContent = th.textContent.replace(/[▲▼]/g, '').trim();
-
-
-                const columnKey = th.dataset.columnKey;
-                if (columnKey === sortBy) {
-                    th.dataset.sortOrder = sortOrder;
-                    th.textContent += (sortOrder === 'asc') ? ' ▲' : ' ▼';
-                }
-            });
-        }
+            const columnKey = th.dataset.columnKey;
+            if (columnKey === sortBy) {
+                th.dataset.sortOrder = sortOrder;
+                th.textContent += sortOrder === 'asc' ? ' ▲' : ' ▼';
+            }
+        });
     }
+}

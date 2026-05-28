@@ -1,13 +1,10 @@
 package org.criticizer.dto.game;
 
+import java.util.List;
 import org.criticizer.dto.tag.TagResponse;
 import org.criticizer.entity.Game;
 
-import java.util.List;
-
-/**
- * Response DTO for a game.
- */
+/** Response DTO for a game. */
 public class GameResponse {
 
     private final int id;
@@ -17,8 +14,13 @@ public class GameResponse {
     private final boolean completed;
     private final List<TagResponse> tags;
 
-    public GameResponse(int id, String name, String coverUrl, int score,
-                        boolean completed, List<TagResponse> tags) {
+    public GameResponse(
+            int id,
+            String name,
+            String coverUrl,
+            int score,
+            boolean completed,
+            List<TagResponse> tags) {
         this.id = id;
         this.name = name;
         this.coverUrl = coverUrl;
@@ -36,8 +38,7 @@ public class GameResponse {
                 game.isCompleted(),
                 game.getTags().stream()
                         .map(tag -> new TagResponse(tag.getId(), tag.getName()))
-                        .toList()
-        );
+                        .toList());
     }
 
     public int getId() {

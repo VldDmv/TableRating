@@ -1,9 +1,7 @@
-
 package org.criticizer.service.helper;
 
 /**
- * Marker interface for all media entities.
- * Enforces common contract for Game, Movie, Book, Show.
+ * Marker interface for all media entities. Enforces common contract for Game, Movie, Book, Show.
  */
 public interface MediaEntity {
     Integer getId();

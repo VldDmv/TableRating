@@ -6,14 +6,15 @@ import {
     securityUtils,
     entityUtils,
     ICONS,
-    CONSTANTS
+    CONSTANTS,
 } from '@/tableScripts/core/utils.js';
 
 describe('htmlUtils', () => {
     describe('escape', () => {
         test('should escape HTML special characters', () => {
-            expect(htmlUtils.escape('<script>alert("xss")</script>'))
-             .toBe('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;');
+            expect(htmlUtils.escape('<script>alert("xss")</script>')).toBe(
+                '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;'
+            );
         });
 
         test('should escape ampersands', () => {
@@ -21,8 +22,8 @@ describe('htmlUtils', () => {
         });
 
         test('should escape quotes', () => {
-     const result = htmlUtils.escape('"quotes"');
-                expect(result).toBe('&quot;quotes&quot;');
+            const result = htmlUtils.escape('"quotes"');
+            expect(result).toBe('&quot;quotes&quot;');
         });
 
         test('should handle empty strings', () => {
@@ -133,7 +134,7 @@ describe('domUtils', () => {
         test('should set attributes', () => {
             const el = domUtils.createElement('input', {
                 type: 'text',
-                placeholder: 'Enter text'
+                placeholder: 'Enter text',
             });
             expect(el.getAttribute('type')).toBe('text');
             expect(el.getAttribute('placeholder')).toBe('Enter text');
@@ -141,7 +142,7 @@ describe('domUtils', () => {
 
         test('should set dataset', () => {
             const el = domUtils.createElement('div', {
-                dataset: { id: '123', name: 'test' }
+                dataset: { id: '123', name: 'test' },
             });
             expect(el.dataset.id).toBe('123');
             expect(el.dataset.name).toBe('test');
@@ -360,13 +361,13 @@ describe('ICONS', () => {
     });
 
     test('icons should be strings', () => {
-        Object.values(ICONS).forEach(icon => {
+        Object.values(ICONS).forEach((icon) => {
             expect(typeof icon).toBe('string');
         });
     });
 
     test('icons should not be empty', () => {
-        Object.values(ICONS).forEach(icon => {
+        Object.values(ICONS).forEach((icon) => {
             expect(icon.length).toBeGreaterThan(0);
         });
     });

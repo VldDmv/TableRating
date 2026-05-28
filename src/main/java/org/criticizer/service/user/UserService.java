@@ -1,5 +1,9 @@
 package org.criticizer.service.user;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.criticizer.dto.helper.PageResponse;
 import org.criticizer.dto.user.UserPublicResponse;
 import org.criticizer.entity.Role;
@@ -21,14 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-/**
- * Service for managing users.
- */
+/** Service for managing users. */
 @Service
 @Transactional(readOnly = true)
 public class UserService {
@@ -42,13 +39,14 @@ public class UserService {
     private final ServiceValidator validator;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository,
-                       GameRepository gameRepository,
-                       MovieRepository movieRepository,
-                       BookRepository bookRepository,
-                       ShowRepository showRepository,
-                       ServiceValidator validator,
-                       PasswordEncoder passwordEncoder) {
+    public UserService(
+            UserRepository userRepository,
+            GameRepository gameRepository,
+            MovieRepository movieRepository,
+            BookRepository bookRepository,
+            ShowRepository showRepository,
+            ServiceValidator validator,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.gameRepository = gameRepository;
         this.movieRepository = movieRepository;
@@ -59,16 +57,14 @@ public class UserService {
     }
 
     public User getUser(String name) {
-        return userRepository.findByNameIgnoreCase(name)
+        return userRepository
+                .findByNameIgnoreCase(name)
                 .orElseThrow(() -> new UserNotFoundException(name));
     }
 
-    /**
-     * Get user by ID — uses a direct DB lookup, not in-memory filtering.
-     */
+    /** Get user by ID — uses a direct DB lookup, not in-memory filtering. */
     public User getUserById(int id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
     }
 
     public int getUserId(String name) {
@@ -106,60 +102,68 @@ public class UserService {
         return userRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
     }
 
-    public PageResponse<User> getUsersPage(String searchTerm, int page, int pageSize, boolean publicOnly) {
+    public PageResponse<User> getUsersPage(
+            String searchTerm, int page, int pageSize, boolean publicOnly) {
         ServiceValidator.PaginationParams params = validator.validatePagination(page, pageSize);
         String sanitizedSearch = validator.sanitizeSearchTerm(searchTerm);
 
-        Pageable pageable = PageRequest.of(params.page() - 1, params.pageSize(),
-                Sort.by(Sort.Direction.ASC, "name"));
+        Pageable pageable =
+                PageRequest.of(
+                        params.page() - 1, params.pageSize(), Sort.by(Sort.Direction.ASC, "name"));
 
-        Page<User> userPage = (sanitizedSearch != null && !sanitizedSearch.isEmpty())
-                ? userRepository.searchUsers(sanitizedSearch, publicOnly, pageable)
-                : userRepository.findUsers(publicOnly, pageable);
+        Page<User> userPage =
+                (sanitizedSearch != null && !sanitizedSearch.isEmpty())
+                        ? userRepository.searchUsers(sanitizedSearch, publicOnly, pageable)
+                        : userRepository.findUsers(publicOnly, pageable);
 
-        log.debug("Fetched {} users (page {} of {})",
-                userPage.getContent().size(), params.page(), userPage.getTotalPages());
+        log.debug(
+                "Fetched {} users (page {} of {})",
+                userPage.getContent().size(),
+                params.page(),
+                userPage.getTotalPages());
 
         return PageResponse.of(userPage);
     }
 
     /**
-     * Returns paginated public users with media statistics.
-     * Uses a single aggregated query per media type (4 queries total)
-     * instead of 4 queries per user, avoiding N+1.
+     * Returns paginated public users with media statistics. Uses a single aggregated query per
+     * media type (4 queries total) instead of 4 queries per user, avoiding N+1.
      */
     public PageResponse<UserPublicResponse> getUsersPageWithStats(
-            String searchTerm,
-            int page,
-            int pageSize,
-            String sortBy,
-            String sortOrder) {
+            String searchTerm, int page, int pageSize, String sortBy, String sortOrder) {
 
         ServiceValidator.PaginationParams params = validator.validatePagination(page, pageSize);
         String sanitizedSearch = validator.sanitizeSearchTerm(searchTerm);
 
         Pageable unpaged = PageRequest.of(0, Integer.MAX_VALUE, Sort.by("name"));
-        List<User> allPublicUsers = (sanitizedSearch != null && !sanitizedSearch.isEmpty())
-                ? userRepository.searchUsers(sanitizedSearch, true, unpaged).getContent()
-                : userRepository.findUsers(true, unpaged).getContent();
+        List<User> allPublicUsers =
+                (sanitizedSearch != null && !sanitizedSearch.isEmpty())
+                        ? userRepository.searchUsers(sanitizedSearch, true, unpaged).getContent()
+                        : userRepository.findUsers(true, unpaged).getContent();
 
         if (allPublicUsers.isEmpty()) {
             return new PageResponse<>(List.of(), params.page(), 0, 0L, params.pageSize());
         }
 
-        List<Integer> userIds = allPublicUsers.stream()
-                .map(User::getId)
-                .collect(Collectors.toList());
+        List<Integer> userIds =
+                allPublicUsers.stream().map(User::getId).collect(Collectors.toList());
 
         Map<Integer, Long> gamesCountMap = gameRepository.countByUserIds(userIds);
         Map<Integer, Long> moviesCountMap = movieRepository.countByUserIds(userIds);
         Map<Integer, Long> booksCountMap = bookRepository.countByUserIds(userIds);
         Map<Integer, Long> showsCountMap = showRepository.countByUserIds(userIds);
 
-        List<UserPublicResponse> usersWithStats = allPublicUsers.stream()
-                .map(user -> toPublicResponse(user, gamesCountMap, moviesCountMap,
-                        booksCountMap, showsCountMap))
-                .collect(Collectors.toList());
+        List<UserPublicResponse> usersWithStats =
+                allPublicUsers.stream()
+                        .map(
+                                user ->
+                                        toPublicResponse(
+                                                user,
+                                                gamesCountMap,
+                                                moviesCountMap,
+                                                booksCountMap,
+                                                showsCountMap))
+                        .collect(Collectors.toList());
 
         usersWithStats = sortUsersByStats(usersWithStats, sortBy, sortOrder);
 
@@ -168,15 +172,17 @@ public class UserService {
         int startIndex = (params.page() - 1) * params.pageSize();
         int endIndex = Math.min(startIndex + params.pageSize(), totalItems);
 
-        List<UserPublicResponse> pagedUsers = startIndex < totalItems
-                ? usersWithStats.subList(startIndex, endIndex)
-                : List.of();
+        List<UserPublicResponse> pagedUsers =
+                startIndex < totalItems ? usersWithStats.subList(startIndex, endIndex) : List.of();
 
-        log.debug("Fetched {} users with stats (page {} of {})",
-                pagedUsers.size(), params.page(), totalPages);
+        log.debug(
+                "Fetched {} users with stats (page {} of {})",
+                pagedUsers.size(),
+                params.page(),
+                totalPages);
 
-        return new PageResponse<>(pagedUsers, params.page(), totalPages,
-                (long) totalItems, params.pageSize());
+        return new PageResponse<>(
+                pagedUsers, params.page(), totalPages, (long) totalItems, params.pageSize());
     }
 
     @Transactional
@@ -186,26 +192,30 @@ public class UserService {
         }
 
         if (initiator == null || initiator.getRole() != Role.ADMIN) {
-            log.warn("Unauthorised role change attempt by user {}",
+            log.warn(
+                    "Unauthorised role change attempt by user {}",
                     initiator != null ? initiator.getId() : "null");
             throw new InsufficientPermissionsException("ADMIN");
         }
 
         if (initiator.getId() == targetUserId && newRole == Role.USER) {
             throw new OperationNotPermittedException(
-                    "changeUserRole",
-                    "Administrator cannot remove their own admin role"
-            );
+                    "changeUserRole", "Administrator cannot remove their own admin role");
         }
 
-        User targetUser = userRepository.findById(targetUserId)
-                .orElseThrow(() -> new UserNotFoundException(targetUserId));
+        User targetUser =
+                userRepository
+                        .findById(targetUserId)
+                        .orElseThrow(() -> new UserNotFoundException(targetUserId));
 
         targetUser.setRole(newRole);
         userRepository.save(targetUser);
 
-        log.info("Admin '{}' changed role for user {} to {}",
-                initiator.getName(), targetUserId, newRole);
+        log.info(
+                "Admin '{}' changed role for user {} to {}",
+                initiator.getName(),
+                targetUserId,
+                newRole);
     }
 
     @Transactional
@@ -215,8 +225,8 @@ public class UserService {
         }
 
         if (initiator.getId() == targetUserId) {
-            throw new OperationNotPermittedException("deleteUser",
-                    "You cannot delete your own account");
+            throw new OperationNotPermittedException(
+                    "deleteUser", "You cannot delete your own account");
         }
 
         if (!userRepository.existsById(targetUserId)) {
@@ -236,8 +246,10 @@ public class UserService {
 
     @Transactional
     public void updateUserPrivacy(int userId, boolean isPublic) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new UserNotFoundException(userId));
 
         user.setProfileIsPublic(isPublic);
         userRepository.save(user);
@@ -268,23 +280,24 @@ public class UserService {
                 showsCount,
                 totalItems,
                 user.isProfileIsPublic(),
-                user.getCreatedAt()
-        );
+                user.getCreatedAt());
     }
 
     private List<UserPublicResponse> sortUsersByStats(
-            List<UserPublicResponse> users,
-            String sortBy,
-            String sortOrder) {
+            List<UserPublicResponse> users, String sortBy, String sortOrder) {
 
-        Comparator<UserPublicResponse> comparator = switch (sortBy != null ? sortBy.toLowerCase() : "name") {
-            case "gamescount" -> Comparator.comparingInt(UserPublicResponse::getGamesCount);
-            case "moviescount" -> Comparator.comparingInt(UserPublicResponse::getMoviesCount);
-            case "bookscount" -> Comparator.comparingInt(UserPublicResponse::getBooksCount);
-            case "showscount" -> Comparator.comparingInt(UserPublicResponse::getShowsCount);
-            case "totalitems" -> Comparator.comparingInt(UserPublicResponse::getTotalItems);
-            default -> Comparator.comparing(UserPublicResponse::getName, String.CASE_INSENSITIVE_ORDER);
-        };
+        Comparator<UserPublicResponse> comparator =
+                switch (sortBy != null ? sortBy.toLowerCase() : "name") {
+                    case "gamescount" -> Comparator.comparingInt(UserPublicResponse::getGamesCount);
+                    case "moviescount" ->
+                            Comparator.comparingInt(UserPublicResponse::getMoviesCount);
+                    case "bookscount" -> Comparator.comparingInt(UserPublicResponse::getBooksCount);
+                    case "showscount" -> Comparator.comparingInt(UserPublicResponse::getShowsCount);
+                    case "totalitems" -> Comparator.comparingInt(UserPublicResponse::getTotalItems);
+                    default ->
+                            Comparator.comparing(
+                                    UserPublicResponse::getName, String.CASE_INSENSITIVE_ORDER);
+                };
 
         if ("desc".equalsIgnoreCase(sortOrder)) {
             comparator = comparator.reversed();

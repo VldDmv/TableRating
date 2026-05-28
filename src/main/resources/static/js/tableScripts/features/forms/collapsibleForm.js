@@ -16,7 +16,7 @@ export class CollapsibleForm {
             buttonIcon: options.buttonIcon || '+',
             animationDuration: options.animationDuration || 300,
             collapseAfterSubmit: options.collapseAfterSubmit || false,
-            ...options
+            ...options,
         };
 
         this.isCollapsed = this.options.startCollapsed;

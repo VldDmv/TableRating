@@ -1,5 +1,7 @@
 package org.criticizer.service.tag;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.criticizer.dto.tag.CreateTagRequest;
 import org.criticizer.dto.tag.TagResponse;
 import org.criticizer.dto.tag.UpdateTagRequest;
@@ -14,12 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-/**
- * Spring Service for managing tags.
- */
+/** Spring Service for managing tags. */
 @Service
 @Transactional(readOnly = true)
 public class TagService {
@@ -33,32 +30,22 @@ public class TagService {
         this.gameRepository = gameRepository;
     }
 
-    /**
-     * Get all tags ordered by name.
-     */
+    /** Get all tags ordered by name. */
     public List<TagResponse> getAllTags() {
         log.debug("Fetching all tags");
 
-        return tagRepository.findAllByOrderByNameAsc()
-                .stream()
-                .map(TagResponse::from)
-                .toList();
+        return tagRepository.findAllByOrderByNameAsc().stream().map(TagResponse::from).toList();
     }
 
-    /**
-     * Get tags for a specific game.
-     */
+    /** Get tags for a specific game. */
     public List<TagResponse> getTagsForGame(Integer gameId) {
         log.debug("Fetching tags for game ID: {}", gameId);
-        return tagRepository.findByGameId(gameId)
-                .stream()
+        return tagRepository.findByGameId(gameId).stream()
                 .map(TagResponse::from)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Create a new tag.
-     */
+    /** Create a new tag. */
     @Transactional
     public TagResponse createTag(CreateTagRequest request) {
         String trimmedName = validateAndTrimName(request.getName());
@@ -75,22 +62,27 @@ public class TagService {
         return TagResponse.from(saved);
     }
 
-    /**
-     * Update an existing tag.
-     */
+    /** Update an existing tag. */
     @Transactional
     public TagResponse updateTag(UpdateTagRequest request) {
         String trimmedName = validateAndTrimName(request.getName());
 
-        Tag tag = tagRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Tag", "ID: " + request.getId()));
+        Tag tag =
+                tagRepository
+                        .findById(request.getId())
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "Tag", "ID: " + request.getId()));
 
-        tagRepository.findByNameIgnoreCase(trimmedName)
-                .ifPresent(existingTag -> {
-                    if (!existingTag.getId().equals(tag.getId())) {
-                        throw new ItemAlreadyExistsException("Tag", trimmedName);
-                    }
-                });
+        tagRepository
+                .findByNameIgnoreCase(trimmedName)
+                .ifPresent(
+                        existingTag -> {
+                            if (!existingTag.getId().equals(tag.getId())) {
+                                throw new ItemAlreadyExistsException("Tag", trimmedName);
+                            }
+                        });
 
         tag.setName(trimmedName);
         Tag updated = tagRepository.save(tag);
@@ -100,24 +92,26 @@ public class TagService {
     }
 
     /**
-     * Delete a tag and cascade-remove it from all games that use it.
-     * Does NOT throw if tag is in use — cleans up instead.
+     * Delete a tag and cascade-remove it from all games that use it. Does NOT throw if tag is in
+     * use — cleans up instead.
      */
     @Transactional
     public void deleteTag(Integer tagId) {
-        Tag tag = tagRepository.findById(tagId)
-                .orElseThrow(() -> new ResourceNotFoundException("Tag", "ID: " + tagId));
+        Tag tag =
+                tagRepository
+                        .findById(tagId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Tag", "ID: " + tagId));
 
         gameRepository.removeTagFromAll(tagId);
 
         tagRepository.deleteById(tagId);
-        log.info("Deleted tag '{}' (ID: {}) and removed from all associated games",
-                tag.getName(), tagId);
+        log.info(
+                "Deleted tag '{}' (ID: {}) and removed from all associated games",
+                tag.getName(),
+                tagId);
     }
 
-    /**
-     * Check if a tag is in use by any games.
-     */
+    /** Check if a tag is in use by any games. */
     public boolean isTagInUse(Integer tagId) {
         return tagRepository.isTagInUse(tagId);
     }

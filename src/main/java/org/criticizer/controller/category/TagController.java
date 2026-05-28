@@ -1,6 +1,7 @@
 package org.criticizer.controller.category;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import org.criticizer.dto.helper.ExistsResponse;
 import org.criticizer.dto.helper.MessageResponse;
 import org.criticizer.dto.tag.CreateTagRequest;
@@ -11,11 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/tags")
@@ -49,15 +47,12 @@ public class TagController {
     public ResponseEntity<TagResponse> createTag(@Valid @RequestBody CreateTagRequest request) {
         log.info("POST /api/tags - Creating tag: {}", request.name());
         TagResponse created = tagService.createTag(request);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TagResponse> updateTag(
-            @PathVariable Integer id,
-            @Valid @RequestBody UpdateTagRequest request) {
+            @PathVariable Integer id, @Valid @RequestBody UpdateTagRequest request) {
 
         UpdateTagRequest updatedRequest = new UpdateTagRequest(id, request.name());
 

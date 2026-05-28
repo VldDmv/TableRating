@@ -1,6 +1,8 @@
 package org.criticizer.controller.helper;
 
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Map;
 import org.criticizer.dto.helper.*;
 import org.criticizer.entity.User;
 import org.criticizer.security.SecurityUtil;
@@ -15,27 +17,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-
-/**
- * Abstract base controller for all media REST endpoints.
- * Works with regular interfaces.
- */
+/** Abstract base controller for all media REST endpoints. Works with regular interfaces. */
 public abstract class AbstractMediaController<
-        T extends MediaEntity,
-        R,
-        C extends CreateMediaRequest,
-        U extends UpdateMediaRequest
-        > {
+        T extends MediaEntity, R, C extends CreateMediaRequest, U extends UpdateMediaRequest> {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
     protected final AbstractMediaService<T, R> service;
     protected final SecurityUtil securityUtil;
 
     protected AbstractMediaController(
-            AbstractMediaService<T, R> service,
-            SecurityUtil securityUtil) {
+            AbstractMediaService<T, R> service, SecurityUtil securityUtil) {
         this.service = service;
         this.securityUtil = securityUtil;
     }
@@ -43,6 +34,7 @@ public abstract class AbstractMediaController<
     // ============= Abstract methods =============
 
     protected abstract String getEntityName();
+
     protected abstract R convertToResponse(T entity);
 
     // ============= Common REST endpoints =============
@@ -57,28 +49,22 @@ public abstract class AbstractMediaController<
             @RequestParam(defaultValue = "asc") String sortOrder) {
 
         User currentUser = securityUtil.getCurrentUser();
-        log.debug("Getting {}s for user {} - page: {}, size: {}, categoryId: {}",
-                getEntityName(), currentUser.getName(), page, size, categoryId);
-
-        PageResponse<T> result = service.getUserItemsPage(
-                currentUser.getId(),
-                page + 1,
+        log.debug(
+                "Getting {}s for user {} - page: {}, size: {}, categoryId: {}",
+                getEntityName(),
+                currentUser.getName(),
+                page,
                 size,
-                categoryId,
-                search,
-                sortBy,
-                sortOrder
-        );
+                categoryId);
 
-        List<R> responses = result.getItems().stream()
-                .map(this::convertToResponse)
-                .toList();
+        PageResponse<T> result =
+                service.getUserItemsPage(
+                        currentUser.getId(), page + 1, size, categoryId, search, sortBy, sortOrder);
 
-        Page<R> pageResult = new PageImpl<>(
-                responses,
-                PageRequest.of(page, size),
-                result.getTotalItems()
-        );
+        List<R> responses = result.getItems().stream().map(this::convertToResponse).toList();
+
+        Page<R> pageResult =
+                new PageImpl<>(responses, PageRequest.of(page, size), result.getTotalItems());
 
         return ResponseEntity.ok(PageResponse.of(pageResult));
     }
@@ -86,30 +72,30 @@ public abstract class AbstractMediaController<
     @PostMapping
     public ResponseEntity<MessageResponse> createItem(@Valid @RequestBody C request) {
         User currentUser = securityUtil.getCurrentUser();
-        log.info("User {} creating {}: {}",
-                currentUser.getName(), getEntityName(), request.name());
+        log.info("User {} creating {}: {}", currentUser.getName(), getEntityName(), request.name());
 
         service.addItem(
                 request.name(),
                 request.coverUrl(),
                 currentUser.getId(),
                 request.score(),
-                request.categoryIds() != null ? request.categoryIds() : List.of()
-        );
+                request.categoryIds() != null ? request.categoryIds() : List.of());
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new MessageResponse(getEntityName() + " created successfully"));
     }
 
     @PutMapping("/{name}")
     public ResponseEntity<MessageResponse> updateItem(
-            @PathVariable String name,
-            @Valid @RequestBody U request) {
+            @PathVariable String name, @Valid @RequestBody U request) {
 
         User currentUser = securityUtil.getCurrentUser();
-        log.info("User {} updating {} '{}' to '{}'",
-                currentUser.getName(), getEntityName(), name, request.name());
+        log.info(
+                "User {} updating {} '{}' to '{}'",
+                currentUser.getName(),
+                getEntityName(),
+                name,
+                request.name());
 
         service.updateItem(
                 name,
@@ -117,12 +103,9 @@ public abstract class AbstractMediaController<
                 request.coverUrl(),
                 request.score(),
                 currentUser.getId(),
-                request.categoryIds() != null ? request.categoryIds() : List.of()
-        );
+                request.categoryIds() != null ? request.categoryIds() : List.of());
 
-        return ResponseEntity.ok(
-                new MessageResponse(getEntityName() + " updated successfully")
-        );
+        return ResponseEntity.ok(new MessageResponse(getEntityName() + " updated successfully"));
     }
 
     @DeleteMapping("/{name}")
@@ -132,26 +115,21 @@ public abstract class AbstractMediaController<
 
         service.removeItem(name, currentUser.getId());
 
-        return ResponseEntity.ok(
-                new MessageResponse(getEntityName() + " deleted successfully")
-        );
+        return ResponseEntity.ok(new MessageResponse(getEntityName() + " deleted successfully"));
     }
 
     @PatchMapping("/{name}/toggle")
     public ResponseEntity<StatusToggleResponse> toggleItemStatus(@PathVariable String name) {
         User currentUser = securityUtil.getCurrentUser();
-        log.debug("User {} toggling status for {}: {}",
-                currentUser.getName(), getEntityName(), name);
+        log.debug(
+                "User {} toggling status for {}: {}", currentUser.getName(), getEntityName(), name);
 
         service.toggleStatus(name, currentUser.getId());
         boolean newStatus = service.getItemStatus(name, currentUser.getId());
 
         return ResponseEntity.ok(
                 new StatusToggleResponse(
-                        getEntityName() + " status toggled successfully",
-                        newStatus
-                )
-        );
+                        getEntityName() + " status toggled successfully", newStatus));
     }
 
     @GetMapping("/{name}/status")
@@ -167,25 +145,20 @@ public abstract class AbstractMediaController<
         boolean exists = service.isItemExists(name, currentUser.getId());
         return ResponseEntity.ok(new ExistsResponse(exists));
     }
-    /**
-     * Updates cover URL for an item.
-     * PATCH /api/{entityType}/{name}/cover
-     */
+
+    /** Updates cover URL for an item. PATCH /api/{entityType}/{name}/cover */
     @PatchMapping("/{name}/cover")
     public ResponseEntity<MessageResponse> updateCover(
-            @PathVariable String name,
-            @RequestBody Map<String, String> request) {
+            @PathVariable String name, @RequestBody Map<String, String> request) {
 
         User currentUser = securityUtil.getCurrentUser();
         String coverUrl = request.get("coverUrl");
 
-        log.info("User {} updating cover for {} '{}'",
-                currentUser.getName(), getEntityName(), name);
+        log.info(
+                "User {} updating cover for {} '{}'", currentUser.getName(), getEntityName(), name);
 
         service.updateCover(name, coverUrl, currentUser.getId());
 
-        return ResponseEntity.ok(
-                new MessageResponse("Cover updated successfully")
-        );
+        return ResponseEntity.ok(new MessageResponse("Cover updated successfully"));
     }
 }

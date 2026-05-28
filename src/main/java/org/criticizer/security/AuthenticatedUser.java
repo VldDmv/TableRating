@@ -1,18 +1,17 @@
 package org.criticizer.security;
 
+import java.util.Collection;
+import java.util.List;
 import org.criticizer.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
-
 /**
  * Custom UserDetails implementation that holds the full User entity.
- * <p>
- * SecurityUtil calls userService.getUser(username) — the entity is already
- * available directly from the Security context principal.
+ *
+ * <p>SecurityUtil calls userService.getUser(username) — the entity is already available directly
+ * from the Security context principal.
  */
 public class AuthenticatedUser implements UserDetails {
 

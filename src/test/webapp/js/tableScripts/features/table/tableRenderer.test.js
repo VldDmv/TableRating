@@ -1,15 +1,13 @@
-
-
 import { jest } from '@jest/globals';
 
 jest.unstable_mockModule('@/tableScripts/core/utils.js', () => ({
     htmlUtils: { escape: (s) => s, decode: (s) => s },
     ICONS: {
-        COMPLETED:     '✅',
+        COMPLETED: '✅',
         NOT_COMPLETED: '❌',
-        EDIT:          '✏️',
-        DELETE:        '🗑️'
-    }
+        EDIT: '✏️',
+        DELETE: '🗑️',
+    },
 }));
 
 const { TableRenderer } = await import('@/tableScripts/features/table/tableRenderer.js');
@@ -18,21 +16,21 @@ const { TableRenderer } = await import('@/tableScripts/features/table/tableRende
 
 function makeConfig(overrides = {}) {
     return {
-        entityType:        'games',
-        hideActions:        false,
-        applyScoreStyling:  jest.fn(),
-        ...overrides
+        entityType: 'games',
+        hideActions: false,
+        applyScoreStyling: jest.fn(),
+        ...overrides,
     };
 }
 
 function makeItem(overrides = {}) {
     return {
-        name:      'Witcher 3',
-        score:     95,
+        name: 'Witcher 3',
+        score: 95,
         completed: false,
-        coverUrl:  '',
-        tags:      [],
-        ...overrides
+        coverUrl: '',
+        tags: [],
+        ...overrides,
     };
 }
 
@@ -44,7 +42,7 @@ describe('TableRenderer.render()', () => {
 
     beforeEach(() => {
         tableBody = document.createElement('tbody');
-        renderer  = new TableRenderer(makeConfig(), tableBody);
+        renderer = new TableRenderer(makeConfig(), tableBody);
     });
 
     test('renders one row per item', () => {
@@ -75,7 +73,7 @@ describe('TableRenderer.render()', () => {
 describe('TableRenderer.renderEmpty()', () => {
     test('renders a single row with a no-items message', () => {
         const tableBody = document.createElement('tbody');
-        const renderer  = new TableRenderer(makeConfig(), tableBody);
+        const renderer = new TableRenderer(makeConfig(), tableBody);
         renderer.renderEmpty();
         const rows = tableBody.querySelectorAll('tr');
         expect(rows.length).toBe(1);
@@ -88,7 +86,7 @@ describe('TableRenderer.renderEmpty()', () => {
 describe('TableRenderer.renderLoading()', () => {
     test('renders a single loading row', () => {
         const tableBody = document.createElement('tbody');
-        const renderer  = new TableRenderer(makeConfig(), tableBody);
+        const renderer = new TableRenderer(makeConfig(), tableBody);
         renderer.renderLoading();
         const rows = tableBody.querySelectorAll('tr');
         expect(rows.length).toBe(1);
@@ -104,7 +102,7 @@ describe('TableRenderer.createRow()', () => {
 
     beforeEach(() => {
         tableBody = document.createElement('tbody');
-        renderer  = new TableRenderer(makeConfig(), tableBody);
+        renderer = new TableRenderer(makeConfig(), tableBody);
     });
 
     test('returns a TR element', () => {
@@ -123,7 +121,12 @@ describe('TableRenderer.createRow()', () => {
 
     test('stores originalTagIds as comma-separated IDs', () => {
         const row = renderer.createRow(
-            makeItem({ tags: [{ id: 1, name: 'Action' }, { id: 2, name: 'RPG' }] })
+            makeItem({
+                tags: [
+                    { id: 1, name: 'Action' },
+                    { id: 2, name: 'RPG' },
+                ],
+            })
         );
         expect(row.dataset.originalTagIds).toBe('1,2');
     });
@@ -133,19 +136,21 @@ describe('TableRenderer.createRow()', () => {
     });
 
     test('score cell contains a .score-cell span with the score', () => {
-        const row       = renderer.createRow(makeItem({ score: 77 }));
+        const row = renderer.createRow(makeItem({ score: 77 }));
         const scoreCell = row.querySelector('.score-cell');
         expect(scoreCell).not.toBeNull();
         expect(scoreCell.textContent).toBe('77');
     });
 
     test('renders cover placeholder when no coverUrl', () => {
-        expect(renderer.createRow(makeItem({ coverUrl: '' })).querySelector('.cover-placeholder'))
-            .not.toBeNull();
+        expect(
+            renderer.createRow(makeItem({ coverUrl: '' })).querySelector('.cover-placeholder')
+        ).not.toBeNull();
     });
 
     test('renders cover img when coverUrl is set', () => {
-        const img = renderer.createRow(makeItem({ coverUrl: 'https://img.jpg' }))
+        const img = renderer
+            .createRow(makeItem({ coverUrl: 'https://img.jpg' }))
             .querySelector('.cover-thumbnail');
         expect(img).not.toBeNull();
         expect(img.src).toContain('img.jpg');
@@ -159,12 +164,16 @@ describe('TableRenderer.createRow()', () => {
     });
 
     test('status button shows COMPLETED icon for completed item', () => {
-        const btn = renderer.createRow(makeItem({ completed: true })).querySelector('.status-button');
+        const btn = renderer
+            .createRow(makeItem({ completed: true }))
+            .querySelector('.status-button');
         expect(btn.innerHTML.trim()).toBe('✅');
     });
 
     test('status button shows NOT_COMPLETED icon for incomplete item', () => {
-        const btn = renderer.createRow(makeItem({ completed: false })).querySelector('.status-button');
+        const btn = renderer
+            .createRow(makeItem({ completed: false }))
+            .querySelector('.status-button');
         expect(btn.innerHTML.trim()).toBe('❌');
     });
 });
@@ -187,7 +196,10 @@ describe('TableRenderer._createTagsHtml()', () => {
     });
 
     test('skips items without a name', () => {
-        const html = renderer._createTagsHtml([{ id: 1, name: null }, { id: 2, name: 'RPG' }]);
+        const html = renderer._createTagsHtml([
+            { id: 1, name: null },
+            { id: 2, name: 'RPG' },
+        ]);
         expect(html).not.toContain('null');
         expect(html).toContain('RPG');
     });

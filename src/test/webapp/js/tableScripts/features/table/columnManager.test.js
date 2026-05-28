@@ -1,4 +1,3 @@
-
 import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals';
 import { ColumnManager } from '@/tableScripts/features/table/columnManager.js';
 
@@ -9,7 +8,6 @@ describe('ColumnManager', () => {
     let container;
 
     beforeEach(() => {
-
         table = document.createElement('table');
         table.dataset.entityType = 'games';
         document.body.appendChild(table);
@@ -25,8 +23,8 @@ describe('ColumnManager', () => {
                 score: { name: 'Score', index: 1, hideable: false },
                 tags: { name: 'Tags', index: 2, hideable: true },
                 completed: { name: 'Completed', index: 3, hideable: true },
-                actions: { name: 'Delete', index: 4, hideable: true }
-            }
+                actions: { name: 'Delete', index: 4, hideable: true },
+            },
         };
 
         columnManager = new ColumnManager(mockConfig);
@@ -191,7 +189,7 @@ describe('ColumnManager', () => {
             columnManager.createToggleUI();
 
             const labels = container.querySelectorAll('label');
-            const labelTexts = Array.from(labels).map(l => l.textContent.trim());
+            const labelTexts = Array.from(labels).map((l) => l.textContent.trim());
 
             expect(labelTexts).not.toContain('Name');
             expect(labelTexts).not.toContain('Score');
@@ -202,7 +200,7 @@ describe('ColumnManager', () => {
 
             const checkboxes = container.querySelectorAll('input[type="checkbox"]');
 
-            checkboxes.forEach(cb => {
+            checkboxes.forEach((cb) => {
                 expect(cb.checked).toBe(true);
             });
         });
@@ -375,7 +373,7 @@ describe('ColumnManager', () => {
             columnManager.reset();
 
             const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => {
+            checkboxes.forEach((cb) => {
                 expect(cb.checked).toBe(true);
             });
         });
@@ -424,10 +422,8 @@ describe('ColumnManager', () => {
 
     describe('Integration', () => {
         test('should handle complete workflow', () => {
-
             columnManager.init();
             expect(container.querySelectorAll('input[type="checkbox"]').length).toBe(3);
-
 
             const tagsCheckbox = container.querySelector('[data-column-key="tags"]');
             tagsCheckbox.checked = false;
@@ -435,7 +431,6 @@ describe('ColumnManager', () => {
 
             expect(columnManager.getHiddenColumns()).toContain('tags');
             expect(table.dataset.hiddenColumns).toContain('tags');
-
 
             columnManager.reset();
 
@@ -460,7 +455,7 @@ describe('ColumnManager', () => {
 
             const moviesConfig = {
                 entityType: 'movies',
-                columns: mockConfig.columns
+                columns: mockConfig.columns,
             };
 
             const moviesTable = document.createElement('table');
@@ -491,8 +486,8 @@ describe('ColumnManager', () => {
                 entityType: 'test',
                 columns: {
                     col1: { name: 'Col1', index: 0, hideable: true },
-                    col2: { name: 'Col2', index: 1, hideable: true }
-                }
+                    col2: { name: 'Col2', index: 1, hideable: true },
+                },
             };
 
             const manager = new ColumnManager(allHideableConfig);
@@ -506,8 +501,8 @@ describe('ColumnManager', () => {
                 entityType: 'test',
                 columns: {
                     col1: { name: 'Col1', index: 0, hideable: false },
-                    col2: { name: 'Col2', index: 1, hideable: false }
-                }
+                    col2: { name: 'Col2', index: 1, hideable: false },
+                },
             };
 
             const manager = new ColumnManager(noHideableConfig);
@@ -525,5 +520,4 @@ describe('ColumnManager', () => {
             expect(manager.entityType).toBe(longEntityType);
         });
     });
-
 });

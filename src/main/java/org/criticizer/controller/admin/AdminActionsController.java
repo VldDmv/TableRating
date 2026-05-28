@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
- * Controller for admin actions (change role, delete user).
- * Uses form submissions with flash messages.
+ * Controller for admin actions (change role, delete user). Uses form submissions with flash
+ * messages.
  */
 @Controller
 @RequestMapping("/admin")
@@ -31,10 +31,7 @@ public class AdminActionsController {
         this.securityUtil = securityUtil;
     }
 
-    /**
-     * POST /admin/changeRole
-     * Changes a user's role
-     */
+    /** POST /admin/changeRole Changes a user's role */
     @PostMapping("/changeRole")
     public String changeRole(
             @RequestParam int userId,
@@ -44,36 +41,33 @@ public class AdminActionsController {
         User admin = securityUtil.getCurrentUser();
 
         try {
-            log.info("Admin {} changing role for user ID {} to {}",
-                    admin.getName(), userId, newRole);
+            log.info(
+                    "Admin {} changing role for user ID {} to {}",
+                    admin.getName(),
+                    userId,
+                    newRole);
 
             Role role = Role.valueOf(newRole.toUpperCase());
             userService.changeUserRole(userId, role, admin);
 
-            redirectAttributes.addFlashAttribute("flashSuccessMessage",
-                    "User role updated successfully");
+            redirectAttributes.addFlashAttribute(
+                    "flashSuccessMessage", "User role updated successfully");
 
         } catch (IllegalArgumentException e) {
             log.error("Invalid role: {}", newRole);
-            redirectAttributes.addFlashAttribute("flashErrorMessage",
-                    "Invalid role specified");
+            redirectAttributes.addFlashAttribute("flashErrorMessage", "Invalid role specified");
         } catch (Exception e) {
             log.error("Error changing user role", e);
-            redirectAttributes.addFlashAttribute("flashErrorMessage",
-                    "Error changing user role: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "flashErrorMessage", "Error changing user role: " + e.getMessage());
         }
 
         return "redirect:/admin/users";
     }
 
-    /**
-     * POST /admin/deleteUser
-     * Deletes a user and all their data
-     */
+    /** POST /admin/deleteUser Deletes a user and all their data */
     @PostMapping("/deleteUser")
-    public String deleteUser(
-            @RequestParam int userId,
-            RedirectAttributes redirectAttributes) {
+    public String deleteUser(@RequestParam int userId, RedirectAttributes redirectAttributes) {
 
         User admin = securityUtil.getCurrentUser();
 
@@ -82,13 +76,13 @@ public class AdminActionsController {
 
             userService.deleteUser(userId, admin);
 
-            redirectAttributes.addFlashAttribute("flashSuccessMessage",
-                    "User deleted successfully");
+            redirectAttributes.addFlashAttribute(
+                    "flashSuccessMessage", "User deleted successfully");
 
         } catch (Exception e) {
             log.error("Error deleting user", e);
-            redirectAttributes.addFlashAttribute("flashErrorMessage",
-                    "Error deleting user: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "flashErrorMessage", "Error deleting user: " + e.getMessage());
         }
 
         return "redirect:/admin/users";

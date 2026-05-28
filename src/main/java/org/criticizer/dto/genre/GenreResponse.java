@@ -1,12 +1,9 @@
 package org.criticizer.dto.genre;
 
+import java.util.List;
 import org.criticizer.entity.Genre;
 
-import java.util.List;
-
-/**
- * Response DTO for a genre.
- */
+/** Response DTO for a genre. */
 public class GenreResponse {
 
     private final Integer id;

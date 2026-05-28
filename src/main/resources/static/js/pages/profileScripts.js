@@ -1,4 +1,13 @@
-export { getScoreClass, getSortIcon, escapeHtml, buildApiUrl, renderTableRow, renderCard, getEmptyMessage, ProfilePageManager }
+export {
+    getScoreClass,
+    getSortIcon,
+    escapeHtml,
+    buildApiUrl,
+    renderTableRow,
+    renderCard,
+    getEmptyMessage,
+    ProfilePageManager,
+};
 
 const config = window.profileConfig || {};
 const username = config.username || '';
@@ -39,8 +48,6 @@ let cardsContainer;
  * Initializes the profile page
  */
 function init() {
-
-
     // Setup DOM elements
     setupDomElements();
 
@@ -56,7 +63,6 @@ function init() {
 
     // Load initial data
     if (config.initialResult?.items) {
-
         cachedData[currentCategory] = config.initialResult;
         currentPage = config.initialResult.currentPage || 1;
         totalPages = config.initialResult.totalPages || 1;
@@ -64,12 +70,9 @@ function init() {
         renderContent(config.initialResult);
         updatePagination();
     } else {
-
         populateFilterDropdown();
         loadCategoryData();
     }
-
-
 }
 
 /**
@@ -98,10 +101,10 @@ function setupDomElements() {
  */
 function setupTabs() {
     const tabs = document.querySelectorAll('.tab-link');
-    tabs.forEach(tab => {
+    tabs.forEach((tab) => {
         tab.addEventListener('click', () => {
             // Update active tab
-            tabs.forEach(t => t.classList.remove('active'));
+            tabs.forEach((t) => t.classList.remove('active'));
             tab.classList.add('active');
 
             // Switch category
@@ -174,7 +177,6 @@ function setupPagination() {
             pageList.style.display = 'none';
         }
     });
-
 }
 
 /**
@@ -241,7 +243,8 @@ function populateFilterDropdown() {
     // Update label
     const filterLabel = document.getElementById('filterLabel');
     if (filterLabel) {
-        filterLabel.textContent = currentCategory === 'games' ? 'Filter by Tag:' : 'Filter by Genre:';
+        filterLabel.textContent =
+            currentCategory === 'games' ? 'Filter by Tag:' : 'Filter by Genre:';
     }
 
     // Get tags/genres for current category
@@ -257,7 +260,7 @@ function populateFilterDropdown() {
     }
 
     // Populate dropdown
-    items.forEach(item => {
+    items.forEach((item) => {
         const option = document.createElement('option');
         option.value = item.id;
         option.textContent = item.name;
@@ -313,14 +316,12 @@ async function loadCategoryData(page = currentPage) {
         // Build URL with all parameters
         const url = buildApiUrl(page);
 
-
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
 
         const data = await response.json();
-
 
         // Update state
         currentPage = data.currentPage || 1;
@@ -334,7 +335,6 @@ async function loadCategoryData(page = currentPage) {
 
         // Update pagination
         updatePagination();
-
     } catch (error) {
         console.error('❌ Error loading data:', error);
         container.innerHTML = `
@@ -356,29 +356,45 @@ function buildApiUrl(pageOrOptions) {
     let opts;
     if (typeof pageOrOptions === 'object' && pageOrOptions !== null) {
         opts = {
-            username, currentCategory, currentPage: 1, rowsPerPage,
-            sortBy, sortOrder, searchTerm: '', filterId: 'all', contextPath,
-            ...pageOrOptions
+            username,
+            currentCategory,
+            currentPage: 1,
+            rowsPerPage,
+            sortBy,
+            sortOrder,
+            searchTerm: '',
+            filterId: 'all',
+            contextPath,
+            ...pageOrOptions,
         };
     } else {
         opts = {
-            username, currentCategory, currentPage: pageOrOptions, rowsPerPage,
-            sortBy, sortOrder, searchTerm, filterId, contextPath
+            username,
+            currentCategory,
+            currentPage: pageOrOptions,
+            rowsPerPage,
+            sortBy,
+            sortOrder,
+            searchTerm,
+            filterId,
+            contextPath,
         };
     }
 
     const apiPath = `${opts.contextPath}/profile-data`.replace(/\/+/g, '/');
     const origin =
-        (typeof window !== 'undefined' && window.location?.origin && window.location.origin !== 'null')
+        typeof window !== 'undefined' &&
+        window.location?.origin &&
+        window.location.origin !== 'null'
             ? window.location.origin
             : 'http://localhost';
     const url = new URL(`${origin}${apiPath}`);
 
-    url.searchParams.set('username',  opts.username);
-    url.searchParams.set('category',  opts.currentCategory);
-    url.searchParams.set('page',      opts.currentPage);
-    url.searchParams.set('pageSize',  opts.rowsPerPage);
-    url.searchParams.set('sortBy',    opts.sortBy);
+    url.searchParams.set('username', opts.username);
+    url.searchParams.set('category', opts.currentCategory);
+    url.searchParams.set('page', opts.currentPage);
+    url.searchParams.set('pageSize', opts.rowsPerPage);
+    url.searchParams.set('sortBy', opts.sortBy);
     url.searchParams.set('sortOrder', opts.sortOrder);
 
     if (opts.searchTerm) {
@@ -413,9 +429,10 @@ function renderContent(data) {
  * Shows empty state
  */
 function showEmptyState() {
-    const message = searchTerm || filterId !== 'all'
-        ? 'No items found matching your criteria.'
-        : `No ${currentCategory} found`;
+    const message =
+        searchTerm || filterId !== 'all'
+            ? 'No items found matching your criteria.'
+            : `No ${currentCategory} found`;
 
     if (currentViewMode === 'table') {
         tabContentContainer.innerHTML = `
@@ -443,10 +460,10 @@ function showEmptyState() {
  */
 function renderTable(items) {
     const categoryLabels = {
-        'games': 'Tags',
-        'movies': 'Genres',
-        'books': 'Genres',
-        'shows': 'Genres'
+        games: 'Tags',
+        movies: 'Genres',
+        books: 'Genres',
+        shows: 'Genres',
     };
 
     const html = `
@@ -461,7 +478,7 @@ function renderTable(items) {
                 </tr>
             </thead>
             <tbody>
-                ${items.map(item => renderTableRow(item)).join('')}
+                ${items.map((item) => renderTableRow(item)).join('')}
             </tbody>
         </table>
     `;
@@ -470,10 +487,8 @@ function renderTable(items) {
     tabContentContainer.style.display = 'block';
     cardsContainer.style.display = 'none';
 
-
-
     const sortableHeaders = tabContentContainer.querySelectorAll('.sortable');
-    sortableHeaders.forEach(header => {
+    sortableHeaders.forEach((header) => {
         header.style.cursor = 'pointer';
         header.addEventListener('click', () => {
             const newSortBy = header.dataset.sort;
@@ -505,9 +520,10 @@ function getSortIcon(columnKey, curSortBy = sortBy, curSortOrder = sortOrder) {
  * Renders a single table row
  */
 function renderTableRow(item, category = currentCategory) {
-    const tags = category === 'games'
-        ? (item.tags || []).map(t => t.name).join(', ')
-        : (item.genres || []).map(g => g.name).join(', ');
+    const tags =
+        category === 'games'
+            ? (item.tags || []).map((t) => t.name).join(', ')
+            : (item.genres || []).map((g) => g.name).join(', ');
 
     const completedIcon = item.completed ? '✅' : '❌';
     const scoreClass = getScoreClass(item.score);
@@ -515,9 +531,10 @@ function renderTableRow(item, category = currentCategory) {
     return `
         <tr>
             <td class="col-cover">
-                ${item.coverUrl
-                    ? `<img src="${item.coverUrl}" alt="${item.name}" class="cover-thumbnail">`
-                    : `<div class="cover-placeholder">📄</div>`
+                ${
+                    item.coverUrl
+                        ? `<img src="${item.coverUrl}" alt="${item.name}" class="cover-thumbnail">`
+                        : `<div class="cover-placeholder">📄</div>`
                 }
             </td>
             <td class="col-name">${escapeHtml(item.name)}</td>
@@ -534,7 +551,7 @@ function renderTableRow(item, category = currentCategory) {
  * Renders cards view
  */
 function renderCards(items) {
-    const html = items.map(item => renderCard(item)).join('');
+    const html = items.map((item) => renderCard(item)).join('');
     cardsContainer.innerHTML = html;
     cardsContainer.style.display = 'grid';
     tabContentContainer.innerHTML = '';
@@ -545,9 +562,10 @@ function renderCards(items) {
  * Renders a single card
  */
 function renderCard(item, category = currentCategory) {
-    const tags = category === 'games'
-        ? (item.tags || []).map(t => `<span class="tag-badge">${t.name}</span>`).join('')
-        : (item.genres || []).map(g => `<span class="tag-badge">${g.name}</span>`).join('');
+    const tags =
+        category === 'games'
+            ? (item.tags || []).map((t) => `<span class="tag-badge">${t.name}</span>`).join('')
+            : (item.genres || []).map((g) => `<span class="tag-badge">${g.name}</span>`).join('');
 
     const completedIcon = item.completed ? '✅' : '❌';
     const scoreClass = getScoreClass(item.score);
@@ -555,9 +573,10 @@ function renderCard(item, category = currentCategory) {
     return `
         <div class="media-card">
             <div class="card-cover">
-                ${item.coverUrl
-                    ? `<img src="${item.coverUrl}" alt="${item.name}" class="card-cover-image">`
-                    : `<div class="card-cover-placeholder">📄</div>`
+                ${
+                    item.coverUrl
+                        ? `<img src="${item.coverUrl}" alt="${item.name}" class="card-cover-image">`
+                        : `<div class="card-cover-placeholder">📄</div>`
                 }
             </div>
             <div class="card-content">
@@ -700,20 +719,20 @@ function getEmptyMessage(searchTerm, filterId, category) {
  */
 class ProfilePageManager {
     constructor(config) {
-        this.username        = config.username;
+        this.username = config.username;
         this.currentCategory = config.category || 'games';
         this.currentViewMode = 'table';
-        this.cachedData      = {};
+        this.cachedData = {};
 
-        this.tableViewBtn        = document.getElementById('tableViewBtn');
-        this.cardsViewBtn        = document.getElementById('cardsViewBtn');
-        this.sortControls        = document.getElementById('sort-controls');
+        this.tableViewBtn = document.getElementById('tableViewBtn');
+        this.cardsViewBtn = document.getElementById('cardsViewBtn');
+        this.sortControls = document.getElementById('sort-controls');
         this.tabContentContainer = document.getElementById('tab-content-container');
-        this.cardsContainer      = document.getElementById('cards-container');
-        this.prevPageBtn         = document.getElementById('prevPage');
-        this.nextPageBtn         = document.getElementById('nextPage');
-        this.pageDropdown        = document.getElementById('pageDropdown');
-        this.pageList            = document.getElementById('pageList');
+        this.cardsContainer = document.getElementById('cards-container');
+        this.prevPageBtn = document.getElementById('prevPage');
+        this.nextPageBtn = document.getElementById('nextPage');
+        this.pageDropdown = document.getElementById('pageDropdown');
+        this.pageList = document.getElementById('pageList');
         this.paginationContainer = document.getElementById('paginationContainer');
     }
 
@@ -741,10 +760,10 @@ class ProfilePageManager {
         this.pageList.innerHTML = '';
         for (let i = 1; i <= totalPages; i++) {
             const li = document.createElement('li');
-            const a  = document.createElement('a');
-            a.href        = '#';
+            const a = document.createElement('a');
+            a.href = '#';
             a.textContent = i;
-            a.className   = i === currentPage ? 'active-page' : '';
+            a.className = i === currentPage ? 'active-page' : '';
             li.appendChild(a);
             this.pageList.appendChild(li);
         }

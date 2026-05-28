@@ -61,9 +61,7 @@ export class PaginationManager {
 
         this.prevButton.addEventListener('click', () => {
             if (this.currentPage > 1) {
-                this.pageChangeListeners.forEach(callback =>
-                    callback(this.currentPage - 1)
-                );
+                this.pageChangeListeners.forEach((callback) => callback(this.currentPage - 1));
             }
         });
     }
@@ -76,9 +74,7 @@ export class PaginationManager {
 
         this.nextButton.addEventListener('click', () => {
             if (this.currentPage < this.totalPages) {
-                this.pageChangeListeners.forEach(callback =>
-                    callback(this.currentPage + 1)
-                );
+                this.pageChangeListeners.forEach((callback) => callback(this.currentPage + 1));
             }
         });
     }
@@ -91,7 +87,7 @@ export class PaginationManager {
 
         this.rowsPerPageSelect.addEventListener('change', () => {
             const newRows = parseInt(this.rowsPerPageSelect.value, 10);
-            this.rowsChangeListeners.forEach(callback => callback(newRows));
+            this.rowsChangeListeners.forEach((callback) => callback(newRows));
         });
     }
 
@@ -112,15 +108,17 @@ export class PaginationManager {
                 e.preventDefault();
                 this.pageList.style.display = 'none';
                 const page = parseInt(e.target.dataset.page, 10);
-                this.pageChangeListeners.forEach(callback => callback(page));
+                this.pageChangeListeners.forEach((callback) => callback(page));
             }
         });
 
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
-            if (this.pageList.style.display === 'block' &&
+            if (
+                this.pageList.style.display === 'block' &&
                 !this.pageDropdown.contains(e.target) &&
-                !this.pageList.contains(e.target)) {
+                !this.pageList.contains(e.target)
+            ) {
                 this.pageList.style.display = 'none';
             }
         });
@@ -130,25 +128,22 @@ export class PaginationManager {
      * Updates pagination display with new data.
      * @param {Object} pageResult - Page result with currentPage and totalPages.
      */
-  update(pageResult) {
-          this.currentPage = pageResult.currentPage;
-          this.totalPages = pageResult.totalPages;
+    update(pageResult) {
+        this.currentPage = pageResult.currentPage;
+        this.totalPages = pageResult.totalPages;
 
+        this.updateButtons();
+        this.updateDropdown();
+        this.updatePageList();
 
-          this.updateButtons();
-          this.updateDropdown();
-          this.updatePageList();
-
-          if (this.paginationContainer) {
-              if (this.totalPages <= 1) {
-                  this.paginationContainer.style.display = 'none';
-
-              } else {
-                  this.paginationContainer.style.display = 'flex';
-              }
-          }
-
-      }
+        if (this.paginationContainer) {
+            if (this.totalPages <= 1) {
+                this.paginationContainer.style.display = 'none';
+            } else {
+                this.paginationContainer.style.display = 'flex';
+            }
+        }
+    }
 
     /**
      * Updates button states.
@@ -187,7 +182,6 @@ export class PaginationManager {
             a.dataset.page = i;
 
             if (i === this.currentPage) {
-
                 a.classList.add('active-page');
             }
 

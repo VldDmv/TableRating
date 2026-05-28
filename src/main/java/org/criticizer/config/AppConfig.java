@@ -9,13 +9,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * Main application configuration.
- * Replaces AppContextListener and web.xml configuration.
- */
+/** Main application configuration. Replaces AppContextListener and web.xml configuration. */
 @Configuration
 public class AppConfig implements WebMvcConfigurer {
-
 
     @Bean
     public RestTemplate restTemplate() {
@@ -32,27 +28,21 @@ public class AppConfig implements WebMvcConfigurer {
 
         mapper.configure(
                 com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-                false
-        );
+                false);
 
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         return mapper;
     }
 
-
-    /**
-     * Application-specific properties.
-     */
+    /** Application-specific properties. */
     @Bean
     @ConfigurationProperties(prefix = "app")
     public AppProperties appProperties() {
         return new AppProperties();
     }
 
-    /**
-     * Properties class for app-specific configuration.
-     */
+    /** Properties class for app-specific configuration. */
     public static class AppProperties {
         private Pagination pagination = new Pagination();
         private Security security = new Security();

@@ -41,7 +41,7 @@ describe('UniversalAutocomplete', () => {
         });
 
         test('should support games, movies, shows, books entity types', () => {
-            ['games', 'movies', 'shows', 'books'].forEach(type => {
+            ['games', 'movies', 'shows', 'books'].forEach((type) => {
                 expect(() => new UniversalAutocomplete(input, type)).not.toThrow();
             });
         });
@@ -84,7 +84,14 @@ describe('UniversalAutocomplete', () => {
         test('should parse games results to common format', () => {
             const ac = new UniversalAutocomplete(input, 'games');
             const raw = {
-                results: [{ name: 'Mario', released: '2020-01-01', rating: 9, background_image: 'http://img.jpg' }]
+                results: [
+                    {
+                        name: 'Mario',
+                        released: '2020-01-01',
+                        rating: 9,
+                        background_image: 'http://img.jpg',
+                    },
+                ],
             };
             const parsed = ac.apiConfigs.games.parseResults(raw);
             expect(parsed[0].name).toBe('Mario');
@@ -94,7 +101,14 @@ describe('UniversalAutocomplete', () => {
         test('should parse movies results to common format', () => {
             const ac = new UniversalAutocomplete(input, 'movies');
             const raw = {
-                results: [{ title: 'Inception', release_date: '2010-07-16', vote_average: 8.8, poster_path: '/abc.jpg' }]
+                results: [
+                    {
+                        title: 'Inception',
+                        release_date: '2010-07-16',
+                        vote_average: 8.8,
+                        poster_path: '/abc.jpg',
+                    },
+                ],
             };
             const parsed = ac.apiConfigs.movies.parseResults(raw);
             expect(parsed[0].name).toBe('Inception');
@@ -113,30 +127,30 @@ describe('UniversalAutocomplete', () => {
         });
     });
 
-   describe('coverUrl input tracking', () => {
-           test('should clear lastSelectedCover when user types manually after selection', () => {
-               const ac = new UniversalAutocomplete(input, 'games');
-               ac.createCoverUrlInput();
+    describe('coverUrl input tracking', () => {
+        test('should clear lastSelectedCover when user types manually after selection', () => {
+            const ac = new UniversalAutocomplete(input, 'games');
+            ac.createCoverUrlInput();
 
-               ac.coverUrlInput.value = 'http://example.com/img.jpg';
-               ac.lastSelectedCover = 'http://example.com/img.jpg';
+            ac.coverUrlInput.value = 'http://example.com/img.jpg';
+            ac.lastSelectedCover = 'http://example.com/img.jpg';
 
-               input.value = 'new search';
-               input.dispatchEvent(new Event('input'));
+            input.value = 'new search';
+            input.dispatchEvent(new Event('input'));
 
-               expect(ac.lastSelectedCover).toBeFalsy();
-               expect(ac.coverUrlInput.value).toBeFalsy();
-           });
+            expect(ac.lastSelectedCover).toBeFalsy();
+            expect(ac.coverUrlInput.value).toBeFalsy();
+        });
 
-           test('lastSelectedCover is set after selecting an autocomplete result', () => {
-               const ac = new UniversalAutocomplete(input, 'games');
-               ac.createCoverUrlInput();
-               const coverUrl = 'http://example.com/cover.jpg';
+        test('lastSelectedCover is set after selecting an autocomplete result', () => {
+            const ac = new UniversalAutocomplete(input, 'games');
+            ac.createCoverUrlInput();
+            const coverUrl = 'http://example.com/cover.jpg';
 
-               ac.results = [{ name: 'Mario', coverUrl }];
-               ac.selectItem(0);
+            ac.results = [{ name: 'Mario', coverUrl }];
+            ac.selectItem(0);
 
-               expect(ac.lastSelectedCover).toBe(coverUrl);
-           });
-       });
+            expect(ac.lastSelectedCover).toBe(coverUrl);
+        });
+    });
 });

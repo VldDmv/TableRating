@@ -1,5 +1,7 @@
 package org.criticizer.service.book;
 
+import java.util.HashSet;
+import java.util.List;
 import org.criticizer.dto.book.BookResponse;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.entity.Book;
@@ -10,17 +12,15 @@ import org.criticizer.service.helper.AbstractMediaService;
 import org.criticizer.service.helper.ServiceValidator;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-
 @Service
 public class BookService extends AbstractMediaService<Book, BookResponse> {
 
     private final GenreRepository genreRepository;
 
-    public BookService(BookRepository bookRepository,
-                       GenreRepository genreRepository,
-                       ServiceValidator validator) {
+    public BookService(
+            BookRepository bookRepository,
+            GenreRepository genreRepository,
+            ServiceValidator validator) {
         super(bookRepository, validator);
         this.genreRepository = genreRepository;
     }
@@ -50,11 +50,10 @@ public class BookService extends AbstractMediaService<Book, BookResponse> {
 
     @Override
     protected BookResponse toResponse(Book book) {
-        List<GenreResponse> genreResponses = book.getGenres() != null
-                ? book.getGenres().stream()
-                .map(GenreResponse::from)
-                .toList()
-                : List.of();
+        List<GenreResponse> genreResponses =
+                book.getGenres() != null
+                        ? book.getGenres().stream().map(GenreResponse::from).toList()
+                        : List.of();
 
         return new BookResponse(
                 book.getId(),
@@ -62,8 +61,7 @@ public class BookService extends AbstractMediaService<Book, BookResponse> {
                 book.getCoverUrl(),
                 book.getScore(),
                 book.isCompleted(),
-                genreResponses
-        );
+                genreResponses);
     }
 
     @Override

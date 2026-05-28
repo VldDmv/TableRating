@@ -49,7 +49,7 @@ class Dashboard {
             // Easing function (easeOutQuart)
             const easeProgress = 1 - Math.pow(1 - progress, 4);
 
-            const currentValue = Math.floor(start + (range * easeProgress));
+            const currentValue = Math.floor(start + range * easeProgress);
             element.textContent = currentValue;
 
             if (progress < 1) {
@@ -70,35 +70,42 @@ class Dashboard {
         const ctx = document.getElementById('mediaDistributionChart');
         if (!ctx) return;
 
-        const stats = window.statsData ?? { totalGames: 0, totalMovies: 0, totalBooks: 0, totalShows: 0 };
+        const stats = window.statsData ?? {
+            totalGames: 0,
+            totalMovies: 0,
+            totalBooks: 0,
+            totalShows: 0,
+        };
 
         const data = {
-            games:  stats.totalGames,
+            games: stats.totalGames,
             movies: stats.totalMovies,
-            books:  stats.totalBooks,
-            shows:  stats.totalShows
+            books: stats.totalBooks,
+            shows: stats.totalShows,
         };
 
         this.charts.mediaDistribution = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: ['🎮 Games', '🎬 Movies', '📚 Books', '📺 Shows'],
-                datasets: [{
-                    data: [data.games, data.movies, data.books, data.shows],
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.8)',   // Blue for games
-                        'rgba(239, 68, 68, 0.8)',    // Red for movies
-                        'rgba(34, 197, 94, 0.8)',    // Green for books
-                        'rgba(249, 115, 22, 0.8)'    // Orange for shows
-                    ],
-                    borderColor: [
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(239, 68, 68, 1)',
-                        'rgba(34, 197, 94, 1)',
-                        'rgba(249, 115, 22, 1)'
-                    ],
-                    borderWidth: 2
-                }]
+                datasets: [
+                    {
+                        data: [data.games, data.movies, data.books, data.shows],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)', // Blue for games
+                            'rgba(239, 68, 68, 0.8)', // Red for movies
+                            'rgba(34, 197, 94, 0.8)', // Green for books
+                            'rgba(249, 115, 22, 0.8)', // Orange for shows
+                        ],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(34, 197, 94, 1)',
+                            'rgba(249, 115, 22, 1)',
+                        ],
+                        borderWidth: 2,
+                    },
+                ],
             },
             options: {
                 responsive: true,
@@ -110,40 +117,40 @@ class Dashboard {
                             padding: 15,
                             font: {
                                 size: 13,
-                                family: "'Inter', sans-serif"
+                                family: "'Inter', sans-serif",
                             },
                             usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
+                            pointStyle: 'circle',
+                        },
                     },
                     tooltip: {
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
                         padding: 12,
                         titleFont: {
                             size: 14,
-                            weight: 'bold'
+                            weight: 'bold',
                         },
                         bodyFont: {
-                            size: 13
+                            size: 13,
                         },
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 const label = context.label || '';
                                 const value = context.parsed || 0;
                                 const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                 const percentage = ((value / total) * 100).toFixed(1);
                                 return `${label}: ${value} (${percentage}%)`;
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 },
                 animation: {
                     animateRotate: true,
                     animateScale: true,
                     duration: 1500,
-                    easing: 'easeInOutQuart'
-                }
-            }
+                    easing: 'easeInOutQuart',
+                },
+            },
         });
     }
 }

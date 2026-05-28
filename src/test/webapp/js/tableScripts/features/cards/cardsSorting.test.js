@@ -14,18 +14,18 @@ describe('SortControls', () => {
 
         mockConfig = {
             columns: {
-                cover:     { name: 'Cover',     sortable: false },
-                name:      { name: 'Name',      sortable: true  },
-                score:     { name: 'Score',     sortable: true  },
-                tags:      { name: 'Tags',      sortable: false },
-                completed: { name: 'Completed', sortable: true  },
-                actions:   { name: 'Actions',   sortable: false }
-            }
+                cover: { name: 'Cover', sortable: false },
+                name: { name: 'Name', sortable: true },
+                score: { name: 'Score', sortable: true },
+                tags: { name: 'Tags', sortable: false },
+                completed: { name: 'Completed', sortable: true },
+                actions: { name: 'Actions', sortable: false },
+            },
         };
 
         mockStateManager = {
             getState: jest.fn(() => ({ sortBy: 'name', sortOrder: 'asc' })),
-            setState: jest.fn()
+            setState: jest.fn(),
         };
 
         controls = new SortControls(mockConfig, mockStateManager);
@@ -47,18 +47,20 @@ describe('SortControls', () => {
     describe('getSortableColumns', () => {
         test('should return only sortable columns', () => {
             const cols = controls.getSortableColumns();
-            expect(cols.every(c => c.key !== 'cover' && c.key !== 'tags' && c.key !== 'actions')).toBe(true);
+            expect(
+                cols.every((c) => c.key !== 'cover' && c.key !== 'tags' && c.key !== 'actions')
+            ).toBe(true);
         });
 
         test('should exclude cover and actions regardless of sortable flag', () => {
             const cols = controls.getSortableColumns();
-            expect(cols.find(c => c.key === 'cover')).toBeUndefined();
-            expect(cols.find(c => c.key === 'actions')).toBeUndefined();
+            expect(cols.find((c) => c.key === 'cover')).toBeUndefined();
+            expect(cols.find((c) => c.key === 'actions')).toBeUndefined();
         });
 
         test('should return correct key/name pairs', () => {
             const cols = controls.getSortableColumns();
-            const nameCol = cols.find(c => c.key === 'name');
+            const nameCol = cols.find((c) => c.key === 'name');
             expect(nameCol).toBeDefined();
             expect(nameCol.name).toBe('Name');
         });

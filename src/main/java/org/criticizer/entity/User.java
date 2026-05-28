@@ -2,10 +2,9 @@ package org.criticizer.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "users")
@@ -34,8 +33,7 @@ public class User {
     private LocalDateTime createdAt;
 
     // Constructors
-    public User() {
-    }
+    public User() {}
 
     public User(Integer id, String name, String password, Role role, boolean profileIsPublic) {
         if (name == null || password == null || role == null) {
@@ -109,8 +107,7 @@ public class User {
     }
 
     /**
-     * Equality based on database ID.
-     * Consistent with how Tag and Genre implement equals/hashCode.
+     * Equality based on database ID. Consistent with how Tag and Genre implement equals/hashCode.
      * Handles null ID (transient entities not yet persisted).
      */
     @Override
@@ -128,6 +125,14 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{id=" + id + ", name='" + name + "', password='<PROTECTED>', role=" + role + ", createdAt=" + createdAt + "}";
+        return "User{id="
+                + id
+                + ", name='"
+                + name
+                + "', password='<PROTECTED>', role="
+                + role
+                + ", createdAt="
+                + createdAt
+                + "}";
     }
 }

@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Enumeration for genre applicability types.
- * Defines which media types a genre can be applied to.
+ * Enumeration for genre applicability types. Defines which media types a genre can be applied to.
  */
 public enum GenreApplicabilityType {
     MOVIE("movie"),
@@ -38,8 +37,10 @@ public enum GenreApplicabilityType {
         }
 
         throw new IllegalArgumentException(
-                "Invalid genre applicability type: '" + value + "'. Valid types: " + getValidTypesString()
-        );
+                "Invalid genre applicability type: '"
+                        + value
+                        + "'. Valid types: "
+                        + getValidTypesString());
     }
 
     public static boolean isValid(String value) {

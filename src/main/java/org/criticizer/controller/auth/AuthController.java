@@ -32,7 +32,6 @@ public class AuthController {
 
     @PostMapping("/auth/register")
     public String registerForm(
-
             @RequestParam(value = "username", required = false) String username,
             @RequestParam(value = "password", required = false) String password,
             @RequestParam(value = "confirmPassword", required = false) String confirmPassword,
@@ -55,29 +54,29 @@ public class AuthController {
         try {
             userService.registerUser(username, password);
 
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password)
-            );
+            Authentication authentication =
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(username, password));
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
             securityContext.setAuthentication(authentication);
             SecurityContextHolder.setContext(securityContext);
 
             HttpSession session = request.getSession(true);
-            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+            session.setAttribute(
+                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                    securityContext);
 
             log.info("User '{}' registered and logged in successfully", username);
             return "redirect:/dashboard";
         } catch (Exception e) {
             log.error("Registration failed for user: {}", username, e);
-            redirectAttributes.addFlashAttribute("flashErrorMessage", "Registration failed. Please try again.");
+            redirectAttributes.addFlashAttribute(
+                    "flashErrorMessage", "Registration failed. Please try again.");
             return "redirect:/index?showRegister=true";
         }
     }
 
-    /**
-     * Check if username is available (AJAX endpoint)
-     * Returns JSON: {"available": true/false}
-     */
+    /** Check if username is available (AJAX endpoint) Returns JSON: {"available": true/false} */
     @GetMapping("/auth/check-username")
     @ResponseBody
     public java.util.Map<String, Boolean> checkUsernameAvailability(

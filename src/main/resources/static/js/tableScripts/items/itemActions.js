@@ -17,7 +17,7 @@ export class ItemActionsManager {
      */
     init() {
         if (!this.tableBody || !this.config.selectors) {
-            console.error("ItemActionsManager: Missing tableBody or selectors configuration.");
+            console.error('ItemActionsManager: Missing tableBody or selectors configuration.');
             return;
         }
 
@@ -43,98 +43,97 @@ export class ItemActionsManager {
     /**
      * Toggles the completion status of an item via AJAX.
      */
-async handleToggleStatus(button) {
-    const itemName = button.dataset.itemName;
-    if (!itemName) return;
+    async handleToggleStatus(button) {
+        const itemName = button.dataset.itemName;
+        if (!itemName) return;
 
-    const row = button.closest('tr');
-    if (row && row.classList.contains('is-editing')) {
-        alert("Please save or cancel your edits before changing the status.");
-        return;
-    }
-
-    const csrfToken = securityUtils.getCsrfToken();
-    const originalContent = button.innerHTML;
-    this.setButtonLoading(button, true);
-
-    try {
-        const url = `/api/${this.config.entityType}/${encodeURIComponent(itemName)}/toggle`;
-
-        const response = await fetch(url, {
-            method: "PATCH",
-            headers: {
-                "X-XSRF-TOKEN": csrfToken
-            }
-        });
-
-        if (!response.ok) {
-            const errorMsg = await ErrorHandler.parseErrorResponse(response);
-            throw new Error(errorMsg);
+        const row = button.closest('tr');
+        if (row && row.classList.contains('is-editing')) {
+            alert('Please save or cancel your edits before changing the status.');
+            return;
         }
 
-        const data = await response.json();
+        const csrfToken = securityUtils.getCsrfToken();
+        const originalContent = button.innerHTML;
+        this.setButtonLoading(button, true);
 
-        if (data && typeof data.completed !== 'undefined') {
-            button.innerHTML = data.completed ? ICONS.COMPLETED : ICONS.NOT_COMPLETED;
+        try {
+            const url = `/api/${this.config.entityType}/${encodeURIComponent(itemName)}/toggle`;
 
-            if (typeof window.syncItemCompleted === 'function') {
-                window.syncItemCompleted(itemName, data.completed);
+            const response = await fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'X-XSRF-TOKEN': csrfToken,
+                },
+            });
+
+            if (!response.ok) {
+                const errorMsg = await ErrorHandler.parseErrorResponse(response);
+                throw new Error(errorMsg);
             }
-        } else {
-            throw new Error("Invalid server response.");
+
+            const data = await response.json();
+
+            if (data && typeof data.completed !== 'undefined') {
+                button.innerHTML = data.completed ? ICONS.COMPLETED : ICONS.NOT_COMPLETED;
+
+                if (typeof window.syncItemCompleted === 'function') {
+                    window.syncItemCompleted(itemName, data.completed);
+                }
+            } else {
+                throw new Error('Invalid server response.');
+            }
+        } catch (error) {
+            ErrorHandler.handle(error, 'Error toggling item status');
+            button.innerHTML = originalContent;
+        } finally {
+            this.setButtonLoading(button, false);
         }
-    } catch (error) {
-        ErrorHandler.handle(error, "Error toggling item status");
-        button.innerHTML = originalContent;
-    } finally {
-        this.setButtonLoading(button, false);
-    }
-}
-
-async handleDeleteConfirmation(button) {
-    const itemName = button.dataset.itemName;
-    if (!itemName) return;
-
-    const row = button.closest('tr');
-    if (row && row.classList.contains('is-editing')) {
-        alert("Please save or cancel your edits before deleting.");
-        return;
     }
 
-    const confirmMessage = `Are you sure you want to delete "${itemName}"?`;
-    if (!confirm(confirmMessage)) return;
+    async handleDeleteConfirmation(button) {
+        const itemName = button.dataset.itemName;
+        if (!itemName) return;
 
-    const originalContent = button.innerHTML;
-    this.setButtonLoading(button, true);
-
-    const csrfToken = securityUtils.getCsrfToken();
-
-    try {
-        const url = `/api/${this.config.entityType}/${encodeURIComponent(itemName)}`;
-
-        const response = await fetch(url, {
-            method: "DELETE",
-            headers: {
-                "X-XSRF-TOKEN": csrfToken
-            }
-        });
-
-        if (!response.ok) {
-            const errorMsg = await ErrorHandler.parseErrorResponse(response);
-            throw new Error(errorMsg);
+        const row = button.closest('tr');
+        if (row && row.classList.contains('is-editing')) {
+            alert('Please save or cancel your edits before deleting.');
+            return;
         }
 
-        // Animate and remove row
-        row.style.transition = 'opacity 0.3s';
-        row.style.opacity = '0';
-        setTimeout(() => row.remove(), 300);
+        const confirmMessage = `Are you sure you want to delete "${itemName}"?`;
+        if (!confirm(confirmMessage)) return;
 
-    } catch (error) {
-        ErrorHandler.handle(error, "Error deleting item");
-        button.innerHTML = originalContent;
-        this.setButtonLoading(button, false);
+        const originalContent = button.innerHTML;
+        this.setButtonLoading(button, true);
+
+        const csrfToken = securityUtils.getCsrfToken();
+
+        try {
+            const url = `/api/${this.config.entityType}/${encodeURIComponent(itemName)}`;
+
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-XSRF-TOKEN': csrfToken,
+                },
+            });
+
+            if (!response.ok) {
+                const errorMsg = await ErrorHandler.parseErrorResponse(response);
+                throw new Error(errorMsg);
+            }
+
+            // Animate and remove row
+            row.style.transition = 'opacity 0.3s';
+            row.style.opacity = '0';
+            setTimeout(() => row.remove(), 300);
+        } catch (error) {
+            ErrorHandler.handle(error, 'Error deleting item');
+            button.innerHTML = originalContent;
+            this.setButtonLoading(button, false);
+        }
     }
-}
     handleEditClick(button) {
         if (!this.inlineEditManager) return;
         const row = button.closest('tr');

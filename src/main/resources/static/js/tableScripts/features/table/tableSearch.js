@@ -40,7 +40,7 @@ export class SearchManager {
             clearTimeout(this.debounceTimeout);
             this.debounceTimeout = setTimeout(() => {
                 const searchTerm = this.searchInput.value.trim();
-                this.listeners.forEach(callback => callback(searchTerm));
+                this.listeners.forEach((callback) => callback(searchTerm));
             }, this.debounceMs);
         });
     }

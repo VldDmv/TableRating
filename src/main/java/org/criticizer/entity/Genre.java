@@ -1,14 +1,12 @@
 package org.criticizer.entity;
 
 import jakarta.persistence.*;
-
 import java.util.Objects;
 
 /**
- * Genre entity.
- * Represents a genre that can be associated with movies, books, or shows.
- * <p>
- * Media type associations are stored in genre_applicability table.
+ * Genre entity. Represents a genre that can be associated with movies, books, or shows.
+ *
+ * <p>Media type associations are stored in genre_applicability table.
  */
 @Entity
 @Table(name = "genres")
@@ -25,9 +23,7 @@ public class Genre {
         // JPA requires protected no-arg constructor
     }
 
-    /**
-     * Constructs a new Genre with the specified ID and name.
-     */
+    /** Constructs a new Genre with the specified ID and name. */
     public Genre(Integer id, String name) {
         this.id = id;
         this.name = name;

@@ -1,4 +1,4 @@
-export { UsersPageManager, getAvatarColor }
+export { UsersPageManager, getAvatarColor };
 
 import { htmlUtils } from '../tableScripts/core/utils.js';
 import { getAvatarColor } from '../shared/avatarUtils.js';
@@ -6,27 +6,27 @@ import { getAvatarColor } from '../shared/avatarUtils.js';
 class UsersPageManager {
     constructor() {
         this.currentPage = 1;
-        this.pageSize    = 18;
-        this.searchTerm  = '';
-        this.sortBy      = 'totalItems';
-        this.sortOrder   = 'desc';
-        this.totalPages  = 1;
-        this.totalUsers  = 0;
+        this.pageSize = 18;
+        this.searchTerm = '';
+        this.sortBy = 'totalItems';
+        this.sortOrder = 'desc';
+        this.totalPages = 1;
+        this.totalUsers = 0;
         this.currentView = localStorage.getItem('usersView') || 'cards';
 
-        this.usersGrid          = document.getElementById('usersGrid');
-        this.usersList          = document.getElementById('usersList');
-        this.searchInput        = document.getElementById('userSearch');
-        this.sortBySelect       = document.getElementById('sortBy');
-        this.sortOrderBtn       = document.getElementById('sortOrderBtn');
-        this.cardsViewBtn       = document.getElementById('cardsViewBtn');
-        this.listViewBtn        = document.getElementById('listViewBtn');
-        this.prevPageBtn        = document.getElementById('prevPage');
-        this.nextPageBtn        = document.getElementById('nextPage');
-        this.pageDropdown       = document.getElementById('pageDropdown');
-        this.pageList           = document.getElementById('pageList');
-        this.emptyState         = document.getElementById('emptyState');
-        this.totalUsersElement  = document.getElementById('totalUsers');
+        this.usersGrid = document.getElementById('usersGrid');
+        this.usersList = document.getElementById('usersList');
+        this.searchInput = document.getElementById('userSearch');
+        this.sortBySelect = document.getElementById('sortBy');
+        this.sortOrderBtn = document.getElementById('sortOrderBtn');
+        this.cardsViewBtn = document.getElementById('cardsViewBtn');
+        this.listViewBtn = document.getElementById('listViewBtn');
+        this.prevPageBtn = document.getElementById('prevPage');
+        this.nextPageBtn = document.getElementById('nextPage');
+        this.pageDropdown = document.getElementById('pageDropdown');
+        this.pageList = document.getElementById('pageList');
+        this.emptyState = document.getElementById('emptyState');
+        this.totalUsersElement = document.getElementById('totalUsers');
         this.paginationContainer = document.getElementById('paginationContainer');
 
         this.searchDebounceTimer = null;
@@ -43,19 +43,17 @@ class UsersPageManager {
     // ─── Events ───────────────────────────────────────────────────────────────
 
     attachEventListeners() {
-
         this.searchInput.addEventListener('input', () => {
             clearTimeout(this.searchDebounceTimer);
             this.searchDebounceTimer = setTimeout(() => {
-                this.searchTerm  = this.searchInput.value.trim();
+                this.searchTerm = this.searchInput.value.trim();
                 this.currentPage = 1;
                 this.loadUsers();
             }, 500);
         });
 
-
         this.sortBySelect.addEventListener('change', () => {
-            this.sortBy      = this.sortBySelect.value;
+            this.sortBy = this.sortBySelect.value;
             this.currentPage = 1;
             this.loadUsers();
         });
@@ -69,7 +67,7 @@ class UsersPageManager {
         });
 
         this.cardsViewBtn.addEventListener('click', () => this.switchView('cards'));
-        this.listViewBtn.addEventListener('click',  () => this.switchView('list'));
+        this.listViewBtn.addEventListener('click', () => this.switchView('list'));
 
         this.prevPageBtn.addEventListener('click', () => {
             if (this.currentPage > 1) {
@@ -115,13 +113,12 @@ class UsersPageManager {
             this.sortOrder === 'asc' ? '↑' : '↓';
     }
 
-
     _applyView(view) {
         localStorage.setItem('usersView', view);
         const isCards = view === 'cards';
 
-        this.cardsViewBtn.classList.toggle('active',  isCards);
-        this.listViewBtn.classList.toggle('active',  !isCards);
+        this.cardsViewBtn.classList.toggle('active', isCards);
+        this.listViewBtn.classList.toggle('active', !isCards);
         this.usersGrid.style.display = isCards ? 'grid' : 'none';
         this.usersList.style.display = isCards ? 'none' : 'flex';
     }
@@ -133,10 +130,10 @@ class UsersPageManager {
             this.showLoading();
 
             const params = new URLSearchParams({
-                page:      this.currentPage,
-                size:      this.pageSize,
-                sortBy:    this.sortBy,
-                sortOrder: this.sortOrder
+                page: this.currentPage,
+                size: this.pageSize,
+                sortBy: this.sortBy,
+                sortOrder: this.sortOrder,
             });
 
             if (this.searchTerm) params.append('search', this.searchTerm);
@@ -152,7 +149,6 @@ class UsersPageManager {
             this.renderUsers(data.items);
             this.updatePagination();
             this.updateStats();
-
         } catch (error) {
             console.error('Error loading users:', error);
             this.showError('Failed to load users. Please try again.');
@@ -173,7 +169,6 @@ class UsersPageManager {
     }
 
     showError(message) {
-
         this._getActiveContainer().innerHTML = `
             <div class="loading-state">
                 <p style="color: var(--color-danger);">⚠️ ${htmlUtils.escape(message)}</p>
@@ -183,14 +178,14 @@ class UsersPageManager {
 
     renderUsers(users) {
         if (!users || users.length === 0) {
-            this.usersGrid.innerHTML     = '';
-            this.usersList.innerHTML     = '';
-            this.emptyState.style.display            = 'block';
-            this.paginationContainer.style.display   = 'none';
+            this.usersGrid.innerHTML = '';
+            this.usersList.innerHTML = '';
+            this.emptyState.style.display = 'block';
+            this.paginationContainer.style.display = 'none';
             return;
         }
 
-        this.emptyState.style.display          = 'none';
+        this.emptyState.style.display = 'none';
         this.paginationContainer.style.display = 'flex';
 
         if (this.currentView === 'cards') {
@@ -201,9 +196,9 @@ class UsersPageManager {
     }
 
     _renderCards(users) {
-        this.usersGrid.innerHTML = users.map(u => this._createUserCard(u)).join('');
+        this.usersGrid.innerHTML = users.map((u) => this._createUserCard(u)).join('');
 
-        this.usersGrid.querySelectorAll('.user-card').forEach(card => {
+        this.usersGrid.querySelectorAll('.user-card').forEach((card) => {
             card.addEventListener('click', () => {
                 window.location.href = `/profile?username=${encodeURIComponent(card.dataset.username)}`;
             });
@@ -211,9 +206,9 @@ class UsersPageManager {
     }
 
     _renderList(users) {
-        this.usersList.innerHTML = users.map(u => this._createUserListItem(u)).join('');
+        this.usersList.innerHTML = users.map((u) => this._createUserListItem(u)).join('');
 
-        this.usersList.querySelectorAll('.user-list-item').forEach(item => {
+        this.usersList.querySelectorAll('.user-list-item').forEach((item) => {
             item.addEventListener('click', () => {
                 window.location.href = `/profile?username=${encodeURIComponent(item.dataset.username)}`;
             });
@@ -221,7 +216,7 @@ class UsersPageManager {
     }
 
     _createUserCard(user) {
-        const initial  = user.name.charAt(0).toUpperCase();
+        const initial = user.name.charAt(0).toUpperCase();
         const joinDate = user.createdAt ? this._formatDate(user.createdAt) : 'Unknown';
 
         return `
@@ -239,17 +234,17 @@ class UsersPageManager {
                 </div>
 
                 <div class="user-stats">
-                    ${this._createStatBox('🎮', user.gamesCount,  'Games')}
+                    ${this._createStatBox('🎮', user.gamesCount, 'Games')}
                     ${this._createStatBox('🎬', user.moviesCount, 'Movies')}
-                    ${this._createStatBox('📚', user.booksCount,  'Books')}
-                    ${this._createStatBox('📺', user.showsCount,  'Shows')}
+                    ${this._createStatBox('📚', user.booksCount, 'Books')}
+                    ${this._createStatBox('📺', user.showsCount, 'Shows')}
                 </div>
             </div>
         `;
     }
 
     _createUserListItem(user) {
-        const initial  = user.name.charAt(0).toUpperCase();
+        const initial = user.name.charAt(0).toUpperCase();
         const joinDate = user.createdAt ? this._formatDate(user.createdAt) : 'Unknown';
 
         return `
@@ -263,17 +258,16 @@ class UsersPageManager {
                         <div class="user-list-joined">📅 Joined ${joinDate}</div>
                     </div>
                     <div class="user-list-stats">
-                        ${this._createListStat('🎮', user.gamesCount,  'Games')}
+                        ${this._createListStat('🎮', user.gamesCount, 'Games')}
                         ${this._createListStat('🎬', user.moviesCount, 'Movies')}
-                        ${this._createListStat('📚', user.booksCount,  'Books')}
-                        ${this._createListStat('📺', user.showsCount,  'Shows')}
+                        ${this._createListStat('📚', user.booksCount, 'Books')}
+                        ${this._createListStat('📺', user.showsCount, 'Shows')}
                     </div>
                 </div>
                 <div class="user-list-total">${user.totalItems} items</div>
             </div>
         `;
     }
-
 
     _createStatBox(icon, count, label) {
         return `
@@ -306,8 +300,8 @@ class UsersPageManager {
         this.pageList.innerHTML = '';
         for (let i = 1; i <= this.totalPages; i++) {
             const li = document.createElement('li');
-            const a  = document.createElement('a');
-            a.href      = '#';
+            const a = document.createElement('a');
+            a.href = '#';
             a.textContent = i;
             a.className = i === this.currentPage ? 'active-page' : '';
             a.addEventListener('click', (e) => {
@@ -334,7 +328,9 @@ class UsersPageManager {
     _formatDate(dateString) {
         if (!dateString) return 'Unknown';
         return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric', month: 'short', day: 'numeric'
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
         });
     }
 }

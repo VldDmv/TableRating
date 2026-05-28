@@ -1,5 +1,3 @@
-
-
 import { jest } from '@jest/globals';
 
 const { TagChipsManager } = await import('@/tableScripts/features/forms/tagchipsManager.js');
@@ -7,12 +5,16 @@ const { TagChipsManager } = await import('@/tableScripts/features/forms/tagchips
 // ─── DOM setup ────────────────────────────────────────────────────────────────
 
 function setupDOM(items = []) {
-    const dropdownItems = items.map(({ id, name }) => `
+    const dropdownItems = items
+        .map(
+            ({ id, name }) => `
         <div class="tag-dropdown-item" data-tag-id="${id}" data-tag-name="${name}">
             <input type="checkbox" value="${id}">
             ${name}
         </div>
-    `).join('');
+    `
+        )
+        .join('');
 
     document.body.innerHTML = `
         <div id="chipsDisplay"></div>
@@ -146,7 +148,7 @@ describe('TagChipsManager.clearAll', () => {
     test('unchecks all checkboxes in dropdown', () => {
         const m = makeManager([
             { id: '1', name: 'Action' },
-            { id: '2', name: 'RPG' }
+            { id: '2', name: 'RPG' },
         ]);
         m.addChip('1', 'Action');
 
@@ -176,15 +178,16 @@ describe('TagChipsManager.filterDropdown', () => {
     const items = [
         { id: '1', name: 'Action' },
         { id: '2', name: 'RPG' },
-        { id: '3', name: 'Action RPG' }
+        { id: '3', name: 'Action RPG' },
     ];
 
     test('shows all items when query is empty', () => {
         const m = makeManager(items);
         m.filterDropdown('');
 
-        const visible = Array.from(document.querySelectorAll('.tag-dropdown-item'))
-            .filter(el => el.style.display !== 'none');
+        const visible = Array.from(document.querySelectorAll('.tag-dropdown-item')).filter(
+            (el) => el.style.display !== 'none'
+        );
         expect(visible.length).toBe(3);
     });
 
@@ -192,8 +195,9 @@ describe('TagChipsManager.filterDropdown', () => {
         const m = makeManager(items);
         m.filterDropdown('rpg');
 
-        const visible = Array.from(document.querySelectorAll('.tag-dropdown-item'))
-            .filter(el => el.style.display !== 'none');
+        const visible = Array.from(document.querySelectorAll('.tag-dropdown-item')).filter(
+            (el) => el.style.display !== 'none'
+        );
         expect(visible.length).toBe(2); // RPG and Action RPG
     });
 
@@ -201,8 +205,8 @@ describe('TagChipsManager.filterDropdown', () => {
         const m = makeManager(items);
         m.filterDropdown('action');
 
-        const actionItem    = document.querySelector('[data-tag-id="1"]');
-        const rpgItem       = document.querySelector('[data-tag-id="2"]');
+        const actionItem = document.querySelector('[data-tag-id="1"]');
+        const rpgItem = document.querySelector('[data-tag-id="2"]');
         const actionRpgItem = document.querySelector('[data-tag-id="3"]');
 
         expect(actionItem.style.display).not.toBe('none');
@@ -214,8 +218,9 @@ describe('TagChipsManager.filterDropdown', () => {
         const m = makeManager(items);
         m.filterDropdown('ACTION');
 
-        const visible = Array.from(document.querySelectorAll('.tag-dropdown-item'))
-            .filter(el => el.style.display !== 'none');
+        const visible = Array.from(document.querySelectorAll('.tag-dropdown-item')).filter(
+            (el) => el.style.display !== 'none'
+        );
         expect(visible.length).toBe(2);
     });
 });
@@ -250,14 +255,14 @@ describe('TagChipsManager.setSelectedTags', () => {
     const items = [
         { id: '1', name: 'Action' },
         { id: '2', name: 'RPG' },
-        { id: '3', name: 'Strategy' }
+        { id: '3', name: 'Strategy' },
     ];
 
     test('sets chips for given tags', () => {
         const m = makeManager(items);
         m.setSelectedTags([
             { id: '1', name: 'Action' },
-            { id: '3', name: 'Strategy' }
+            { id: '3', name: 'Strategy' },
         ]);
 
         const ids = m.getSelectedIds();
@@ -291,7 +296,7 @@ describe('TagChipsManager.toggleTag', () => {
     test('selecting unchecked item adds chip', () => {
         const m = makeManager([{ id: '1', name: 'Action' }]);
         const item = document.querySelector('.tag-dropdown-item');
-        const cb   = item.querySelector('input[type="checkbox"]');
+        const cb = item.querySelector('input[type="checkbox"]');
         cb.checked = false;
 
         m.toggleTag(item);
@@ -306,7 +311,7 @@ describe('TagChipsManager.toggleTag', () => {
         m.addChip('1', 'Action');
 
         const item = document.querySelector('.tag-dropdown-item');
-        const cb   = item.querySelector('input[type="checkbox"]');
+        const cb = item.querySelector('input[type="checkbox"]');
         cb.checked = true;
         item.classList.add('selected');
 

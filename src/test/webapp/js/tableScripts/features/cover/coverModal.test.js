@@ -128,7 +128,9 @@ describe('CoverModal', () => {
 
         test('should include item name in event detail', () => {
             let detail;
-            document.addEventListener('coverEditRequested', (e) => { detail = e.detail; });
+            document.addEventListener('coverEditRequested', (e) => {
+                detail = e.detail;
+            });
             coverModal.show('http://example.com/img.jpg', 'Test Game');
             document.querySelector('.cover-modal-edit-btn').click();
             expect(detail.itemName).toBe('Test Game');

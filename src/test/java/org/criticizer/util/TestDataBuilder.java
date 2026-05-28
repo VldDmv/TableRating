@@ -1,5 +1,10 @@
 package org.criticizer.util;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.criticizer.dto.admin.AdminStats;
 import org.criticizer.dto.helper.PageResponse;
 import org.criticizer.entity.*;
@@ -7,16 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Utility class for building test data objects.
- * Provides builder methods for creating test entities and DTOs.
- * Uses reflection to bypass protected constructors for testing purposes.
+ * Utility class for building test data objects. Provides builder methods for creating test entities
+ * and DTOs. Uses reflection to bypass protected constructors for testing purposes.
  */
 public class TestDataBuilder {
 
@@ -192,11 +190,7 @@ public class TestDataBuilder {
     // ============= Page Response Builders =============
 
     public static <T> PageResponse<T> createPageResponse(List<T> items, int page, int size) {
-        Page<T> springPage = new PageImpl<>(
-                items,
-                PageRequest.of(page - 1, size),
-                items.size()
-        );
+        Page<T> springPage = new PageImpl<>(items, PageRequest.of(page - 1, size), items.size());
         return PageResponse.of(springPage);
     }
 
@@ -208,28 +202,24 @@ public class TestDataBuilder {
 
     public static AdminStats createAdminStats() {
         return new AdminStats(
-                100,  // totalUsers
-                50,   // totalGames
-                30,   // totalMovies
-                20,   // totalBooks
-                15    // totalShows
-        );
+                100, // totalUsers
+                50, // totalGames
+                30, // totalMovies
+                20, // totalBooks
+                15 // totalShows
+                );
     }
 
     // ============= Reflection Helpers =============
 
-    /**
-     * Helper method to safely instantiate objects with protected/private no-args constructors.
-     */
+    /** Helper method to safely instantiate objects with protected/private no-args constructors. */
     private static <T> T createInstance(Class<T> clazz) throws Exception {
         Constructor<T> constructor = clazz.getDeclaredConstructor();
         constructor.setAccessible(true);
         return constructor.newInstance();
     }
 
-    /**
-     * Helper method to set private/protected fields using reflection.
-     */
+    /** Helper method to set private/protected fields using reflection. */
     private static void setField(Object target, String fieldName, Object value) {
         try {
             Field field = findField(target.getClass(), fieldName);
@@ -242,9 +232,7 @@ public class TestDataBuilder {
         }
     }
 
-    /**
-     * Find field in class hierarchy.
-     */
+    /** Find field in class hierarchy. */
     private static Field findField(Class<?> clazz, String fieldName) {
         while (clazz != null) {
             try {

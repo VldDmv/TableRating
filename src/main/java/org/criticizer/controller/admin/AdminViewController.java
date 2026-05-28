@@ -1,4 +1,3 @@
-
 package org.criticizer.controller.admin;
 
 import org.criticizer.dto.helper.PageResponse;
@@ -17,9 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-/**
- * View Controller for Admin pages.
- */
+/** View Controller for Admin pages. */
 @Controller
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('ADMIN')")
@@ -32,19 +29,17 @@ public class AdminViewController {
     private final GenreService genreService;
     private final SecurityUtil securityUtil;
 
-
-    public AdminViewController(DashboardService dashboardService,
-                               UserService userService,
-                               TagService tagService,
-                               GenreService genreService,
-                               SecurityUtil securityUtil
-    ) {
+    public AdminViewController(
+            DashboardService dashboardService,
+            UserService userService,
+            TagService tagService,
+            GenreService genreService,
+            SecurityUtil securityUtil) {
         this.dashboardService = dashboardService;
         this.userService = userService;
         this.tagService = tagService;
         this.genreService = genreService;
         this.securityUtil = securityUtil;
-
     }
 
     @GetMapping("/dashboard")
@@ -73,7 +68,6 @@ public class AdminViewController {
         var currentUser = securityUtil.getCurrentUser();
         int currentUserId = currentUser.getId();
 
-
         PageResponse<User> result = userService.getUsersPage(search, page, size, false);
 
         model.addAttribute("userList", result.getItems());
@@ -87,8 +81,7 @@ public class AdminViewController {
 
     @GetMapping("/management")
     public String management(
-            @RequestParam(required = false, defaultValue = "tags") String type,
-            Model model) {
+            @RequestParam(required = false, defaultValue = "tags") String type, Model model) {
 
         log.debug("Loading management page for type: {}", type);
 
@@ -104,7 +97,6 @@ public class AdminViewController {
         }
 
         model.addAttribute("type", type);
-
 
         return "admin/management";
     }

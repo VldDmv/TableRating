@@ -21,7 +21,6 @@ export class ErrorHandler {
         } else {
             alert(`${userMessage}\n\nDetails: ${errorMessage}`);
         }
-
     }
 
     /**
@@ -31,14 +30,12 @@ export class ErrorHandler {
      * @param {string} details - Error details.
      */
     static showError(container, title, details) {
-
         const safeTitle = title || 'Error';
         const safeDetails = details || 'No details provided.';
 
         if (!container) {
-            throw new Error("showError: container element is null or undefined.");
+            throw new Error('showError: container element is null or undefined.');
         }
-
 
         container.innerHTML = `
             <div class="error-message" style="padding: 20px; background-color: #fee; border: 1px solid #fcc; border-radius: 4px;">

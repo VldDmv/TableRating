@@ -1,5 +1,10 @@
 package org.criticizer.security;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
 import org.criticizer.entity.Role;
 import org.criticizer.entity.User;
 import org.criticizer.exceptions.security.UnauthorizedException;
@@ -16,23 +21,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class SecurityUtilTest {
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
 
-    @Mock
-    private SecurityContext securityContext;
+    @Mock private SecurityContext securityContext;
 
-    @InjectMocks
-    private SecurityUtil securityUtil;
+    @InjectMocks private SecurityUtil securityUtil;
 
     private User testUser;
     private User adminUser;
@@ -78,11 +74,8 @@ class SecurityUtilTest {
     @Test
     void getCurrentUser_AnonymousUser_ThrowsException() {
         // Arrange
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                "anonymousUser",
-                null,
-                List.of()
-        );
+        Authentication auth =
+                new UsernamePasswordAuthenticationToken("anonymousUser", null, List.of());
         when(securityContext.getAuthentication()).thenReturn(auth);
 
         // Act & Assert
@@ -134,11 +127,8 @@ class SecurityUtilTest {
     @Test
     void getCurrentUsername_AnonymousUser_ReturnsNull() {
         // Arrange
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                "anonymousUser",
-                null,
-                List.of()
-        );
+        Authentication auth =
+                new UsernamePasswordAuthenticationToken("anonymousUser", null, List.of());
         when(securityContext.getAuthentication()).thenReturn(auth);
 
         // Act
@@ -179,11 +169,8 @@ class SecurityUtilTest {
     @Test
     void isAuthenticated_AnonymousUser_ReturnsFalse() {
         // Arrange
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                "anonymousUser",
-                null,
-                List.of()
-        );
+        Authentication auth =
+                new UsernamePasswordAuthenticationToken("anonymousUser", null, List.of());
         when(securityContext.getAuthentication()).thenReturn(auth);
 
         // Act

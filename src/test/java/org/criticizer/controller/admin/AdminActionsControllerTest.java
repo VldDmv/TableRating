@@ -1,5 +1,10 @@
 package org.criticizer.controller.admin;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import org.criticizer.entity.Role;
 import org.criticizer.entity.User;
 import org.criticizer.security.SecurityUtil;
@@ -16,23 +21,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AdminActionsController Tests")
 class AdminActionsControllerTest {
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
 
-    @Mock
-    private SecurityUtil securityUtil;
+    @Mock private SecurityUtil securityUtil;
 
-    @InjectMocks
-    private AdminActionsController controller;
+    @InjectMocks private AdminActionsController controller;
 
     private MockMvc mockMvc;
     private User adminUser;
@@ -43,10 +40,8 @@ class AdminActionsControllerTest {
         viewResolver.setPrefix("/WEB-INF/views/");
         viewResolver.setSuffix(".jsp");
 
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .setViewResolvers(viewResolver)
-                .build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver).build();
 
         adminUser = TestDataBuilder.createAdminUser();
     }
@@ -59,9 +54,7 @@ class AdminActionsControllerTest {
         doNothing().when(userService).changeUserRole(anyInt(), any(Role.class), any(User.class));
 
         // When & Then
-        mockMvc.perform(post("/admin/changeRole")
-                        .param("userId", "2")
-                        .param("newRole", "ADMIN"))
+        mockMvc.perform(post("/admin/changeRole").param("userId", "2").param("newRole", "ADMIN"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"))
                 .andExpect(flash().attributeExists("flashSuccessMessage"));
@@ -76,9 +69,10 @@ class AdminActionsControllerTest {
         when(securityUtil.getCurrentUser()).thenReturn(adminUser);
 
         // When & Then
-        mockMvc.perform(post("/admin/changeRole")
-                        .param("userId", "2")
-                        .param("newRole", "INVALID_ROLE"))
+        mockMvc.perform(
+                        post("/admin/changeRole")
+                                .param("userId", "2")
+                                .param("newRole", "INVALID_ROLE"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"))
                 .andExpect(flash().attributeExists("flashErrorMessage"));
@@ -94,8 +88,7 @@ class AdminActionsControllerTest {
         doNothing().when(userService).deleteUser(anyInt(), any(User.class));
 
         // When & Then
-        mockMvc.perform(post("/admin/deleteUser")
-                        .param("userId", "2"))
+        mockMvc.perform(post("/admin/deleteUser").param("userId", "2"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"))
                 .andExpect(flash().attributeExists("flashSuccessMessage"));
@@ -109,11 +102,11 @@ class AdminActionsControllerTest {
         // Given
         when(securityUtil.getCurrentUser()).thenReturn(adminUser);
         doThrow(new RuntimeException("Cannot delete user"))
-                .when(userService).deleteUser(anyInt(), any(User.class));
+                .when(userService)
+                .deleteUser(anyInt(), any(User.class));
 
         // When & Then
-        mockMvc.perform(post("/admin/deleteUser")
-                        .param("userId", "2"))
+        mockMvc.perform(post("/admin/deleteUser").param("userId", "2"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"))
                 .andExpect(flash().attributeExists("flashErrorMessage"));

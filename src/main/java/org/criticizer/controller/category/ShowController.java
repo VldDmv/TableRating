@@ -12,11 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/shows")
-public class ShowController extends AbstractMediaController<
-        Show,
-        ShowResponse,
-        CreateShowRequest,
-        UpdateShowRequest> {
+public class ShowController
+        extends AbstractMediaController<Show, ShowResponse, CreateShowRequest, UpdateShowRequest> {
 
     public ShowController(ShowService showService, SecurityUtil securityUtil) {
         super(showService, securityUtil);

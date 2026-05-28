@@ -7,7 +7,6 @@ describe('SortManager', () => {
     let columnsConfig;
 
     beforeEach(() => {
-
         headers = [];
         for (let i = 0; i < 5; i++) {
             const th = document.createElement('th');
@@ -15,7 +14,7 @@ describe('SortManager', () => {
             Object.defineProperty(th, 'cellIndex', {
                 value: i,
                 writable: true,
-                configurable: true
+                configurable: true,
             });
             th.textContent = `Column ${i}`;
             headers.push(th);
@@ -26,7 +25,7 @@ describe('SortManager', () => {
             score: { name: 'Score', index: 1, sortable: true },
             tags: { name: 'Tags', index: 2, sortable: false },
             completed: { name: 'Completed', index: 3, sortable: true },
-            actions: { name: 'Actions', index: 4, sortable: false }
+            actions: { name: 'Actions', index: 4, sortable: false },
         };
 
         sortManager = new SortManager(headers, columnsConfig);
@@ -117,7 +116,7 @@ describe('SortManager', () => {
             Object.defineProperty(extraHeader, 'cellIndex', {
                 value: 99,
                 writable: true,
-                configurable: true
+                configurable: true,
             });
             headers.push(extraHeader);
 
@@ -205,7 +204,7 @@ describe('SortManager', () => {
             Object.defineProperty(header, 'cellIndex', {
                 value: 10,
                 writable: true,
-                configurable: true
+                configurable: true,
             });
 
             expect(() => sortManager.handleHeaderClick(header)).not.toThrow();
@@ -409,14 +408,12 @@ describe('SortManager', () => {
             expect(headers[0].style.cursor).toBe('pointer');
         });
 
-     test('should handle very long column names', () => {
+        test('should handle very long column names', () => {
+            sortManager.init();
 
-                 sortManager.init();
-
-
-                 headers[0].textContent = 'A'.repeat(1000);
-                 sortManager.updateHeaders('name', 'asc');
-                 expect(headers[0].textContent).toContain('▲');
-             });
-         });
+            headers[0].textContent = 'A'.repeat(1000);
+            sortManager.updateHeaders('name', 'asc');
+            expect(headers[0].textContent).toContain('▲');
+        });
+    });
 });

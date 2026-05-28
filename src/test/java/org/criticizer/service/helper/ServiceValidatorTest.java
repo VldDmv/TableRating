@@ -1,5 +1,7 @@
 package org.criticizer.service.helper;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.criticizer.exceptions.validation.EmptyNameException;
 import org.criticizer.exceptions.validation.InvalidInputException;
 import org.criticizer.exceptions.validation.InvalidScoreException;
@@ -11,17 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.*;
-
-/**
- * Unit tests for ServiceValidator utility class.
- */
+/** Unit tests for ServiceValidator utility class. */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ServiceValidator Tests")
 class ServiceValidatorTest {
 
-    @InjectMocks
-    private ServiceValidator validator;
+    @InjectMocks private ServiceValidator validator;
 
     // ==================== VALIDATE SCORE TESTS ====================
 
@@ -32,8 +29,7 @@ class ServiceValidatorTest {
         @Test
         @DisplayName("Should accept valid score of 1")
         void shouldAcceptScoreOne() {
-            assertThatCode(() -> validator.validateScore(1, 1, "Game"))
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> validator.validateScore(1, 1, "Game")).doesNotThrowAnyException();
         }
 
         @Test
@@ -46,8 +42,7 @@ class ServiceValidatorTest {
         @Test
         @DisplayName("Should accept valid score of 50")
         void shouldAcceptScoreFifty() {
-            assertThatCode(() -> validator.validateScore(50, 1, "Book"))
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> validator.validateScore(50, 1, "Book")).doesNotThrowAnyException();
         }
 
         @Test
@@ -119,7 +114,7 @@ class ServiceValidatorTest {
         @Test
         @DisplayName("Should throw for username exceeding max length")
         void shouldThrowForTooLong() {
-            String longUsername = "a".repeat(51);  // Max is 50
+            String longUsername = "a".repeat(51); // Max is 50
 
             assertThatThrownBy(() -> validator.validateUsername(longUsername))
                     .isInstanceOf(InvalidInputException.class)
@@ -152,14 +147,14 @@ class ServiceValidatorTest {
         @Test
         @DisplayName("Should accept password at minimum length")
         void shouldAcceptMinLength() {
-            assertThatCode(() -> validator.validatePassword("pass12"))  // 6 chars
+            assertThatCode(() -> validator.validatePassword("pass12")) // 6 chars
                     .doesNotThrowAnyException();
         }
 
         @Test
         @DisplayName("Should throw for password too short")
         void shouldThrowForTooShort() {
-            assertThatThrownBy(() -> validator.validatePassword("pass"))  // 4 chars
+            assertThatThrownBy(() -> validator.validatePassword("pass")) // 4 chars
                     .isInstanceOf(WeakPasswordException.class)
                     .hasMessageContaining("6");
         }
@@ -174,7 +169,7 @@ class ServiceValidatorTest {
         @Test
         @DisplayName("Should throw for password exceeding max length")
         void shouldThrowForTooLong() {
-            String longPassword = "a".repeat(129);  // Max is 128
+            String longPassword = "a".repeat(129); // Max is 128
 
             assertThatThrownBy(() -> validator.validatePassword(longPassword))
                     .isInstanceOf(InvalidInputException.class)
@@ -204,7 +199,7 @@ class ServiceValidatorTest {
 
             assertThat(result.page()).isEqualTo(2);
             assertThat(result.pageSize()).isEqualTo(20);
-            assertThat(result.offset()).isEqualTo(20);  // (2-1) * 20
+            assertThat(result.offset()).isEqualTo(20); // (2-1) * 20
         }
 
         @Test
@@ -237,7 +232,7 @@ class ServiceValidatorTest {
         void shouldCalculateCorrectOffset() {
             ServiceValidator.PaginationParams result = validator.validatePagination(3, 15);
 
-            assertThat(result.offset()).isEqualTo(30);  // (3-1) * 15
+            assertThat(result.offset()).isEqualTo(30); // (3-1) * 15
         }
 
         @Test
@@ -287,7 +282,7 @@ class ServiceValidatorTest {
         @Test
         @DisplayName("Should throw for search term exceeding max length")
         void shouldThrowForTooLong() {
-            String longTerm = "a".repeat(101);  // Max is 100
+            String longTerm = "a".repeat(101); // Max is 100
 
             assertThatThrownBy(() -> validator.sanitizeSearchTerm(longTerm))
                     .isInstanceOf(InvalidInputException.class)
@@ -349,7 +344,7 @@ class ServiceValidatorTest {
         @Test
         @DisplayName("Should throw for name exceeding max length")
         void shouldThrowForTooLong() {
-            String longName = "a".repeat(256);  // Max is 255
+            String longName = "a".repeat(256); // Max is 255
 
             assertThatThrownBy(() -> validator.validateName(longName, "Show name"))
                     .isInstanceOf(InvalidInputException.class)

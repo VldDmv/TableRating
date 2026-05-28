@@ -10,13 +10,11 @@ import org.criticizer.service.game.GameService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST Controller for Game management.
- * All endpoints require authentication.
- */
+/** REST Controller for Game management. All endpoints require authentication. */
 @RestController
 @RequestMapping("/api/games")
-public class GameController extends AbstractMediaController<Game, GameResponse, CreateGameRequest, UpdateGameRequest> {
+public class GameController
+        extends AbstractMediaController<Game, GameResponse, CreateGameRequest, UpdateGameRequest> {
 
     public GameController(GameService gameService, SecurityUtil securityUtil) {
         super(gameService, securityUtil);

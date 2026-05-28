@@ -1,5 +1,14 @@
 package org.criticizer.controller.profile;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.criticizer.dto.profile.UpdatePrivacyRequest;
 import org.criticizer.entity.User;
@@ -18,30 +27,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProfileController Tests")
 class ProfileControllerTest {
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
 
-    @Mock
-    private SecurityUtil securityUtil;
+    @Mock private SecurityUtil securityUtil;
 
-    @Mock
-    private ProfileAccessService accessService;
+    @Mock private ProfileAccessService accessService;
 
-    @InjectMocks
-    private ProfileController controller;
+    @InjectMocks private ProfileController controller;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
@@ -50,9 +46,7 @@ class ProfileControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
 
@@ -72,8 +66,7 @@ class ProfileControllerTest {
         when(accessService.checkAccess(any(User.class), anyString())).thenReturn(context);
 
         // When & Then
-        mockMvc.perform(get("/api/profiles/testuser")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/profiles/testuser").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         verify(userService).getUser("testuser");
@@ -91,8 +84,7 @@ class ProfileControllerTest {
         when(accessService.checkAccess(any(User.class), anyString())).thenReturn(context);
 
         // When & Then
-        mockMvc.perform(get("/api/profiles/privateuser")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/profiles/privateuser").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
 
         verify(userService).getUser("privateuser");
@@ -105,8 +97,7 @@ class ProfileControllerTest {
         when(securityUtil.getCurrentUser()).thenReturn(testUser);
 
         // When & Then
-        mockMvc.perform(get("/api/profiles/me")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/profiles/me").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         verify(securityUtil).getCurrentUser();
@@ -120,9 +111,10 @@ class ProfileControllerTest {
         UpdatePrivacyRequest request = new UpdatePrivacyRequest(false);
 
         // When & Then
-        mockMvc.perform(put("/api/profiles/me/privacy")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+                        put("/api/profiles/me/privacy")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").exists());
 

@@ -56,8 +56,9 @@ describe('getAvatarColor', () => {
     describe('Distribution', () => {
         test('different names should not all get the same color', () => {
             const colors = new Set(
-                ['alice', 'bob', 'charlie', 'diana', 'eve', 'frank', 'grace', 'henry']
-                    .map(getAvatarColor)
+                ['alice', 'bob', 'charlie', 'diana', 'eve', 'frank', 'grace', 'henry'].map(
+                    getAvatarColor
+                )
             );
             expect(colors.size).toBeGreaterThan(1);
         });

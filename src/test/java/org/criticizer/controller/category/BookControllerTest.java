@@ -1,5 +1,7 @@
 package org.criticizer.controller.category;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.criticizer.dto.book.BookResponse;
 import org.criticizer.entity.Book;
 import org.criticizer.security.SecurityUtil;
@@ -12,20 +14,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BookController Tests")
 class BookControllerTest {
 
-    @Mock
-    private BookService bookService;
+    @Mock private BookService bookService;
 
-    @Mock
-    private SecurityUtil securityUtil;
+    @Mock private SecurityUtil securityUtil;
 
-    @InjectMocks
-    private BookController controller;
+    @InjectMocks private BookController controller;
 
     @Test
     @DisplayName("Should return correct entity name")

@@ -1,29 +1,29 @@
 /**
  * View Toggle Manager
-* Controls switching between Table and Card views.
+ * Controls switching between Table and Card views.
  */
 
 export class ViewToggleManager {
-   /**
-   * @param {Object} config
-   * @param {Object} tableRenderer
-   * @param {Object} cardRenderer
-   * @param {Function} getItems — a callback returning the current items array for the cards view
-   */
+    /**
+     * @param {Object} config
+     * @param {Object} tableRenderer
+     * @param {Object} cardRenderer
+     * @param {Function} getItems — a callback returning the current items array for the cards view
+     */
     constructor(config, tableRenderer, cardRenderer, getItems) {
-        this.config         = config;
-        this.tableRenderer  = tableRenderer;
-        this.cardRenderer   = cardRenderer;
-        this.getItems       = getItems;
+        this.config = config;
+        this.tableRenderer = tableRenderer;
+        this.cardRenderer = cardRenderer;
+        this.getItems = getItems;
 
         if (typeof getItems !== 'function') {
             console.warn('[ViewToggle] getItems not passed - cards view may be empty when toggled');
         }
 
         this.tableContainer = document.querySelector('table');
-        this.storageKey     = `view-preference-${config.entityType}`;
-        this.currentView    = this._loadPreference();
-        this.onViewChange   = null;
+        this.storageKey = `view-preference-${config.entityType}`;
+        this.currentView = this._loadPreference();
+        this.onViewChange = null;
 
         this.init();
     }
@@ -45,7 +45,6 @@ export class ViewToggleManager {
         this._savePreference(view);
         this.applyView(view);
         this._updateActiveButton();
-
     }
 
     applyView(view) {
@@ -53,9 +52,15 @@ export class ViewToggleManager {
         this.onViewChange?.(view);
     }
 
-    getCurrentView()  { return this.currentView; }
-    isCardsView()     { return this.currentView === 'cards'; }
-    isTableView()     { return this.currentView === 'table'; }
+    getCurrentView() {
+        return this.currentView;
+    }
+    isCardsView() {
+        return this.currentView === 'cards';
+    }
+    isTableView() {
+        return this.currentView === 'table';
+    }
 
     // ─── Private methods ─────────────────────────────────────────────────────
 
@@ -64,11 +69,11 @@ export class ViewToggleManager {
             this.tableContainer.style.display = 'table';
         }
 
-        const cardsContainer  = document.getElementById('cards-container');
-        const columnControls  = document.getElementById('column-toggle-container');
+        const cardsContainer = document.getElementById('cards-container');
+        const columnControls = document.getElementById('column-toggle-container');
 
-        if (cardsContainer) cardsContainer.style.display  = 'none';
-        if (columnControls) columnControls.style.display  = 'flex';
+        if (cardsContainer) cardsContainer.style.display = 'none';
+        if (columnControls) columnControls.style.display = 'flex';
     }
 
     _showCards() {
@@ -82,7 +87,7 @@ export class ViewToggleManager {
         let cardsContainer = document.getElementById('cards-container');
         if (!cardsContainer) {
             cardsContainer = document.createElement('div');
-            cardsContainer.id        = 'cards-container';
+            cardsContainer.id = 'cards-container';
             cardsContainer.className = 'cards-grid';
 
             this.tableContainer?.parentNode?.insertBefore(
@@ -123,7 +128,7 @@ export class ViewToggleManager {
             </label>
         `;
 
-        container.querySelectorAll('.view-toggle-btn').forEach(btn => {
+        container.querySelectorAll('.view-toggle-btn').forEach((btn) => {
             btn.addEventListener('click', () => this.switchView(btn.dataset.view));
         });
 
@@ -132,7 +137,7 @@ export class ViewToggleManager {
     }
 
     _updateActiveButton() {
-        document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+        document.querySelectorAll('.view-toggle-btn').forEach((btn) => {
             btn.classList.toggle('active', btn.dataset.view === this.currentView);
         });
     }

@@ -20,7 +20,7 @@ export class ItemFormManager {
      */
     init() {
         if (!this.formElement || !this.scoreInputElement) {
-            console.error("ItemFormManager: Missing required elements.");
+            console.error('ItemFormManager: Missing required elements.');
             return;
         }
 
@@ -36,10 +36,9 @@ export class ItemFormManager {
      * @returns {boolean} True if validation passed.
      */
     handleSubmit() {
- const scoreValue = this.scoreInputElement.value.trim();
-    
+        const scoreValue = this.scoreInputElement.value.trim();
 
-         const isValid = this.validateScore(scoreValue);
+        const isValid = this.validateScore(scoreValue);
 
         if (!isValid) {
             this.scoreInputElement.focus();

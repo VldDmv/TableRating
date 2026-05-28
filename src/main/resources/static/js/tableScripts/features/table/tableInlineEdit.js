@@ -25,7 +25,7 @@ export class InlineEditManager {
      */
     init() {
         if (!this.tableBody) {
-            console.error("InlineEditManager: Missing required tableBody.");
+            console.error('InlineEditManager: Missing required tableBody.');
             return;
         }
     }
@@ -44,7 +44,6 @@ export class InlineEditManager {
         if (isEditing) {
             this.saveRow(row);
         } else {
-
             if (this.currentEditRow && this.currentEditRow !== row) {
                 this.switchToViewRow(this.currentEditRow);
             }
@@ -71,8 +70,6 @@ export class InlineEditManager {
         this.createNameInput(row, nameCell);
         this.createScoreInput(row, scoreCell);
 
-
-
         // Update tags display (adds "Edit Tags" button)
         this.updateTagsInRow(row, true);
 
@@ -95,12 +92,11 @@ export class InlineEditManager {
         }
         if (row.dataset.originalScore === undefined) {
             const scoreCellElement = scoreCell.querySelector('.score-cell');
-            row.dataset.originalScore = scoreCellElement ?
-                scoreCellElement.textContent.trim() : '';
+            row.dataset.originalScore = scoreCellElement ? scoreCellElement.textContent.trim() : '';
         }
         if (row.dataset.initialTagIds === undefined) {
             const initialTagIds = Array.from(row.querySelectorAll('.tag-badge'))
-                .map(badge => badge.dataset.tagId)
+                .map((badge) => badge.dataset.tagId)
                 .join(',');
             row.dataset.initialTagIds = initialTagIds;
             row.dataset.originalTagIds = initialTagIds;
@@ -119,13 +115,13 @@ export class InlineEditManager {
      * @param {HTMLElement} nameCell - Name cell.
      */
     createNameInput(row, nameCell) {
-        if (nameCell.querySelector("input")) return;
+        if (nameCell.querySelector('input')) return;
 
-        const nameInput = document.createElement("input");
-        nameInput.type = "text";
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
         nameInput.value = row.dataset.originalName;
-        nameInput.className = "edit-name-input";
-        nameCell.textContent = "";
+        nameInput.className = 'edit-name-input';
+        nameCell.textContent = '';
         nameCell.appendChild(nameInput);
     }
 
@@ -135,15 +131,15 @@ export class InlineEditManager {
      * @param {HTMLElement} scoreCell - Score cell.
      */
     createScoreInput(row, scoreCell) {
-        if (scoreCell.querySelector("input")) return;
+        if (scoreCell.querySelector('input')) return;
 
-        const scoreInput = document.createElement("input");
-        scoreInput.type = "number";
-        scoreInput.min = "1";
-        scoreInput.max = "100";
+        const scoreInput = document.createElement('input');
+        scoreInput.type = 'number';
+        scoreInput.min = '1';
+        scoreInput.max = '100';
         scoreInput.value = row.dataset.originalScore;
-        scoreInput.className = "edit-score-input";
-        scoreCell.textContent = "";
+        scoreInput.className = 'edit-score-input';
+        scoreCell.textContent = '';
         scoreCell.appendChild(scoreInput);
     }
 
@@ -157,11 +153,11 @@ export class InlineEditManager {
         if (row.querySelector('.edit-cover-url-input')) return;
 
         // Create input
-        const coverInput = document.createElement("input");
-        coverInput.type = "url";
+        const coverInput = document.createElement('input');
+        coverInput.type = 'url';
         coverInput.value = row.dataset.originalCoverUrl || '';
-        coverInput.placeholder = "Cover URL (optional)";
-        coverInput.className = "edit-cover-url-input";
+        coverInput.placeholder = 'Cover URL (optional)';
+        coverInput.className = 'edit-cover-url-input';
         coverInput.style.cssText = `
             width: 100%;
             margin-top: 8px;
@@ -280,7 +276,8 @@ export class InlineEditManager {
         const tagsCell = row.children[this.config.columns.tags.index];
         if (!tagsCell) return;
 
-        const container = tagsCell.querySelector('.tags-container') ||
+        const container =
+            tagsCell.querySelector('.tags-container') ||
             (() => {
                 const div = document.createElement('div');
                 div.className = 'tags-container';
@@ -312,11 +309,9 @@ export class InlineEditManager {
      */
     renderTagBadges(container, tagIds) {
         const availableItems = this.getAvailableItems();
-        const allItemsMap = new Map(
-            availableItems.map(item => [String(item.id), item.name])
-        );
+        const allItemsMap = new Map(availableItems.map((item) => [String(item.id), item.name]));
 
-        tagIds.forEach(id => {
+        tagIds.forEach((id) => {
             const badge = document.createElement('span');
             badge.className = 'tag-badge';
             badge.textContent = htmlUtils.decode(allItemsMap.get(id) || 'Unknown');
@@ -350,9 +345,9 @@ export class InlineEditManager {
         const saveBtn = document.getElementById('modal-save-tags');
         const cancelBtn = document.getElementById('modal-cancel-tags');
         const closeBtn = modal.querySelector('.close-btn');
-        if (saveBtn)   saveBtn.onclick   = () => this.saveTagsFromModal();
+        if (saveBtn) saveBtn.onclick = () => this.saveTagsFromModal();
         if (cancelBtn) cancelBtn.onclick = () => this.closeTagsModal();
-        if (closeBtn)  closeBtn.onclick  = () => this.closeTagsModal();
+        if (closeBtn) closeBtn.onclick = () => this.closeTagsModal();
 
         modalBody.innerHTML = '';
 
@@ -362,13 +357,14 @@ export class InlineEditManager {
         const availableItems = this.getAvailableItems();
 
         if (availableItems.length === 0) {
-            modalBody.textContent = 'List of available items not found. Please check JSP variables.';
+            modalBody.textContent =
+                'List of available items not found. Please check JSP variables.';
             modal.style.display = 'block';
             return;
         }
 
         // Create checkboxes
-        availableItems.forEach(item => {
+        availableItems.forEach((item) => {
             const label = this.createTagCheckbox(item, currentTagIds);
             modalBody.appendChild(label);
         });
@@ -411,7 +407,7 @@ export class InlineEditManager {
         clearButton.textContent = `Clear ${entityUtils.getItemTypeName(this.config.entityType)}`;
         clearButton.className = 'clear-tags-button';
         clearButton.onclick = () => {
-            modalBody.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            modalBody.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
                 cb.checked = false;
             });
         };
@@ -426,7 +422,7 @@ export class InlineEditManager {
 
         const modal = document.getElementById('tags-edit-modal');
         const selectedCheckboxes = modal.querySelectorAll('input[type="checkbox"]:checked');
-        const newTagIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+        const newTagIds = Array.from(selectedCheckboxes).map((cb) => cb.value);
 
         this.currentEditRow.dataset.originalTagIds = newTagIds.join(',');
         this.updateTagsInRow(this.currentEditRow, true);
@@ -442,7 +438,6 @@ export class InlineEditManager {
         if (modal) {
             modal.style.display = 'none';
         }
-
     }
 
     /**
@@ -467,89 +462,92 @@ export class InlineEditManager {
      * Saves a single row using REST API.
      * @param {HTMLElement} row - Table row.
      */
-async saveRow(row) {
-    const csrfToken = securityUtils.getCsrfToken();
-    if (!csrfToken) {
-        alert("Security token missing. Please refresh the page.");
-        return;
-    }
-
-    const nameInput = row.children[this.config.columns.name.index]?.querySelector("input");
-    const scoreInput = row.children[this.config.columns.score.index]?.querySelector("input.edit-score-input");
-    const coverUrlInput = row.querySelector(".edit-cover-url-input");
-    const oldName = row.dataset.originalName;
-
-    if (!nameInput || !scoreInput || oldName === undefined) {
-        return;
-    }
-
-    const newName = nameInput.value.trim();
-    const newScore = scoreInput.value.trim();
-    const newCoverUrl = coverUrlInput ? coverUrlInput.value.trim() : (row.dataset.originalCoverUrl || '');
-    const newTagIds = (row.dataset.originalTagIds || '').split(',').filter(Boolean);
-
-    // Validate score
-    if (!this.config.validateScore(newScore)) {
-        scoreInput.focus();
-        return;
-    }
-
-    const hasChanges = this.detectChanges(row, newName, newScore, newTagIds, newCoverUrl);
-
-    if (!hasChanges) {
-        this.switchToViewRow(row);
-        return;
-    }
-
-         try {
-             const itemsKey = this.config.entityType === 'games' ? 'tagIds' : 'genreIds';
-
-             // Build request body for REST API
-             const requestBody = {
-                 name: newName,
-                 score: parseInt(newScore, 10),
-                 coverUrl: newCoverUrl || null,
-                 [itemsKey]: newTagIds.map(id => parseInt(id, 10))
-             };
-
-        // Send PUT request to /api/{entityType}/{oldName}
-        const response = await fetch(`/api/${this.config.entityType}/${encodeURIComponent(oldName)}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "X-XSRF-TOKEN": csrfToken
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        if (!response.ok) {
-            const errorMessage = await ErrorHandler.parseErrorResponse(response);
-            throw new Error(errorMessage);
+    async saveRow(row) {
+        const csrfToken = securityUtils.getCsrfToken();
+        if (!csrfToken) {
+            alert('Security token missing. Please refresh the page.');
+            return;
         }
 
-        // Success - update row data and switch back to view mode
-        this.updateRowData(row, newName, newScore, newTagIds, newCoverUrl);
+        const nameInput = row.children[this.config.columns.name.index]?.querySelector('input');
+        const scoreInput =
+            row.children[this.config.columns.score.index]?.querySelector('input.edit-score-input');
+        const coverUrlInput = row.querySelector('.edit-cover-url-input');
+        const oldName = row.dataset.originalName;
 
-        // Sync with cards view
-        if (typeof window.syncItemUpdate === 'function') {
-            window.syncItemUpdate(oldName, {
+        if (!nameInput || !scoreInput || oldName === undefined) {
+            return;
+        }
+
+        const newName = nameInput.value.trim();
+        const newScore = scoreInput.value.trim();
+        const newCoverUrl = coverUrlInput
+            ? coverUrlInput.value.trim()
+            : row.dataset.originalCoverUrl || '';
+        const newTagIds = (row.dataset.originalTagIds || '').split(',').filter(Boolean);
+
+        // Validate score
+        if (!this.config.validateScore(newScore)) {
+            scoreInput.focus();
+            return;
+        }
+
+        const hasChanges = this.detectChanges(row, newName, newScore, newTagIds, newCoverUrl);
+
+        if (!hasChanges) {
+            this.switchToViewRow(row);
+            return;
+        }
+
+        try {
+            const itemsKey = this.config.entityType === 'games' ? 'tagIds' : 'genreIds';
+
+            // Build request body for REST API
+            const requestBody = {
                 name: newName,
                 score: parseInt(newScore, 10),
-                coverUrl: newCoverUrl,
-                tagIds: newTagIds.map(id => parseInt(id, 10))
-            });
+                coverUrl: newCoverUrl || null,
+                [itemsKey]: newTagIds.map((id) => parseInt(id, 10)),
+            };
+
+            // Send PUT request to /api/{entityType}/{oldName}
+            const response = await fetch(
+                `/api/${this.config.entityType}/${encodeURIComponent(oldName)}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-XSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify(requestBody),
+                }
+            );
+
+            if (!response.ok) {
+                const errorMessage = await ErrorHandler.parseErrorResponse(response);
+                throw new Error(errorMessage);
+            }
+
+            // Success - update row data and switch back to view mode
+            this.updateRowData(row, newName, newScore, newTagIds, newCoverUrl);
+
+            // Sync with cards view
+            if (typeof window.syncItemUpdate === 'function') {
+                window.syncItemUpdate(oldName, {
+                    name: newName,
+                    score: parseInt(newScore, 10),
+                    coverUrl: newCoverUrl,
+                    tagIds: newTagIds.map((id) => parseInt(id, 10)),
+                });
+            }
+
+            this.switchToViewRow(row);
+        } catch (error) {
+            console.error('Failed to save row:', error);
+            alert(`Error saving: ${error.message}`);
+            row.classList.add('save-error');
         }
-
-        this.switchToViewRow(row);
-
-    } catch (error) {
-        console.error("Failed to save row:", error);
-        alert(`Error saving: ${error.message}`);
-        row.classList.add('save-error');
     }
-}
-
-
 
     /**
      * Updates row data after successful save.

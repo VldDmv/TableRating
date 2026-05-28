@@ -3,9 +3,7 @@ package org.criticizer.dto.admin;
 import org.criticizer.entity.Role;
 import org.criticizer.entity.User;
 
-/**
- * Response DTO for a user in the admin panel.
- */
+/** Response DTO for a user in the admin panel. */
 public class UserAdminResponse {
 
     private final int id;
@@ -22,15 +20,22 @@ public class UserAdminResponse {
 
     public static UserAdminResponse from(User user) {
         return new UserAdminResponse(
-                user.getId(),
-                user.getName(),
-                user.getRole(),
-                user.isProfileIsPublic()
-        );
+                user.getId(), user.getName(), user.getRole(), user.isProfileIsPublic());
     }
 
-    public int getId() { return id; }
-    public String getName() { return name; }
-    public Role getRole() { return role; }
-    public boolean isProfileIsPublic() { return profileIsPublic; }
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public boolean isProfileIsPublic() {
+        return profileIsPublic;
+    }
 }

@@ -1,5 +1,13 @@
 package org.criticizer.service.genre;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.criticizer.dto.genre.CreateGenreRequest;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.dto.genre.UpdateGenreRequest;
@@ -18,39 +26,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-/**
- * Comprehensive unit tests for GenreService.
- */
+/** Comprehensive unit tests for GenreService. */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("GenreService Tests")
 class GenreServiceTest {
 
-    @Mock
-    private GenreRepository genreRepository;
+    @Mock private GenreRepository genreRepository;
 
-    @Mock
-    private GenreApplicabilityRepository applicabilityRepository;
+    @Mock private GenreApplicabilityRepository applicabilityRepository;
 
-    @Mock
-    private MovieRepository movieRepository;
+    @Mock private MovieRepository movieRepository;
 
-    @Mock
-    private BookRepository bookRepository;
+    @Mock private BookRepository bookRepository;
 
-    @Mock
-    private ShowRepository showRepository;
+    @Mock private ShowRepository showRepository;
 
-    @InjectMocks
-    private GenreService genreService;
+    @InjectMocks private GenreService genreService;
 
     private Genre testGenre;
 
@@ -72,13 +63,14 @@ class GenreServiceTest {
             Genre genre1 = new Genre(1, "Action");
             Genre genre2 = new Genre(2, "Drama");
 
-            when(genreRepository.findAllByOrderByNameAsc()).thenReturn(Arrays.asList(genre1, genre2));
+            when(genreRepository.findAllByOrderByNameAsc())
+                    .thenReturn(Arrays.asList(genre1, genre2));
 
-            List<Object[]> batchData = Arrays.asList(
-                    new Object[]{1, "movie"},
-                    new Object[]{1, "show"},
-                    new Object[]{2, "book"}
-            );
+            List<Object[]> batchData =
+                    Arrays.asList(
+                            new Object[] {1, "movie"},
+                            new Object[] {1, "show"},
+                            new Object[] {2, "book"});
             when(applicabilityRepository.findMediaTypesByGenreIds(anyList())).thenReturn(batchData);
 
             // When
@@ -86,7 +78,12 @@ class GenreServiceTest {
 
             // Then
             assertThat(result).hasSize(2);
-            assertThat(result.stream().filter(r -> r.getId() == 1).findFirst().get().getMediaTypes())
+            assertThat(
+                            result.stream()
+                                    .filter(r -> r.getId() == 1)
+                                    .findFirst()
+                                    .get()
+                                    .getMediaTypes())
                     .containsExactlyInAnyOrder("movie", "show");
         }
 
@@ -116,9 +113,8 @@ class GenreServiceTest {
             // Given
             when(genreRepository.findAvailableGenresFor("movie")).thenReturn(List.of(testGenre));
 
-
             when(applicabilityRepository.findMediaTypesByGenreIds(anyList()))
-                    .thenReturn(List.of(new Object[]{1, "movie"}, new Object[]{1, "shared"}));
+                    .thenReturn(List.of(new Object[] {1, "movie"}, new Object[] {1, "shared"}));
 
             // When
             List<GenreResponse> result = genreService.getAvailableGenresFor("movie");
@@ -145,17 +141,20 @@ class GenreServiceTest {
             when(genreRepository.findAvailableGenresFor(anyString()))
                     .thenReturn(List.of(testGenre));
             when(applicabilityRepository.findMediaTypesByGenreIds(any()))
-                    .thenReturn(Collections.singletonList(new Object[]{1, "movie"}));
+                    .thenReturn(Collections.singletonList(new Object[] {1, "movie"}));
 
             // When & Then
-            assertThatCode(() -> {
-                genreService.getAvailableGenresFor("movie");
-                genreService.getAvailableGenresFor("book");
-                genreService.getAvailableGenresFor("show");
-                genreService.getAvailableGenresFor("shared");
-            }).doesNotThrowAnyException();
+            assertThatCode(
+                            () -> {
+                                genreService.getAvailableGenresFor("movie");
+                                genreService.getAvailableGenresFor("book");
+                                genreService.getAvailableGenresFor("show");
+                                genreService.getAvailableGenresFor("shared");
+                            })
+                    .doesNotThrowAnyException();
         }
     }
+
     // ==================== CREATE GENRE TESTS ====================
 
     @Nested
@@ -166,7 +165,8 @@ class GenreServiceTest {
         @DisplayName("Should successfully create genre with media types")
         void shouldCreateGenre() {
             // Given
-            CreateGenreRequest request = new CreateGenreRequest("Sci-Fi", Arrays.asList("movie", "book"));
+            CreateGenreRequest request =
+                    new CreateGenreRequest("Sci-Fi", Arrays.asList("movie", "book"));
             Genre savedGenre = new Genre(1, "Sci-Fi");
 
             when(genreRepository.existsByNameIgnoreCase("Sci-Fi")).thenReturn(false);
@@ -185,6 +185,7 @@ class GenreServiceTest {
             verify(applicabilityRepository).insertApplicability(1, "movie");
             verify(applicabilityRepository).insertApplicability(1, "book");
         }
+
         @Test
         @DisplayName("Should default to 'shared' when no media types provided")
         void shouldDefaultToShared() {
@@ -194,8 +195,7 @@ class GenreServiceTest {
 
             when(genreRepository.existsByNameIgnoreCase("Comedy")).thenReturn(false);
             when(genreRepository.save(any(Genre.class))).thenReturn(savedGenre);
-            when(applicabilityRepository.findMediaTypesByGenreId(1))
-                    .thenReturn(List.of("shared"));
+            when(applicabilityRepository.findMediaTypesByGenreId(1)).thenReturn(List.of("shared"));
 
             // When
             GenreResponse result = genreService.createGenre(request);
@@ -237,10 +237,8 @@ class GenreServiceTest {
         @DisplayName("Should throw for invalid media type")
         void shouldThrowForInvalidMediaType() {
             // Given
-            CreateGenreRequest request = new CreateGenreRequest(
-                    "Horror",
-                    Arrays.asList("movie", "invalid")
-            );
+            CreateGenreRequest request =
+                    new CreateGenreRequest("Horror", Arrays.asList("movie", "invalid"));
 
             // When & Then
             assertThatThrownBy(() -> genreService.createGenre(request))
@@ -252,10 +250,9 @@ class GenreServiceTest {
         @DisplayName("Should trim and deduplicate media types")
         void shouldTrimAndDeduplicateMediaTypes() {
             // Given
-            CreateGenreRequest request = new CreateGenreRequest(
-                    "Thriller",
-                    Arrays.asList("MOVIE", "movie", "Movie", "book")
-            );
+            CreateGenreRequest request =
+                    new CreateGenreRequest(
+                            "Thriller", Arrays.asList("MOVIE", "movie", "Movie", "book"));
 
             Genre savedGenre = new Genre(1, "Thriller");
 
@@ -286,14 +283,11 @@ class GenreServiceTest {
         void shouldUpdateGenre() {
             // Given
             List<String> newMediaTypes = Arrays.asList("movie", "show", "book");
-            UpdateGenreRequest request = new UpdateGenreRequest(
-                    1,
-                    "Updated Action",
-                    newMediaTypes
-            );
+            UpdateGenreRequest request = new UpdateGenreRequest(1, "Updated Action", newMediaTypes);
 
             when(genreRepository.findById(1)).thenReturn(Optional.of(testGenre));
-            when(genreRepository.findByNameIgnoreCase("Updated Action")).thenReturn(Optional.empty());
+            when(genreRepository.findByNameIgnoreCase("Updated Action"))
+                    .thenReturn(Optional.empty());
             when(genreRepository.save(any(Genre.class))).thenReturn(new Genre(1, "Updated Action"));
 
             // Stubbing for the final response assembly
@@ -306,9 +300,8 @@ class GenreServiceTest {
             assertThat(result.getName()).isEqualTo("Updated Action");
             assertThat(result.getMediaTypes()).containsExactlyInAnyOrder("movie", "show", "book");
 
-            verify(genreRepository).save(argThat(genre ->
-                    genre.getName().equals("Updated Action")
-            ));
+            verify(genreRepository)
+                    .save(argThat(genre -> genre.getName().equals("Updated Action")));
 
             verify(applicabilityRepository).deleteByGenreId(1);
             // Verifying that each new type was inserted
@@ -355,25 +348,22 @@ class GenreServiceTest {
 
             when(genreRepository.findById(1)).thenReturn(Optional.of(testGenre));
             when(genreRepository.findByNameIgnoreCase("ACTION"))
-                    .thenReturn(Optional.of(testGenre));  // Same ID
+                    .thenReturn(Optional.of(testGenre)); // Same ID
             when(genreRepository.save(any(Genre.class))).thenReturn(testGenre);
-            when(applicabilityRepository.findMediaTypesByGenreId(1))
-                    .thenReturn(List.of("movie"));
+            when(applicabilityRepository.findMediaTypesByGenreId(1)).thenReturn(List.of("movie"));
 
             // When & Then
-            assertThatCode(() -> genreService.updateGenre(request))
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> genreService.updateGenre(request)).doesNotThrowAnyException();
         }
 
         @Test
         @DisplayName("Should cascade remove genre from items when media type removed during update")
         void shouldCascadeRemoveFromItems() {
             // Given
-            UpdateGenreRequest request = new UpdateGenreRequest(
-                    1,
-                    "Action",
-                    List.of("movie") // "book" and "show" are being removed
-            );
+            UpdateGenreRequest request =
+                    new UpdateGenreRequest(
+                            1, "Action", List.of("movie") // "book" and "show" are being removed
+                            );
 
             when(genreRepository.findById(1)).thenReturn(Optional.of(testGenre));
             when(genreRepository.findByNameIgnoreCase("Action")).thenReturn(Optional.empty());
@@ -394,7 +384,7 @@ class GenreServiceTest {
             // verify that 'movie' was kept
             verify(movieRepository, never()).removeGenreFromAll(1);
         }
-        }
+    }
 
     // ==================== DELETE GENRE TESTS ====================
 
@@ -493,8 +483,7 @@ class GenreServiceTest {
         @DisplayName("Should return genres for movie")
         void shouldReturnGenresForMovie() {
             // Given
-            when(genreRepository.findByMovieId(1))
-                    .thenReturn(Arrays.asList(testGenre));
+            when(genreRepository.findByMovieId(1)).thenReturn(Arrays.asList(testGenre));
 
             // When
             List<GenreResponse> result = genreService.getGenresForMovie(1);
@@ -508,8 +497,7 @@ class GenreServiceTest {
         @DisplayName("Should return genres for book")
         void shouldReturnGenresForBook() {
             // Given
-            when(genreRepository.findByBookId(1))
-                    .thenReturn(Arrays.asList(testGenre));
+            when(genreRepository.findByBookId(1)).thenReturn(Arrays.asList(testGenre));
 
             // When
             List<GenreResponse> result = genreService.getGenresForBook(1);
@@ -523,8 +511,7 @@ class GenreServiceTest {
         @DisplayName("Should return genres for show")
         void shouldReturnGenresForShow() {
             // Given
-            when(genreRepository.findByShowId(1))
-                    .thenReturn(Arrays.asList(testGenre));
+            when(genreRepository.findByShowId(1)).thenReturn(Arrays.asList(testGenre));
 
             // When
             List<GenreResponse> result = genreService.getGenresForShow(1);

@@ -1,6 +1,5 @@
 import { jest } from '@jest/globals';
 
-
 const { AdminUsersManager } = await import('@/pages/admin/adminUsers.js');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -35,11 +34,11 @@ function addCards(cards) {
     const container = document.getElementById('usersCards');
     cards.forEach(({ userId = '1', username, role, visible = true }) => {
         const card = document.createElement('div');
-        card.className        = 'user-card';
-        card.dataset.userId   = userId;
+        card.className = 'user-card';
+        card.dataset.userId = userId;
         card.dataset.username = username;
-        card.dataset.role     = role;
-        card.style.display    = visible ? '' : 'none';
+        card.dataset.role = role;
+        card.style.display = visible ? '' : 'none';
         container.appendChild(card);
     });
 }
@@ -48,7 +47,7 @@ function addTableRows(rows) {
     const tbody = document.querySelector('#usersTable tbody');
     rows.forEach(({ username }) => {
         const tr = document.createElement('tr');
-        ['', username, '', ''].forEach(text => {
+        ['', username, '', ''].forEach((text) => {
             const td = document.createElement('td');
             td.textContent = text;
             tr.appendChild(td);
@@ -59,7 +58,8 @@ function addTableRows(rows) {
 
 function makeManager() {
     global.fetch = jest.fn().mockResolvedValue({
-        ok: true, json: async () => ({ users: [], totalPages: 1 })
+        ok: true,
+        json: async () => ({ users: [], totalPages: 1 }),
     });
     return new AdminUsersManager();
 }
@@ -75,7 +75,10 @@ afterEach(() => {
 describe('AdminUsersManager._applyView', () => {
     let manager;
 
-    beforeEach(() => { setupDOM(); manager = makeManager(); });
+    beforeEach(() => {
+        setupDOM();
+        manager = makeManager();
+    });
 
     test('cards: usersCards=grid, usersTable=none', () => {
         manager._applyView('cards');
@@ -118,16 +121,17 @@ describe('AdminUsersManager.performSearch', () => {
         setupDOM();
         manager = makeManager();
         addCards([
-            { username: 'alice',   role: 'USER'  },
-            { username: 'bob',     role: 'ADMIN' },
-            { username: 'charlie', role: 'USER'  }
+            { username: 'alice', role: 'USER' },
+            { username: 'bob', role: 'ADMIN' },
+            { username: 'charlie', role: 'USER' },
         ]);
     });
 
     test('empty search: all cards visible', () => {
         manager.performSearch('');
-        document.querySelectorAll('.user-card')
-            .forEach(c => expect(c.style.display).not.toBe('none'));
+        document
+            .querySelectorAll('.user-card')
+            .forEach((c) => expect(c.style.display).not.toBe('none'));
     });
 
     test('matches correct card by partial name', () => {
@@ -177,13 +181,16 @@ describe('AdminUsersManager.performSearch', () => {
 describe('AdminUsersManager.updateAdminCount', () => {
     let manager;
 
-    beforeEach(() => { setupDOM(); manager = makeManager(); });
+    beforeEach(() => {
+        setupDOM();
+        manager = makeManager();
+    });
 
     test('counts ADMIN cards correctly', () => {
         addCards([
-            { username: 'a', role: 'USER'  },
+            { username: 'a', role: 'USER' },
             { username: 'b', role: 'ADMIN' },
-            { username: 'c', role: 'ADMIN' }
+            { username: 'c', role: 'ADMIN' },
         ]);
         manager.updateAdminCount();
         expect(document.getElementById('adminCount').textContent).toBe('2');
@@ -191,9 +198,9 @@ describe('AdminUsersManager.updateAdminCount', () => {
 
     test('counts total visible users', () => {
         addCards([
-            { username: 'a', role: 'USER'  },
-            { username: 'b', role: 'USER'  },
-            { username: 'c', role: 'ADMIN' }
+            { username: 'a', role: 'USER' },
+            { username: 'b', role: 'USER' },
+            { username: 'c', role: 'ADMIN' },
         ]);
         manager.updateAdminCount();
         expect(document.getElementById('totalUsersCount').textContent).toBe('3');
@@ -201,8 +208,8 @@ describe('AdminUsersManager.updateAdminCount', () => {
 
     test('hidden cards are excluded from the visible count', () => {
         addCards([
-            { username: 'a', role: 'USER',  visible: true  },
-            { username: 'b', role: 'ADMIN', visible: false }
+            { username: 'a', role: 'USER', visible: true },
+            { username: 'b', role: 'ADMIN', visible: false },
         ]);
         manager.updateAdminCount();
         expect(document.getElementById('adminCount').textContent).toBe('0');
@@ -214,7 +221,7 @@ describe('AdminUsersManager.updateAdminCount', () => {
     test('falls back to all cards when none are visible', () => {
         addCards([
             { username: 'a', role: 'ADMIN', visible: false },
-            { username: 'b', role: 'ADMIN', visible: false }
+            { username: 'b', role: 'ADMIN', visible: false },
         ]);
         manager.updateAdminCount();
         expect(document.getElementById('adminCount').textContent).toBe('2');
@@ -232,7 +239,10 @@ describe('AdminUsersManager.updateAdminCount', () => {
 describe('AdminUsersManager modal helpers', () => {
     let manager;
 
-    beforeEach(() => { setupDOM(); manager = makeManager(); });
+    beforeEach(() => {
+        setupDOM();
+        manager = makeManager();
+    });
 
     test('closeEditModal removes show class and hides modal', () => {
         const modal = document.getElementById('editModal');
@@ -262,7 +272,7 @@ describe('AdminUsersManager.editUser', () => {
         setupDOM();
         addCards([
             { userId: '1', username: 'alice', role: 'ADMIN' },
-            { userId: '2', username: 'bob',   role: 'USER'  }
+            { userId: '2', username: 'bob', role: 'USER' },
         ]);
         manager = makeManager();
     });
@@ -299,7 +309,10 @@ describe('AdminUsersManager.editUser', () => {
 describe('AdminUsersManager.deleteUser', () => {
     let manager;
 
-    beforeEach(() => { setupDOM(); manager = makeManager(); });
+    beforeEach(() => {
+        setupDOM();
+        manager = makeManager();
+    });
 
     test('populates delete form with userId and username', () => {
         manager.deleteUser('5', 'charlie');
@@ -318,21 +331,23 @@ describe('AdminUsersManager.deleteUser', () => {
 describe('AdminUsersManager.generateAvatarColors', () => {
     let manager;
 
-    beforeEach(() => { setupDOM(); manager = makeManager(); });
+    beforeEach(() => {
+        setupDOM();
+        manager = makeManager();
+    });
 
-  test('assigns a non-empty background to each .user-card-avatar element', () => {
-          document.body.innerHTML += `
+    test('assigns a non-empty background to each .user-card-avatar element', () => {
+        document.body.innerHTML += `
               <div class="user-card-avatar" data-username="alice"></div>
               <div class="user-card-avatar" data-username="bob"></div>
           `;
-          manager.generateAvatarColors();
+        manager.generateAvatarColors();
 
-          document.querySelectorAll('.user-card-avatar').forEach(avatar => {
-
-              const styleValue = avatar.getAttribute('style') || avatar.style.cssText;
-              expect(styleValue).toBeDefined();
-          });
-      });
+        document.querySelectorAll('.user-card-avatar').forEach((avatar) => {
+            const styleValue = avatar.getAttribute('style') || avatar.style.cssText;
+            expect(styleValue).toBeDefined();
+        });
+    });
 
     test('does not throw when no avatar elements are present', () => {
         expect(() => manager.generateAvatarColors()).not.toThrow();

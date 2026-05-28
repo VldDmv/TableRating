@@ -14,7 +14,6 @@ export class ColumnManager {
         this.tableElement = document.querySelector(`table[data-entity-type="${this.entityType}"]`);
         this.containerElement = document.getElementById('column-toggle-container');
 
-
         this.initStateStorage();
     }
 
@@ -61,7 +60,7 @@ export class ColumnManager {
         if (!this.containerElement) return;
 
         const hiddenKeys = [];
-        this.containerElement.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        this.containerElement.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
             if (!checkbox.checked) {
                 hiddenKeys.push(checkbox.dataset.columnKey);
             }
@@ -78,7 +77,8 @@ export class ColumnManager {
         if (!this.containerElement) return;
 
         const hiddenColumns = this.getHiddenColumns();
-        this.containerElement.innerHTML = '<span class="column-controls-title">Show Columns:</span>';
+        this.containerElement.innerHTML =
+            '<span class="column-controls-title">Show Columns:</span>';
 
         for (const key in this.columnsConfig) {
             const column = this.columnsConfig[key];
@@ -116,7 +116,7 @@ export class ColumnManager {
      */
     init() {
         if (!this.tableElement || !this.containerElement || !this.columnsConfig) {
-            console.warn("Column manager init failed: required elements or config not found.");
+            console.warn('Column manager init failed: required elements or config not found.');
             return;
         }
 

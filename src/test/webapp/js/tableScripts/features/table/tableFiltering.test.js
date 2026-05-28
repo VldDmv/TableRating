@@ -1,4 +1,3 @@
-
 import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals';
 import { FilterManager } from '@/tableScripts/features/table/tableFiltering.js';
 
@@ -13,10 +12,10 @@ describe('FilterManager', () => {
             { value: 'all', text: 'All' },
             { value: '1', text: 'Action' },
             { value: '2', text: 'RPG' },
-            { value: '3', text: 'Strategy' }
+            { value: '3', text: 'Strategy' },
         ];
 
-        options.forEach(opt => {
+        options.forEach((opt) => {
             const option = document.createElement('option');
             option.value = opt.value;
             option.textContent = opt.text;

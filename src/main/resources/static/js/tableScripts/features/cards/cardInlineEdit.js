@@ -125,7 +125,6 @@ export class CardInlineEditManager {
         if (cancelBtn) {
             cancelBtn.addEventListener('click', () => this.switchToViewMode(card));
         }
-
     }
 
     /**
@@ -139,13 +138,13 @@ export class CardInlineEditManager {
         }
 
         const availableItems = this.getAvailableItems();
-        const selectedItems = availableItems.filter(item =>
+        const selectedItems = availableItems.filter((item) =>
             originalTagIds.includes(String(item.id))
         );
 
-        return selectedItems.map(item =>
-            `<span class="tag-badge">${htmlUtils.escape(item.name)}</span>`
-        ).join(' ');
+        return selectedItems
+            .map((item) => `<span class="tag-badge">${htmlUtils.escape(item.name)}</span>`)
+            .join(' ');
     }
 
     /**
@@ -164,19 +163,23 @@ export class CardInlineEditManager {
 
         // Get tags for display
         const availableItems = this.getAvailableItems();
-        const selectedItems = availableItems.filter(item =>
+        const selectedItems = availableItems.filter((item) =>
             originalTagIds.includes(String(item.id))
         );
 
-        const tagsHtml = selectedItems.length > 0
-            ? selectedItems.map(item =>
-                `<span class="tag-badge" data-tag-id="${item.id}">${htmlUtils.escape(item.name)}</span>`
-              ).join(' ')
-            : '<span class="card-no-tags">No tags</span>';
+        const tagsHtml =
+            selectedItems.length > 0
+                ? selectedItems
+                      .map(
+                          (item) =>
+                              `<span class="tag-badge" data-tag-id="${item.id}">${htmlUtils.escape(item.name)}</span>`
+                      )
+                      .join(' ')
+                : '<span class="card-no-tags">No tags</span>';
 
         // Get completed status from card dataset (or assume false)
         const completed = card.dataset.completed === 'true';
-        const completedIcon = completed ? (ICONS.COMPLETED || '✓') : (ICONS.NOT_COMPLETED || '✗');
+        const completedIcon = completed ? ICONS.COMPLETED || '✓' : ICONS.NOT_COMPLETED || '✗';
 
         // Restore view mode content
         cardContent.innerHTML = `
@@ -190,7 +193,10 @@ export class CardInlineEditManager {
                 ${tagsHtml}
             </div>
 
-            ${this.config.hideActions ? '' : `
+            ${
+                this.config.hideActions
+                    ? ''
+                    : `
             <div class="card-status">
                 <button class="status-button" data-item-name="${htmlUtils.escape(originalName)}">
                     ${completedIcon}
@@ -211,7 +217,8 @@ export class CardInlineEditManager {
                     ${ICONS.DELETE || '🗑️'} Delete
                 </button>
             </div>
-            `}
+            `
+            }
         `;
 
         // Update cover if changed
@@ -241,7 +248,6 @@ export class CardInlineEditManager {
         if (this.currentEditCard === card) {
             this.currentEditCard = null;
         }
-
     }
 
     /**
@@ -286,7 +292,7 @@ export class CardInlineEditManager {
             name: newName,
             score: newScore,
             coverUrl: newCoverUrl,
-            [`${this.config.entityType === 'games' ? 'tagIds' : 'genreIds'}`]: newTagIds
+            [`${this.config.entityType === 'games' ? 'tagIds' : 'genreIds'}`]: newTagIds,
         };
 
         try {
@@ -297,9 +303,9 @@ export class CardInlineEditManager {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-XSRF-TOKEN': csrfToken
+                        'X-XSRF-TOKEN': csrfToken,
                     },
-                    body: JSON.stringify(updateData)
+                    body: JSON.stringify(updateData),
                 }
             );
 
@@ -315,20 +321,17 @@ export class CardInlineEditManager {
             card.dataset.originalTagIds = newTagIds.join(',');
             card.dataset.initialTagIds = newTagIds.join(',');
 
-
             //  Sync to OTHER view (table)
             if (typeof window.syncItemUpdate === 'function') {
                 window.syncItemUpdate(originalName, {
                     name: newName,
                     score: newScore,
                     coverUrl: newCoverUrl,
-                    tagIds: newTagIds
+                    tagIds: newTagIds,
                 });
             }
 
-
             this.switchToViewMode(card);
-
         } catch (error) {
             ErrorHandler.handle(error, 'Error saving changes');
         }
@@ -347,9 +350,9 @@ export class CardInlineEditManager {
         const saveBtn = document.getElementById('modal-save-tags');
         const cancelBtn = document.getElementById('modal-cancel-tags');
         const closeBtn = modal.querySelector('.close-btn');
-        if (saveBtn)   saveBtn.onclick   = () => this.saveTagsFromModal();
+        if (saveBtn) saveBtn.onclick = () => this.saveTagsFromModal();
         if (cancelBtn) cancelBtn.onclick = () => this.closeTagsModal();
-        if (closeBtn)  closeBtn.onclick  = () => this.closeTagsModal();
+        if (closeBtn) closeBtn.onclick = () => this.closeTagsModal();
 
         const modalBody = modal.querySelector('.modal-body');
         const modalCategoryName = document.getElementById('modal-category-name');
@@ -362,9 +365,10 @@ export class CardInlineEditManager {
             const currentTagIds = (card.dataset.originalTagIds || '').split(',').filter(Boolean);
             const availableItems = this.getAvailableItems();
 
-            modalBody.innerHTML = availableItems.map(item => {
-                const isChecked = currentTagIds.includes(String(item.id));
-                return `
+            modalBody.innerHTML = availableItems
+                .map((item) => {
+                    const isChecked = currentTagIds.includes(String(item.id));
+                    return `
                     <label class="modal-tag-label">
                         <input type="checkbox"
                                value="${item.id}"
@@ -372,13 +376,13 @@ export class CardInlineEditManager {
                         ${htmlUtils.escape(item.name)}
                     </label>
                 `;
-            }).join('');
+                })
+                .join('');
         }
 
         // Store reference to card for saving later
         this.currentModalCard = card;
         modal.style.display = 'block';
-
     }
 
     /**
@@ -389,7 +393,7 @@ export class CardInlineEditManager {
 
         const modal = document.getElementById('tags-edit-modal');
         const checkboxes = modal.querySelectorAll('input[type="checkbox"]:checked');
-        const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+        const selectedIds = Array.from(checkboxes).map((cb) => cb.value);
 
         // Update card dataset
         this.currentModalCard.dataset.originalTagIds = selectedIds.join(',');

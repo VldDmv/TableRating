@@ -6,10 +6,14 @@ const { UsersPageManager, getAvatarColor } = await import('@/pages/usersPage.js'
 
 function makeUser(overrides = {}) {
     return {
-        name: 'alice', totalItems: 42,
-        gamesCount: 10, moviesCount: 15, booksCount: 7, showsCount: 10,
+        name: 'alice',
+        totalItems: 42,
+        gamesCount: 10,
+        moviesCount: 15,
+        booksCount: 7,
+        showsCount: 10,
         createdAt: '2023-06-15T00:00:00Z',
-        ...overrides
+        ...overrides,
     };
 }
 
@@ -35,7 +39,7 @@ function setupDOM() {
 function makeManager() {
     global.fetch = jest.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({ items: [], totalPages: 1, totalItems: 0 })
+        json: async () => ({ items: [], totalPages: 1, totalItems: 0 }),
     });
     return new UsersPageManager();
 }
@@ -50,7 +54,10 @@ afterEach(() => {
 
 describe('formatDate', () => {
     let manager;
-    beforeEach(() => { setupDOM(); manager = makeManager(); });
+    beforeEach(() => {
+        setupDOM();
+        manager = makeManager();
+    });
 
     test('returns "Unknown" for null', () => {
         expect(manager._formatDate(null)).toBe('Unknown');
@@ -91,7 +98,10 @@ describe('getAvatarColor', () => {
 
 describe('createUserCard', () => {
     let manager;
-    beforeEach(() => { setupDOM(); manager = makeManager(); });
+    beforeEach(() => {
+        setupDOM();
+        manager = makeManager();
+    });
 
     function parse(user) {
         const div = document.createElement('div');
@@ -108,18 +118,23 @@ describe('createUserCard', () => {
     });
 
     test('avatar shows first letter of name in uppercase', () => {
-        expect(parse(makeUser({ name: 'charlie' })).querySelector('.user-avatar')
-            .textContent.trim()).toBe('C');
+        expect(
+            parse(makeUser({ name: 'charlie' }))
+                .querySelector('.user-avatar')
+                .textContent.trim()
+        ).toBe('C');
     });
 
     test('totalItems badge shows correct count', () => {
-        expect(parse(makeUser({ totalItems: 99 }))
-            .querySelector('.total-items-badge').textContent).toContain('99');
+        expect(
+            parse(makeUser({ totalItems: 99 })).querySelector('.total-items-badge').textContent
+        ).toContain('99');
     });
 
     test('user name appears in .user-name', () => {
-        expect(parse(makeUser({ name: 'diana' })).querySelector('.user-name').textContent)
-            .toBe('diana');
+        expect(parse(makeUser({ name: 'diana' })).querySelector('.user-name').textContent).toBe(
+            'diana'
+        );
     });
 
     test('renders 4 stat boxes', () => {
@@ -128,36 +143,42 @@ describe('createUserCard', () => {
 
     test('stat values are in order: Games, Movies, Books, Shows', () => {
         const values = Array.from(
-            parse(makeUser({ gamesCount: 5, moviesCount: 8, booksCount: 3, showsCount: 12 }))
-                .querySelectorAll('.stat-box-value')
-        ).map(el => el.textContent);
+            parse(
+                makeUser({ gamesCount: 5, moviesCount: 8, booksCount: 3, showsCount: 12 })
+            ).querySelectorAll('.stat-box-value')
+        ).map((el) => el.textContent);
         expect(values).toEqual(['5', '8', '3', '12']);
     });
 
     test('stat labels are Games, Movies, Books, Shows', () => {
-        const labels = Array.from(parse(makeUser()).querySelectorAll('.stat-box-label'))
-            .map(el => el.textContent);
+        const labels = Array.from(parse(makeUser()).querySelectorAll('.stat-box-label')).map(
+            (el) => el.textContent
+        );
         expect(labels).toEqual(['Games', 'Movies', 'Books', 'Shows']);
     });
 
     test('join date contains year', () => {
-        expect(parse(makeUser({ createdAt: '2023-06-15T00:00:00Z' }))
-            .querySelector('.user-joined').textContent).toContain('2023');
+        expect(
+            parse(makeUser({ createdAt: '2023-06-15T00:00:00Z' })).querySelector('.user-joined')
+                .textContent
+        ).toContain('2023');
     });
 
     test('shows "Unknown" when createdAt is null', () => {
-        expect(parse(makeUser({ createdAt: null }))
-            .querySelector('.user-joined').textContent).toContain('Unknown');
+        expect(
+            parse(makeUser({ createdAt: null })).querySelector('.user-joined').textContent
+        ).toContain('Unknown');
     });
 
-   test('avatar has a background color set', () => {
-       const avatar = parse(makeUser({ name: 'alice' })).querySelector('.user-avatar');
-       expect(avatar.getAttribute('style')).toContain('background');
-   });
+    test('avatar has a background color set', () => {
+        const avatar = parse(makeUser({ name: 'alice' })).querySelector('.user-avatar');
+        expect(avatar.getAttribute('style')).toContain('background');
+    });
 
     test('escapes XSS in username', () => {
-        expect(parse(makeUser({ name: '<script>xss</script>' })).innerHTML)
-            .not.toContain('<script>');
+        expect(parse(makeUser({ name: '<script>xss</script>' })).innerHTML).not.toContain(
+            '<script>'
+        );
     });
 });
 
@@ -165,7 +186,10 @@ describe('createUserCard', () => {
 
 describe('createUserListItem', () => {
     let manager;
-    beforeEach(() => { setupDOM(); manager = makeManager(); });
+    beforeEach(() => {
+        setupDOM();
+        manager = makeManager();
+    });
 
     function parse(user) {
         const div = document.createElement('div');
@@ -182,18 +206,23 @@ describe('createUserListItem', () => {
     });
 
     test('avatar shows first letter of name in uppercase', () => {
-        expect(parse(makeUser({ name: 'frank' })).querySelector('.user-avatar')
-            .textContent.trim()).toBe('F');
+        expect(
+            parse(makeUser({ name: 'frank' }))
+                .querySelector('.user-avatar')
+                .textContent.trim()
+        ).toBe('F');
     });
 
     test('.user-list-total shows correct count', () => {
-        expect(parse(makeUser({ totalItems: 77 }))
-            .querySelector('.user-list-total').textContent).toContain('77');
+        expect(
+            parse(makeUser({ totalItems: 77 })).querySelector('.user-list-total').textContent
+        ).toContain('77');
     });
 
     test('user name appears in .user-list-name', () => {
-        expect(parse(makeUser({ name: 'grace' })).querySelector('.user-list-name').textContent)
-            .toBe('grace');
+        expect(
+            parse(makeUser({ name: 'grace' })).querySelector('.user-list-name').textContent
+        ).toBe('grace');
     });
 
     test('renders 4 stat spans', () => {
@@ -201,18 +230,23 @@ describe('createUserListItem', () => {
     });
 
     test('.user-list-joined contains "Joined" prefix', () => {
-        expect(parse(makeUser({ createdAt: '2022-01-01T00:00:00Z' }))
-            .querySelector('.user-list-joined').textContent).toContain('Joined');
+        expect(
+            parse(makeUser({ createdAt: '2022-01-01T00:00:00Z' })).querySelector(
+                '.user-list-joined'
+            ).textContent
+        ).toContain('Joined');
     });
 
     test('shows "Unknown" when createdAt is null', () => {
-        expect(parse(makeUser({ createdAt: null }))
-            .querySelector('.user-list-joined').textContent).toContain('Unknown');
+        expect(
+            parse(makeUser({ createdAt: null })).querySelector('.user-list-joined').textContent
+        ).toContain('Unknown');
     });
 
     test('escapes XSS in username', () => {
-        expect(parse(makeUser({ name: '<img onerror=alert(1)>' })).innerHTML)
-            .not.toContain('<img onerror');
+        expect(parse(makeUser({ name: '<img onerror=alert(1)>' })).innerHTML).not.toContain(
+            '<img onerror'
+        );
     });
 });
 
@@ -221,7 +255,10 @@ describe('createUserListItem', () => {
 describe('UsersPageManager._applyView', () => {
     let manager;
 
-    beforeEach(() => { setupDOM(); manager = makeManager(); });
+    beforeEach(() => {
+        setupDOM();
+        manager = makeManager();
+    });
 
     test('cards: usersGrid=grid, usersList=none', () => {
         manager._applyView('cards');
@@ -260,7 +297,10 @@ describe('UsersPageManager._applyView', () => {
 describe('UsersPageManager.renderUsers', () => {
     let manager;
 
-    beforeEach(() => { setupDOM(); manager = makeManager(); });
+    beforeEach(() => {
+        setupDOM();
+        manager = makeManager();
+    });
 
     test('empty array: shows emptyState', () => {
         manager.renderUsers([]);
@@ -302,48 +342,58 @@ describe('UsersPageManager.renderUsers', () => {
 describe('UsersPageManager.updatePagination', () => {
     let manager;
 
-    beforeEach(() => { setupDOM(); manager = makeManager(); });
+    beforeEach(() => {
+        setupDOM();
+        manager = makeManager();
+    });
 
     test('prevPage disabled on page 1', () => {
-        manager.currentPage = 1; manager.totalPages = 5;
+        manager.currentPage = 1;
+        manager.totalPages = 5;
         manager.updatePagination();
         expect(document.getElementById('prevPage').disabled).toBe(true);
     });
 
     test('nextPage disabled on last page', () => {
-        manager.currentPage = 5; manager.totalPages = 5;
+        manager.currentPage = 5;
+        manager.totalPages = 5;
         manager.updatePagination();
         expect(document.getElementById('nextPage').disabled).toBe(true);
     });
 
     test('both buttons enabled on a middle page', () => {
-        manager.currentPage = 3; manager.totalPages = 5;
+        manager.currentPage = 3;
+        manager.totalPages = 5;
         manager.updatePagination();
         expect(document.getElementById('prevPage').disabled).toBe(false);
         expect(document.getElementById('nextPage').disabled).toBe(false);
     });
 
     test('dropdown shows "Page X of Y"', () => {
-        manager.currentPage = 2; manager.totalPages = 7;
+        manager.currentPage = 2;
+        manager.totalPages = 7;
         manager.updatePagination();
         expect(document.getElementById('pageDropdown').textContent).toBe('Page 2 of 7');
     });
 
     test('pageList has correct number of items', () => {
-        manager.currentPage = 1; manager.totalPages = 4;
+        manager.currentPage = 1;
+        manager.totalPages = 4;
         manager.updatePagination();
         expect(document.getElementById('pageList').querySelectorAll('li').length).toBe(4);
     });
 
     test('active page link has active-page class', () => {
-        manager.currentPage = 3; manager.totalPages = 5;
+        manager.currentPage = 3;
+        manager.totalPages = 5;
         manager.updatePagination();
         const links = document.querySelectorAll('#pageList a');
         expect(links[2].classList.contains('active-page')).toBe(true);
     });
 
     test('single page: both buttons disabled', () => {
-        manager.currentPage = 1; manager.totalPages = 1;
+        manager.currentPage = 1;
+        manager.totalPages = 1;
         manager.updatePagination();
         expect(document.getElementById('prevPage').disabled).toBe(true);
         expect(document.getElementById('nextPage').disabled).toBe(true);
@@ -353,7 +403,9 @@ describe('UsersPageManager.updatePagination', () => {
 // ─── UsersPageManager.updateStats ────────────────────────────────────────────
 
 describe('UsersPageManager.updateStats', () => {
-    beforeEach(() => { setupDOM(); });
+    beforeEach(() => {
+        setupDOM();
+    });
 
     test('sets totalUsers element to the provided count', () => {
         const manager = makeManager();
@@ -375,7 +427,10 @@ describe('UsersPageManager.updateStats', () => {
 describe('UsersPageManager.toggleSortOrder', () => {
     let manager;
 
-    beforeEach(() => { setupDOM(); manager = makeManager(); });
+    beforeEach(() => {
+        setupDOM();
+        manager = makeManager();
+    });
 
     test('toggles from asc to desc', () => {
         manager.sortOrder = 'asc';
@@ -400,11 +455,14 @@ describe('UsersPageManager.toggleSortOrder', () => {
 // ─── UsersPageManager.loadUsers fetch integration ────────────────────────────
 
 describe('UsersPageManager.loadUsers', () => {
-    beforeEach(() => { setupDOM(); });
+    beforeEach(() => {
+        setupDOM();
+    });
 
     test('calls /api/users endpoint', async () => {
         global.fetch = jest.fn().mockResolvedValue({
-            ok: true, json: async () => ({ items: [], totalPages: 1, totalItems: 0 })
+            ok: true,
+            json: async () => ({ items: [], totalPages: 1, totalItems: 0 }),
         });
         const manager = new UsersPageManager();
         await manager.loadUsers();
@@ -413,7 +471,8 @@ describe('UsersPageManager.loadUsers', () => {
 
     test('URL includes search param when searchTerm is set', async () => {
         global.fetch = jest.fn().mockResolvedValue({
-            ok: true, json: async () => ({ items: [], totalPages: 1, totalItems: 0 })
+            ok: true,
+            json: async () => ({ items: [], totalPages: 1, totalItems: 0 }),
         });
         const manager = new UsersPageManager();
         manager.searchTerm = 'alice';
@@ -423,7 +482,8 @@ describe('UsersPageManager.loadUsers', () => {
 
     test('shows emptyState when API returns no items', async () => {
         global.fetch = jest.fn().mockResolvedValue({
-            ok: true, json: async () => ({ items: [], totalPages: 1, totalItems: 0 })
+            ok: true,
+            json: async () => ({ items: [], totalPages: 1, totalItems: 0 }),
         });
         const manager = new UsersPageManager();
         await manager.loadUsers();
@@ -433,7 +493,8 @@ describe('UsersPageManager.loadUsers', () => {
     test('renders cards when API returns items', async () => {
         const users = [makeUser({ name: 'alice' }), makeUser({ name: 'bob' })];
         global.fetch = jest.fn().mockResolvedValue({
-            ok: true, json: async () => ({ items: users, totalPages: 1, totalItems: 2 })
+            ok: true,
+            json: async () => ({ items: users, totalPages: 1, totalItems: 2 }),
         });
         const manager = new UsersPageManager();
         await manager.loadUsers();

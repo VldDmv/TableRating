@@ -27,12 +27,8 @@ describe('ErrorHandler', () => {
 
             ErrorHandler.handle(error, 'User message');
 
-            expect(global.alert).toHaveBeenCalledWith(
-                expect.stringContaining('User message')
-            );
-            expect(global.alert).toHaveBeenCalledWith(
-                expect.stringContaining('Test error')
-            );
+            expect(global.alert).toHaveBeenCalledWith(expect.stringContaining('User message'));
+            expect(global.alert).toHaveBeenCalledWith(expect.stringContaining('Test error'));
         });
 
         test('should display error in container when provided', () => {
@@ -66,14 +62,12 @@ describe('ErrorHandler', () => {
             expect(container.innerHTML).toContain('User message');
         });
 
-
         test('should handle null error objects gracefully', () => {
             const container = document.createElement('div');
 
             expect(() => {
                 ErrorHandler.handle(null, 'User message', container);
             }).not.toThrow();
-
 
             expect(container.innerHTML).toContain('User message');
             expect(consoleErrorSpy).toHaveBeenCalledWith('Error occurred:', null);
@@ -195,7 +189,7 @@ describe('ErrorHandler', () => {
             const response = {
                 ok: false,
                 status: 400,
-                text: async () => JSON.stringify({ message: 'Bad Request' })
+                text: async () => JSON.stringify({ message: 'Bad Request' }),
             };
 
             const message = await ErrorHandler.parseErrorResponse(response);
@@ -207,7 +201,7 @@ describe('ErrorHandler', () => {
             const response = {
                 ok: false,
                 status: 404,
-                text: async () => JSON.stringify({})
+                text: async () => JSON.stringify({}),
             };
 
             const message = await ErrorHandler.parseErrorResponse(response);
@@ -219,7 +213,7 @@ describe('ErrorHandler', () => {
             const response = {
                 ok: false,
                 status: 500,
-                text: async () => 'Internal Server Error'
+                text: async () => 'Internal Server Error',
             };
 
             const message = await ErrorHandler.parseErrorResponse(response);
@@ -231,7 +225,7 @@ describe('ErrorHandler', () => {
             const response = {
                 ok: false,
                 status: 503,
-                text: async () => ''
+                text: async () => '',
             };
 
             const message = await ErrorHandler.parseErrorResponse(response);
@@ -245,7 +239,7 @@ describe('ErrorHandler', () => {
                 status: 500,
                 text: async () => {
                     throw new Error('Cannot read response');
-                }
+                },
             };
 
             const message = await ErrorHandler.parseErrorResponse(response);
@@ -257,7 +251,7 @@ describe('ErrorHandler', () => {
             const response = {
                 ok: false,
                 status: 400,
-                text: async () => 'Not valid JSON {'
+                text: async () => 'Not valid JSON {',
             };
 
             const message = await ErrorHandler.parseErrorResponse(response);
@@ -272,7 +266,7 @@ describe('ErrorHandler', () => {
                 const response = {
                     ok: false,
                     status,
-                    text: async () => ''
+                    text: async () => '',
                 };
 
                 const message = await ErrorHandler.parseErrorResponse(response);
@@ -284,7 +278,7 @@ describe('ErrorHandler', () => {
             const response = {
                 ok: false,
                 status: 400,
-                text: async () => JSON.stringify({ message: 'Custom error message' })
+                text: async () => JSON.stringify({ message: 'Custom error message' }),
             };
 
             const message = await ErrorHandler.parseErrorResponse(response);
@@ -353,11 +347,7 @@ describe('ErrorHandler', () => {
         test('should handle special characters in error messages', () => {
             const container = document.createElement('div');
 
-            ErrorHandler.showError(
-                container,
-                'Error: <>&"\'',
-                'Details: <>&"\''
-            );
+            ErrorHandler.showError(container, 'Error: <>&"\'', 'Details: <>&"\'');
 
             expect(container.innerHTML).toContain('&lt;');
             expect(container.innerHTML).toContain('&gt;');
@@ -367,11 +357,7 @@ describe('ErrorHandler', () => {
         test('should handle unicode characters', () => {
             const container = document.createElement('div');
 
-            ErrorHandler.showError(
-                container,
-                'Error: 你好 🎮',
-                'Details: テスト ⚠️'
-            );
+            ErrorHandler.showError(container, 'Error: 你好 🎮', 'Details: テスト ⚠️');
 
             expect(container.textContent).toContain('你好 🎮');
             expect(container.textContent).toContain('テスト ⚠️');

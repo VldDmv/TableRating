@@ -1,5 +1,7 @@
 package org.criticizer.service.movie;
 
+import java.util.HashSet;
+import java.util.List;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.dto.movie.MovieResponse;
 import org.criticizer.entity.Genre;
@@ -10,17 +12,15 @@ import org.criticizer.service.helper.AbstractMediaService;
 import org.criticizer.service.helper.ServiceValidator;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-
 @Service
 public class MovieService extends AbstractMediaService<Movie, MovieResponse> {
 
     private final GenreRepository genreRepository;
 
-    public MovieService(MovieRepository movieRepository,
-                        GenreRepository genreRepository,
-                        ServiceValidator validator) {
+    public MovieService(
+            MovieRepository movieRepository,
+            GenreRepository genreRepository,
+            ServiceValidator validator) {
         super(movieRepository, validator);
         this.genreRepository = genreRepository;
     }
@@ -50,11 +50,10 @@ public class MovieService extends AbstractMediaService<Movie, MovieResponse> {
 
     @Override
     protected MovieResponse toResponse(Movie movie) {
-        List<GenreResponse> genreResponses = movie.getGenres() != null
-                ? movie.getGenres().stream()
-                .map(GenreResponse::from)
-                .toList()
-                : List.of();
+        List<GenreResponse> genreResponses =
+                movie.getGenres() != null
+                        ? movie.getGenres().stream().map(GenreResponse::from).toList()
+                        : List.of();
 
         return new MovieResponse(
                 movie.getId(),
@@ -62,8 +61,7 @@ public class MovieService extends AbstractMediaService<Movie, MovieResponse> {
                 movie.getCoverUrl(),
                 movie.getScore(),
                 movie.isCompleted(),
-                genreResponses
-        );
+                genreResponses);
     }
 
     @Override

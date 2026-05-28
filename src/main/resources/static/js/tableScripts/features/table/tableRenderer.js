@@ -12,8 +12,8 @@ export class TableRenderer {
      * @param {Object|null} coverModal
      */
     constructor(config, tableBody, coverModal = null) {
-        this.config     = config;
-        this.tableBody  = tableBody;
+        this.config = config;
+        this.tableBody = tableBody;
         this.coverModal = coverModal;
     }
 
@@ -28,7 +28,7 @@ export class TableRenderer {
         }
 
         const fragment = document.createDocumentFragment();
-        items.forEach(item => fragment.appendChild(this.createRow(item)));
+        items.forEach((item) => fragment.appendChild(this.createRow(item)));
         this.tableBody.appendChild(fragment);
 
         this.config.applyScoreStyling?.(this.tableBody);
@@ -61,19 +61,19 @@ export class TableRenderer {
 
         const tagsOrGenres = item.tags || item.genres || [];
 
-        row.dataset.originalName     = item.name;
-        row.dataset.originalScore    = item.score;
-        row.dataset.originalTagIds   = tagsOrGenres.map(t => t.id).join(',');
-        row.dataset.initialTagIds    = row.dataset.originalTagIds;
+        row.dataset.originalName = item.name;
+        row.dataset.originalScore = item.score;
+        row.dataset.originalTagIds = tagsOrGenres.map((t) => t.id).join(',');
+        row.dataset.initialTagIds = row.dataset.originalTagIds;
         row.dataset.originalCoverUrl = item.coverUrl || '';
 
-        const escapedName   = htmlUtils.escape(item.name);
-        const completedIcon = item.completed ? ICONS.COMPLETED    : ICONS.NOT_COMPLETED;
-        const editIcon      = ICONS.EDIT      ?? '✏️';
-        const deleteIcon    = ICONS.DELETE    ?? '🗑️';
+        const escapedName = htmlUtils.escape(item.name);
+        const completedIcon = item.completed ? ICONS.COMPLETED : ICONS.NOT_COMPLETED;
+        const editIcon = ICONS.EDIT ?? '✏️';
+        const deleteIcon = ICONS.DELETE ?? '🗑️';
 
         row.appendChild(this._createCoverCell(item));
-        row.appendChild(this._createTextCell('col-name',  item.name));
+        row.appendChild(this._createTextCell('col-name', item.name));
         row.appendChild(this._createScoreCell(item.score));
         row.appendChild(this._createTagsCell(tagsOrGenres));
         row.appendChild(this._createCompletedCell(escapedName, completedIcon));
@@ -90,10 +90,10 @@ export class TableRenderer {
 
         if (item.coverUrl) {
             const img = document.createElement('img');
-            img.src       = item.coverUrl;
-            img.alt       = item.name;
+            img.src = item.coverUrl;
+            img.alt = item.name;
             img.className = 'cover-thumbnail';
-            img.title     = 'Click to view | Ctrl+Click to edit';
+            img.title = 'Click to view | Ctrl+Click to edit';
 
             img.addEventListener('click', (e) => {
                 if (!e.ctrlKey && !e.metaKey) {
@@ -105,9 +105,9 @@ export class TableRenderer {
             cell.appendChild(img);
         } else {
             const placeholder = document.createElement('div');
-            placeholder.className   = 'cover-placeholder';
+            placeholder.className = 'cover-placeholder';
             placeholder.textContent = '📦';
-            placeholder.title       = 'Click to add cover';
+            placeholder.title = 'Click to add cover';
             cell.appendChild(placeholder);
         }
 
@@ -116,7 +116,7 @@ export class TableRenderer {
 
     _createTextCell(className, text) {
         const cell = document.createElement('td');
-        cell.className   = className;
+        cell.className = className;
         cell.textContent = text;
         return cell;
     }
@@ -131,7 +131,7 @@ export class TableRenderer {
     _createTagsCell(tags) {
         const cell = document.createElement('td');
         cell.className = this.config.entityType === 'games' ? 'col-tags' : 'col-genres';
-        cell.innerHTML  = this._createTagsHtml(tags) || '<span style="color:#999;">-</span>';
+        cell.innerHTML = this._createTagsHtml(tags) || '<span style="color:#999;">-</span>';
         return cell;
     }
 
@@ -161,12 +161,14 @@ export class TableRenderer {
     _createTagsHtml(tags) {
         if (!tags || tags.length === 0) return '';
 
-        const valid = tags.filter(t => t?.name);
+        const valid = tags.filter((t) => t?.name);
         if (valid.length === 0) return '';
 
-        return valid.map(tag => {
-            const name = htmlUtils.decode(tag.name);
-            return `<span class="tag-badge" data-tag-id="${tag.id}">${name}</span>`;
-        }).join(' ');
+        return valid
+            .map((tag) => {
+                const name = htmlUtils.decode(tag.name);
+                return `<span class="tag-badge" data-tag-id="${tag.id}">${name}</span>`;
+            })
+            .join(' ');
     }
 }

@@ -1,5 +1,6 @@
 package org.criticizer.service.helper;
 
+import java.util.Map;
 import org.criticizer.constants.ContentCategory;
 import org.criticizer.service.book.BookService;
 import org.criticizer.service.game.GameService;
@@ -7,11 +8,9 @@ import org.criticizer.service.movie.MovieService;
 import org.criticizer.service.show.ShowService;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 /**
- * Resolves a content category string to its corresponding media service.
- * Implements the Strategy pattern for media type dispatch.
+ * Resolves a content category string to its corresponding media service. Implements the Strategy
+ * pattern for media type dispatch.
  */
 @Service
 public class MediaTypeResolver {
@@ -22,14 +21,13 @@ public class MediaTypeResolver {
             GameService gameService,
             MovieService movieService,
             BookService bookService,
-            ShowService showService
-    ) {
-        this.services = Map.of(
-                ContentCategory.GAMES, gameService,
-                ContentCategory.MOVIES, movieService,
-                ContentCategory.BOOKS, bookService,
-                ContentCategory.SHOWS, showService
-        );
+            ShowService showService) {
+        this.services =
+                Map.of(
+                        ContentCategory.GAMES, gameService,
+                        ContentCategory.MOVIES, movieService,
+                        ContentCategory.BOOKS, bookService,
+                        ContentCategory.SHOWS, showService);
     }
 
     /**

@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import org.criticizer.service.helper.MediaEntity;
 
 /**
- * Base entity for all media types (Game, Movie, Book, Show).
- * Contains all common fields to eliminate duplication.
+ * Base entity for all media types (Game, Movie, Book, Show). Contains all common fields to
+ * eliminate duplication.
  */
 @MappedSuperclass
 public abstract class BaseEntity implements MediaEntity {
@@ -29,10 +29,10 @@ public abstract class BaseEntity implements MediaEntity {
     @Column(name = "cover_url", length = 500)
     private String coverUrl;
 
-    protected BaseEntity() {
-    }
+    protected BaseEntity() {}
 
-    protected BaseEntity(Integer id, String name, Integer userId, Integer score, boolean completed) {
+    protected BaseEntity(
+            Integer id, String name, Integer userId, Integer score, boolean completed) {
         this.id = id;
         this.name = name;
         this.userId = userId;

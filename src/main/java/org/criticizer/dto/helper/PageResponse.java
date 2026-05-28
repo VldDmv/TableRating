@@ -1,8 +1,7 @@
 package org.criticizer.dto.helper;
 
-import org.springframework.data.domain.Page;
-
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 /**
  * Generic paginated response wrapper.
@@ -10,12 +9,7 @@ import java.util.List;
  * @param <T> Type of items in the page
  */
 public record PageResponse<T>(
-        List<T> items,
-        int currentPage,
-        int totalPages,
-        long totalItems,
-        int pageSize
-) {
+        List<T> items, int currentPage, int totalPages, long totalItems, int pageSize) {
     public List<T> getItems() {
         return items();
     }
@@ -42,8 +36,7 @@ public record PageResponse<T>(
                 page.getNumber() + 1,
                 page.getTotalPages(),
                 page.getTotalElements(),
-                page.getSize()
-        );
+                page.getSize());
     }
 
     public static <T> PageResponse<T> of(Page<?> page, List<T> items) {
@@ -52,8 +45,7 @@ public record PageResponse<T>(
                 page.getNumber() + 1,
                 page.getTotalPages(),
                 page.getTotalElements(),
-                page.getSize()
-        );
+                page.getSize());
     }
 
     public static <T> PageResponse<T> of(PageResponse<?> metadata, List<T> items) {
@@ -62,7 +54,6 @@ public record PageResponse<T>(
                 metadata.currentPage(),
                 metadata.totalPages(),
                 metadata.totalItems(),
-                metadata.pageSize()
-        );
+                metadata.pageSize());
     }
 }

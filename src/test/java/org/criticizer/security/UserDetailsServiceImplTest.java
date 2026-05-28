@@ -1,5 +1,10 @@
 package org.criticizer.security;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.criticizer.entity.Role;
 import org.criticizer.entity.User;
 import org.criticizer.service.user.UserService;
@@ -12,19 +17,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class UserDetailsServiceImplTest {
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
 
-    @InjectMocks
-    private UserDetailsServiceImpl userDetailsService;
+    @InjectMocks private UserDetailsServiceImpl userDetailsService;
 
     private User testUser;
     private User adminUser;
@@ -76,7 +74,9 @@ class UserDetailsServiceImplTest {
 
         // Act & Assert
         assertThatThrownBy(() -> userDetailsService.loadUserByUsername("nonexistent"))
-                .isInstanceOf(org.springframework.security.core.userdetails.UsernameNotFoundException.class);
+                .isInstanceOf(
+                        org.springframework.security.core.userdetails.UsernameNotFoundException
+                                .class);
 
         verify(userService).getUser("nonexistent");
     }

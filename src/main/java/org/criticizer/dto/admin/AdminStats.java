@@ -1,8 +1,6 @@
 package org.criticizer.dto.admin;
 
-/**
- * DTO for admin dashboard statistics.
- */
+/** DTO for admin dashboard statistics. */
 public class AdminStats {
 
     private final long totalUsers;
@@ -11,8 +9,8 @@ public class AdminStats {
     private final long totalBooks;
     private final long totalShows;
 
-    public AdminStats(long totalUsers, long totalGames, long totalMovies,
-                      long totalBooks, long totalShows) {
+    public AdminStats(
+            long totalUsers, long totalGames, long totalMovies, long totalBooks, long totalShows) {
         this.totalUsers = totalUsers;
         this.totalGames = totalGames;
         this.totalMovies = totalMovies;
@@ -20,8 +18,8 @@ public class AdminStats {
         this.totalShows = totalShows;
     }
 
-    public static AdminStats of(long totalUsers, long totalGames, long totalMovies,
-                                long totalBooks, long totalShows) {
+    public static AdminStats of(
+            long totalUsers, long totalGames, long totalMovies, long totalBooks, long totalShows) {
         return new AdminStats(totalUsers, totalGames, totalMovies, totalBooks, totalShows);
     }
 

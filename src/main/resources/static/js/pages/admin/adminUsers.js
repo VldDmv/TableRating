@@ -2,7 +2,7 @@
  * Admin Users Page
  * Handles view toggle, modals, live search, and avatar colors.
  */
- export { AdminUsersManager }
+export { AdminUsersManager };
 import { ToastService } from '../../shared/toast.js';
 import { getAvatarColor } from '../../shared/avatarUtils.js';
 
@@ -15,12 +15,12 @@ class AdminUsersManager {
 
         this.cardsViewBtn = document.getElementById('cardsViewBtn');
         this.tableViewBtn = document.getElementById('tableViewBtn');
-        this.usersCards   = document.getElementById('usersCards');
-        this.usersTable   = document.getElementById('usersTable');
-        this.liveSearch   = document.getElementById('liveSearch');
-        this.emptyState   = document.getElementById('emptyState');
-        this.editModal    = document.getElementById('editModal');
-        this.deleteModal  = document.getElementById('deleteModal');
+        this.usersCards = document.getElementById('usersCards');
+        this.usersTable = document.getElementById('usersTable');
+        this.liveSearch = document.getElementById('liveSearch');
+        this.emptyState = document.getElementById('emptyState');
+        this.editModal = document.getElementById('editModal');
+        this.deleteModal = document.getElementById('deleteModal');
 
         this.init();
     }
@@ -39,19 +39,22 @@ class AdminUsersManager {
 
         this.liveSearch?.addEventListener('input', (e) => {
             clearTimeout(this.searchDebounceTimer);
-            this.searchDebounceTimer = setTimeout(
-                () => this.performSearch(e.target.value),
-                500
-            );
+            this.searchDebounceTimer = setTimeout(() => this.performSearch(e.target.value), 500);
         });
 
-        this.editModal?.addEventListener('click',  (e) => { if (e.target === this.editModal)  this.closeEditModal();  });
-        this.deleteModal?.addEventListener('click', (e) => { if (e.target === this.deleteModal) this.closeDeleteModal(); });
+        this.editModal?.addEventListener('click', (e) => {
+            if (e.target === this.editModal) this.closeEditModal();
+        });
+        this.deleteModal?.addEventListener('click', (e) => {
+            if (e.target === this.deleteModal) this.closeDeleteModal();
+        });
 
-        document.getElementById('editRoleForm')
+        document
+            .getElementById('editRoleForm')
             ?.addEventListener('submit', () => this.toast.show('Saving changes...', 'info', '⏳'));
 
-        document.getElementById('deleteUserForm')
+        document
+            .getElementById('deleteUserForm')
             ?.addEventListener('submit', () => this.toast.show('Deleting user...', 'info', '⏳'));
     }
 
@@ -69,10 +72,10 @@ class AdminUsersManager {
     _applyView(view) {
         localStorage.setItem('adminUsersView', view);
         const isCards = view === 'cards';
-        this.cardsViewBtn?.classList.toggle('active',  isCards);
+        this.cardsViewBtn?.classList.toggle('active', isCards);
         this.tableViewBtn?.classList.toggle('active', !isCards);
-        this.usersCards.style.display = isCards ? 'grid'  : 'none';
-        this.usersTable.style.display = isCards ? 'none'  : 'block';
+        this.usersCards.style.display = isCards ? 'grid' : 'none';
+        this.usersTable.style.display = isCards ? 'none' : 'block';
     }
 
     editUser(userId) {
@@ -84,7 +87,7 @@ class AdminUsersManager {
 
         const isAdmin = card.dataset.role === 'ADMIN';
         document.getElementById('roleAdmin').checked = isAdmin;
-        document.getElementById('roleUser').checked  = !isAdmin;
+        document.getElementById('roleUser').checked = !isAdmin;
 
         const modal = document.getElementById('editModal');
         modal.style.display = 'flex';
@@ -108,21 +111,30 @@ class AdminUsersManager {
         const cards = this.usersCards.querySelectorAll('.user-card');
         let visibleCount = 0;
 
-        cards.forEach(card => {
+        cards.forEach((card) => {
             const matches = card.dataset.username.toLowerCase().includes(trimmed) || trimmed === '';
             card.style.display = matches ? '' : 'none';
             if (matches) visibleCount++;
         });
 
-        this.usersTable.querySelectorAll('tbody tr').forEach(row => {
-            const matches = row.cells[1].textContent.toLowerCase().includes(trimmed) || trimmed === '';
+        this.usersTable.querySelectorAll('tbody tr').forEach((row) => {
+            const matches =
+                row.cells[1].textContent.toLowerCase().includes(trimmed) || trimmed === '';
             row.style.display = matches ? '' : 'none';
         });
 
         const isEmpty = visibleCount === 0 && trimmed !== '';
         this.emptyState.style.display = isEmpty ? 'block' : 'none';
-        this.usersCards.style.display = isEmpty ? 'none' : (this.currentView === 'cards' ? 'grid'  : 'none');
-        this.usersTable.style.display = isEmpty ? 'none' : (this.currentView === 'table' ? 'block' : 'none');
+        this.usersCards.style.display = isEmpty
+            ? 'none'
+            : this.currentView === 'cards'
+              ? 'grid'
+              : 'none';
+        this.usersTable.style.display = isEmpty
+            ? 'none'
+            : this.currentView === 'table'
+              ? 'block'
+              : 'none';
 
         this.updateAdminCount();
     }
@@ -130,11 +142,11 @@ class AdminUsersManager {
     // ─── Stats ────────────────────────────────────────────────────────────────
 
     updateAdminCount() {
-        const allCards     = document.querySelectorAll('.user-card');
-        const visibleCards = Array.from(allCards).filter(c => c.style.display !== 'none');
-        const source       = visibleCards.length > 0 ? visibleCards : Array.from(allCards);
+        const allCards = document.querySelectorAll('.user-card');
+        const visibleCards = Array.from(allCards).filter((c) => c.style.display !== 'none');
+        const source = visibleCards.length > 0 ? visibleCards : Array.from(allCards);
 
-        const adminCount = source.filter(c => c.dataset.role === 'ADMIN').length;
+        const adminCount = source.filter((c) => c.dataset.role === 'ADMIN').length;
 
         const adminCountEl = document.getElementById('adminCount');
         const totalCountEl = document.getElementById('totalUsersCount');
@@ -145,7 +157,7 @@ class AdminUsersManager {
     // ─── Avatars ──────────────────────────────────────────────────────────────
 
     generateAvatarColors() {
-        document.querySelectorAll('.user-card-avatar').forEach(avatar => {
+        document.querySelectorAll('.user-card-avatar').forEach((avatar) => {
             avatar.style.background = getAvatarColor(avatar.dataset.username);
         });
     }
@@ -176,15 +188,19 @@ function editUser(userId) {
 
     const isAdmin = card.dataset.role === 'ADMIN';
     document.getElementById('roleAdmin').checked = isAdmin;
-    document.getElementById('roleUser').checked  = !isAdmin;
+    document.getElementById('roleUser').checked = !isAdmin;
 
     const modal = document.getElementById('editModal');
     modal.style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
 }
 
-function closeEditModal()   { adminManager?.closeEditModal();   }
-function closeDeleteModal() { adminManager?.closeDeleteModal(); }
+function closeEditModal() {
+    adminManager?.closeEditModal();
+}
+function closeDeleteModal() {
+    adminManager?.closeDeleteModal();
+}
 
 function deleteUser(userId, username) {
     document.getElementById('deleteUserId').value = userId;
@@ -198,8 +214,8 @@ function deleteUser(userId, username) {
 document.addEventListener('DOMContentLoaded', () => {
     adminManager = new AdminUsersManager();
 
-    window.editUser         = editUser;
-    window.closeEditModal   = closeEditModal;
-    window.deleteUser       = deleteUser;
+    window.editUser = editUser;
+    window.closeEditModal = closeEditModal;
+    window.deleteUser = deleteUser;
     window.closeDeleteModal = closeDeleteModal;
 });

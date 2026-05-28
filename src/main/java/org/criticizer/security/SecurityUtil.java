@@ -9,11 +9,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * Utility class for retrieving the current authenticated user.
- * <p>
- * Reads the User entity directly from the AuthenticatedUser principal —
- * no database query is made. The entity was loaded once during authentication
- * by UserDetailsServiceImpl and cached in the Security context for the
- * duration of the request.
+ *
+ * <p>Reads the User entity directly from the AuthenticatedUser principal — no database query is
+ * made. The entity was loaded once during authentication by UserDetailsServiceImpl and cached in
+ * the Security context for the duration of the request.
  */
 @Component
 public class SecurityUtil {
@@ -31,9 +30,7 @@ public class SecurityUtil {
         return principal.getUser();
     }
 
-    /**
-     * Returns the username of the current user, or null if not authenticated.
-     */
+    /** Returns the username of the current user, or null if not authenticated. */
     public String getCurrentUsername() {
         AuthenticatedUser principal = getAuthenticatedPrincipal();
         return principal != null ? principal.getUsername() : null;

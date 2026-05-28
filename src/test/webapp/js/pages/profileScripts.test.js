@@ -1,6 +1,5 @@
 import { jest } from '@jest/globals';
 
-
 const {
     getScoreClass,
     getSortIcon,
@@ -9,30 +8,37 @@ const {
     renderTableRow,
     renderCard,
     getEmptyMessage,
-    ProfilePageManager
+    ProfilePageManager,
 } = await import('@/pages/profileScripts.js');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function makeItem(overrides = {}) {
     return {
-        name: 'Test Game', score: 75, completed: false,
-        coverUrl: '', tags: [], genres: [],
-        ...overrides
+        name: 'Test Game',
+        score: 75,
+        completed: false,
+        coverUrl: '',
+        tags: [],
+        genres: [],
+        ...overrides,
     };
 }
 
-afterEach(() => { document.body.innerHTML = ''; localStorage.clear(); });
+afterEach(() => {
+    document.body.innerHTML = '';
+    localStorage.clear();
+});
 
 // ─── getScoreClass ────────────────────────────────────────────────────────────
 
 describe('getScoreClass', () => {
     test.each([
-        [0,   'score-low'],
-        [30,  'score-low'],
-        [49,  'score-medium'],
-        [50,  'score-medium'],
-        [74,  'score-high'],
+        [0, 'score-low'],
+        [30, 'score-low'],
+        [49, 'score-medium'],
+        [50, 'score-medium'],
+        [74, 'score-high'],
         [100, 'score-high'],
     ])('score %i → %s', (score, expected) => {
         expect(getScoreClass(score)).toBe(expected);
@@ -88,16 +94,18 @@ describe('escapeHtml', () => {
 // ─── buildApiUrl ──────────────────────────────────────────────────────────────
 
 describe('buildApiUrl', () => {
-
-
     function makeUrl(overrides = {}) {
-
         const base = {
-            username: 'alice', currentCategory: 'games',
-            currentPage: 1, rowsPerPage: 10,
-            sortBy: 'name', sortOrder: 'asc',
-            searchTerm: '', filterId: 'all', contextPath: '',
-            ...overrides
+            username: 'alice',
+            currentCategory: 'games',
+            currentPage: 1,
+            rowsPerPage: 10,
+            sortBy: 'name',
+            sortOrder: 'asc',
+            searchTerm: '',
+            filterId: 'all',
+            contextPath: '',
+            ...overrides,
         };
 
         return new URL(buildApiUrl(base));
@@ -118,8 +126,7 @@ describe('buildApiUrl', () => {
     });
 
     test('adds search param when searchTerm is non-empty', () => {
-        expect(makeUrl({ searchTerm: 'witcher' }).searchParams.get('search'))
-            .toBe('witcher');
+        expect(makeUrl({ searchTerm: 'witcher' }).searchParams.get('search')).toBe('witcher');
     });
 
     test('omits search param when searchTerm is empty', () => {
@@ -160,8 +167,9 @@ describe('renderTableRow', () => {
     }
 
     test('renders name in .col-name', () => {
-        expect(parse(makeItem({ name: 'Elden Ring' })).querySelector('.col-name').textContent)
-            .toBe('Elden Ring');
+        expect(parse(makeItem({ name: 'Elden Ring' })).querySelector('.col-name').textContent).toBe(
+            'Elden Ring'
+        );
     });
 
     test('score cell has correct value and CSS class', () => {
@@ -171,8 +179,9 @@ describe('renderTableRow', () => {
     });
 
     test('renders cover image when coverUrl is set', () => {
-        expect(parse(makeItem({ coverUrl: 'https://img.jpg' })).querySelector('.cover-thumbnail'))
-            .not.toBeNull();
+        expect(
+            parse(makeItem({ coverUrl: 'https://img.jpg' })).querySelector('.cover-thumbnail')
+        ).not.toBeNull();
     });
 
     test('renders cover placeholder when coverUrl is empty', () => {
@@ -180,13 +189,15 @@ describe('renderTableRow', () => {
     });
 
     test('shows ✅ for completed items', () => {
-        expect(parse(makeItem({ completed: true })).querySelector('.col-completed').textContent)
-            .toBe('✅');
+        expect(
+            parse(makeItem({ completed: true })).querySelector('.col-completed').textContent
+        ).toBe('✅');
     });
 
     test('shows ❌ for incomplete items', () => {
-        expect(parse(makeItem({ completed: false })).querySelector('.col-completed').textContent)
-            .toBe('❌');
+        expect(
+            parse(makeItem({ completed: false })).querySelector('.col-completed').textContent
+        ).toBe('❌');
     });
 
     test('shows comma-joined tag names for games', () => {
@@ -224,8 +235,9 @@ describe('renderCard', () => {
     });
 
     test('.card-title contains item name', () => {
-        expect(parse(makeItem({ name: 'Sekiro' })).querySelector('.card-title').textContent)
-            .toBe('Sekiro');
+        expect(parse(makeItem({ name: 'Sekiro' })).querySelector('.card-title').textContent).toBe(
+            'Sekiro'
+        );
     });
 
     test('score-cell has correct value and CSS class', () => {
@@ -235,8 +247,9 @@ describe('renderCard', () => {
     });
 
     test('renders cover image when coverUrl is set', () => {
-        expect(parse(makeItem({ coverUrl: 'https://img.jpg' })).querySelector('.card-cover-image'))
-            .not.toBeNull();
+        expect(
+            parse(makeItem({ coverUrl: 'https://img.jpg' })).querySelector('.card-cover-image')
+        ).not.toBeNull();
     });
 
     test('renders cover placeholder when coverUrl is empty', () => {
@@ -244,15 +257,19 @@ describe('renderCard', () => {
     });
 
     test('renders tag badges for games', () => {
-        const badges = parse(makeItem({ tags: [{ name: 'Action' }, { name: 'RPG' }] }), 'games')
-            .querySelectorAll('.tag-badge');
+        const badges = parse(
+            makeItem({ tags: [{ name: 'Action' }, { name: 'RPG' }] }),
+            'games'
+        ).querySelectorAll('.tag-badge');
         expect(badges.length).toBe(2);
         expect(badges[0].textContent).toBe('Action');
     });
 
     test('renders genre badges for movies', () => {
-        expect(parse(makeItem({ genres: [{ name: 'Drama' }] }), 'movies')
-            .querySelector('.tag-badge').textContent).toBe('Drama');
+        expect(
+            parse(makeItem({ genres: [{ name: 'Drama' }] }), 'movies').querySelector('.tag-badge')
+                .textContent
+        ).toBe('Drama');
     });
 
     test('shows .card-no-tags when no tags', () => {
@@ -260,18 +277,21 @@ describe('renderCard', () => {
     });
 
     test('shows ✅ for completed items', () => {
-        expect(parse(makeItem({ completed: true })).querySelector('.card-status').textContent)
-            .toContain('✅');
+        expect(
+            parse(makeItem({ completed: true })).querySelector('.card-status').textContent
+        ).toContain('✅');
     });
 
     test('shows ❌ for incomplete items', () => {
-        expect(parse(makeItem({ completed: false })).querySelector('.card-status').textContent)
-            .toContain('❌');
+        expect(
+            parse(makeItem({ completed: false })).querySelector('.card-status').textContent
+        ).toContain('❌');
     });
 
     test('escapes XSS in item name', () => {
-        expect(parse(makeItem({ name: '<img src=x onerror=alert(1)>' })).innerHTML)
-            .not.toContain('<img src=x');
+        expect(parse(makeItem({ name: '<img src=x onerror=alert(1)>' })).innerHTML).not.toContain(
+            '<img src=x'
+        );
     });
 });
 
@@ -279,13 +299,13 @@ describe('renderCard', () => {
 
 describe('getEmptyMessage', () => {
     test('returns criteria message when search term is active', () => {
-        expect(getEmptyMessage('witcher', 'all', 'games'))
-            .toBe('No items found matching your criteria.');
+        expect(getEmptyMessage('witcher', 'all', 'games')).toBe(
+            'No items found matching your criteria.'
+        );
     });
 
     test('returns criteria message when filter is active', () => {
-        expect(getEmptyMessage('', '3', 'games'))
-            .toBe('No items found matching your criteria.');
+        expect(getEmptyMessage('', '3', 'games')).toBe('No items found matching your criteria.');
     });
 
     test('returns category message when no search or filter applied', () => {
@@ -307,7 +327,8 @@ describe('ProfilePageManager.switchView', () => {
             <div id="cards-container" style="display:none"></div>
         `;
         global.fetch = jest.fn().mockResolvedValue({
-            ok: true, json: async () => ({ items: [], totalPages: 1, totalItems: 0 })
+            ok: true,
+            json: async () => ({ items: [], totalPages: 1, totalItems: 0 }),
         });
         manager = new ProfilePageManager({ username: 'alice', category: 'games' });
     });
@@ -353,7 +374,8 @@ describe('ProfilePageManager.updatePagination', () => {
             <div id="paginationContainer"></div>
         `;
         global.fetch = jest.fn().mockResolvedValue({
-            ok: true, json: async () => ({ items: [], totalPages: 1, totalItems: 0 })
+            ok: true,
+            json: async () => ({ items: [], totalPages: 1, totalItems: 0 }),
         });
         manager = new ProfilePageManager({ username: 'alice', category: 'games' });
     });

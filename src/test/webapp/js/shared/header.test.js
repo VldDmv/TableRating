@@ -1,11 +1,8 @@
-
-
 describe('Header Dropdown', () => {
     let userMenuButton;
     let userMenuDropdown;
 
     beforeEach(() => {
-
         document.body.innerHTML = `
             <button id="user-menu-button">User Menu</button>
             <div id="user-menu-dropdown"></div>
@@ -14,19 +11,18 @@ describe('Header Dropdown', () => {
         userMenuButton = document.getElementById('user-menu-button');
         userMenuDropdown = document.getElementById('user-menu-dropdown');
 
-
-        userMenuButton.addEventListener('click', function(e) {
+        userMenuButton.addEventListener('click', function (e) {
             e.stopPropagation();
             userMenuDropdown.classList.toggle('show');
         });
 
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (!userMenuButton.contains(e.target) && !userMenuDropdown.contains(e.target)) {
                 userMenuDropdown.classList.remove('show');
             }
         });
 
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 userMenuDropdown.classList.remove('show');
             }
@@ -51,7 +47,9 @@ describe('Header Dropdown', () => {
 
             const event = new MouseEvent('click', { bubbles: true });
             Object.defineProperty(event, 'stopPropagation', {
-                value: () => { propagationStopped = true; }
+                value: () => {
+                    propagationStopped = true;
+                },
             });
 
             userMenuButton.dispatchEvent(event);
@@ -61,7 +59,6 @@ describe('Header Dropdown', () => {
 
     describe('Close Dropdown', () => {
         beforeEach(() => {
-
             userMenuButton.click();
         });
 

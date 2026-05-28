@@ -33,7 +33,7 @@ export class FilterManager {
 
         this.filterSelect.addEventListener('change', () => {
             const filterId = this.filterSelect.value;
-            this.listeners.forEach(callback => callback(filterId));
+            this.listeners.forEach((callback) => callback(filterId));
         });
     }
 
@@ -62,4 +62,3 @@ export class FilterManager {
         this.setValue('all');
     }
 }
-

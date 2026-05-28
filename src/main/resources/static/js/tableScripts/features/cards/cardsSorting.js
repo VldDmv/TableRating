@@ -42,9 +42,13 @@ export class SortControls {
                 Sort by:
                 <div class="sort-controls-group">
                     <select class="sort-select" id="sortBySelect">
-                        ${sortableColumns.map(col => `
+                        ${sortableColumns
+                            .map(
+                                (col) => `
                             <option value="${col.key}">${col.name}</option>
-                        `).join('')}
+                        `
+                            )
+                            .join('')}
                     </select>
                     <button type="button" class="sort-order-btn" id="sortOrderBtn" title="Toggle sort order">
                         <span class="sort-icon">↓</span>
@@ -58,8 +62,6 @@ export class SortControls {
 
         // Attach event listeners
         this.attachEventListeners();
-
-
     }
 
     /**
@@ -74,7 +76,7 @@ export class SortControls {
             if (col.sortable !== false && key !== 'actions' && key !== 'cover') {
                 columns.push({
                     key: key,
-                    name: col.name
+                    name: col.name,
                 });
             }
         }
@@ -96,7 +98,7 @@ export class SortControls {
 
                 this.stateManager.setState({
                     sortBy: newSortBy,
-                    currentPage: 1
+                    currentPage: 1,
                 });
 
                 this.updateActiveSort();
@@ -109,7 +111,7 @@ export class SortControls {
                 const newOrder = currentState.sortOrder === 'asc' ? 'desc' : 'asc';
 
                 this.stateManager.setState({
-                    sortOrder: newOrder
+                    sortOrder: newOrder,
                 });
 
                 this.updateActiveSort();
@@ -135,9 +137,7 @@ export class SortControls {
 
         if (sortIcon) {
             sortIcon.textContent = state.sortOrder === 'asc' ? '↑' : '↓';
-            sortOrderBtn.title = state.sortOrder === 'asc'
-                ? 'Sort descending'
-                : 'Sort ascending';
+            sortOrderBtn.title = state.sortOrder === 'asc' ? 'Sort descending' : 'Sort ascending';
         }
 
         // Add active class to button
@@ -173,7 +173,7 @@ export class SortControls {
         const state = this.stateManager.getState();
         return {
             sortBy: state.sortBy,
-            sortOrder: state.sortOrder
+            sortOrder: state.sortOrder,
         };
     }
 }

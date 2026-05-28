@@ -21,7 +21,7 @@ export class UniversalAutocomplete {
             minChars: options.minChars || 2,
             debounceMs: options.debounceMs || 300,
             maxResults: options.maxResults || 10,
-            ...options
+            ...options,
         };
 
         this.coverUrlInput = null;
@@ -37,14 +37,14 @@ export class UniversalAutocomplete {
                     return url;
                 },
                 parseResults: (data) => {
-                    return (data.results || []).map(item => ({
+                    return (data.results || []).map((item) => ({
                         name: item.name,
                         year: item.released ? new Date(item.released).getFullYear() : null,
                         rating: item.rating,
                         imageUrl: item.background_image,
-                        coverUrl: item.background_image
+                        coverUrl: item.background_image,
                     }));
-                }
+                },
             },
             movies: {
                 apiUrl: '/api/proxy/movies',
@@ -54,14 +54,18 @@ export class UniversalAutocomplete {
                     return url;
                 },
                 parseResults: (data) => {
-                    return (data.results || []).slice(0, this.options.maxResults).map(item => ({
+                    return (data.results || []).slice(0, this.options.maxResults).map((item) => ({
                         name: item.title,
                         year: item.release_date ? new Date(item.release_date).getFullYear() : null,
                         rating: item.vote_average ? item.vote_average.toFixed(1) : null,
-                        imageUrl: item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : null,
-                        coverUrl: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : null
+                        imageUrl: item.poster_path
+                            ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+                            : null,
+                        coverUrl: item.poster_path
+                            ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                            : null,
                     }));
-                }
+                },
             },
             shows: {
                 apiUrl: '/api/proxy/shows',
@@ -71,14 +75,20 @@ export class UniversalAutocomplete {
                     return url;
                 },
                 parseResults: (data) => {
-                    return (data.results || []).slice(0, this.options.maxResults).map(item => ({
+                    return (data.results || []).slice(0, this.options.maxResults).map((item) => ({
                         name: item.name,
-                        year: item.first_air_date ? new Date(item.first_air_date).getFullYear() : null,
+                        year: item.first_air_date
+                            ? new Date(item.first_air_date).getFullYear()
+                            : null,
                         rating: item.vote_average ? item.vote_average.toFixed(1) : null,
-                        imageUrl: item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : null,
-                        coverUrl: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : null
+                        imageUrl: item.poster_path
+                            ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+                            : null,
+                        coverUrl: item.poster_path
+                            ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                            : null,
                     }));
-                }
+                },
             },
             books: {
                 apiUrl: '/api/proxy/books',
@@ -89,7 +99,7 @@ export class UniversalAutocomplete {
                     return url;
                 },
                 parseResults: (data) => {
-                    return (data.docs || []).map(book => ({
+                    return (data.docs || []).map((book) => ({
                         name: book.title || 'Unknown',
                         year: book.first_publish_year || null,
                         rating: book.ratings_average ? book.ratings_average.toFixed(1) : null,
@@ -99,10 +109,10 @@ export class UniversalAutocomplete {
                         coverUrl: book.cover_i
                             ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
                             : null,
-                        authors: book.author_name ? book.author_name.join(', ') : 'Unknown'
+                        authors: book.author_name ? book.author_name.join(', ') : 'Unknown',
                     }));
-                }
-            }
+                },
+            },
         };
 
         this.debounceTimeout = null;
@@ -137,7 +147,6 @@ export class UniversalAutocomplete {
         this.coverUrlInput.value = '';
 
         this.input.parentNode.insertBefore(this.coverUrlInput, this.input.nextSibling);
-
     }
 
     createDropdown() {
@@ -173,15 +182,15 @@ export class UniversalAutocomplete {
         });
     }
 
-   handleInput(event) {
-           const value = event.target.value.trim();
-           if (this.coverUrlInput && this.coverUrlInput.value) {
-               const currentResults = this.results.find(r => r.name === value);
-               if (!currentResults) {
-                   this.coverUrlInput.value = '';
-                   this.lastSelectedCover = null;
-               }
-           }
+    handleInput(event) {
+        const value = event.target.value.trim();
+        if (this.coverUrlInput && this.coverUrlInput.value) {
+            const currentResults = this.results.find((r) => r.name === value);
+            if (!currentResults) {
+                this.coverUrlInput.value = '';
+                this.lastSelectedCover = null;
+            }
+        }
 
         clearTimeout(this.debounceTimeout);
 
@@ -242,8 +251,6 @@ export class UniversalAutocomplete {
             const config = this.apiConfigs[this.entityType];
             const url = config.buildUrl(query);
 
-
-
             const response = await fetch(url);
 
             if (response.status === 503) {
@@ -281,14 +288,12 @@ export class UniversalAutocomplete {
 
             this.results = config.parseResults(data);
 
-
             if (this.results.length > 0) {
                 this.render();
                 this.open();
             } else {
                 this.showNoResults();
             }
-
         } catch (error) {
             console.error(`[Autocomplete:${this.entityType}]`, error);
             if (!notifiedError.has(this.entityType)) {
@@ -390,12 +395,9 @@ export class UniversalAutocomplete {
         if (this.coverUrlInput && item.coverUrl) {
             this.coverUrlInput.value = item.coverUrl;
             this.lastSelectedCover = item.coverUrl;
-
         } else if (this.coverUrlInput) {
-
             this.coverUrlInput.value = '';
             this.lastSelectedCover = null;
-
         }
 
         this.input.dispatchEvent(new Event('input', { bubbles: true }));

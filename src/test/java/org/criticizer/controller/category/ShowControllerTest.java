@@ -1,5 +1,7 @@
 package org.criticizer.controller.category;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.criticizer.dto.show.ShowResponse;
 import org.criticizer.entity.Show;
 import org.criticizer.security.SecurityUtil;
@@ -12,20 +14,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ShowController Tests")
 class ShowControllerTest {
 
-    @Mock
-    private ShowService showService;
+    @Mock private ShowService showService;
 
-    @Mock
-    private SecurityUtil securityUtil;
+    @Mock private SecurityUtil securityUtil;
 
-    @InjectMocks
-    private ShowController controller;
+    @InjectMocks private ShowController controller;
 
     @Test
     @DisplayName("Should return correct entity name")

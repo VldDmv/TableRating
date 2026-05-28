@@ -1,5 +1,13 @@
 package org.criticizer.controller.admin;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
 import org.criticizer.dto.admin.AdminStats;
 import org.criticizer.dto.helper.PageResponse;
 import org.criticizer.entity.User;
@@ -20,36 +28,21 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AdminViewController Tests")
 class AdminViewControllerTest {
 
-    @Mock
-    private DashboardService dashboardService;
+    @Mock private DashboardService dashboardService;
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
 
-    @Mock
-    private TagService tagService;
+    @Mock private TagService tagService;
 
-    @Mock
-    private GenreService genreService;
+    @Mock private GenreService genreService;
 
-    @Mock
-    private SecurityUtil securityUtil;
+    @Mock private SecurityUtil securityUtil;
 
-    @InjectMocks
-    private AdminViewController controller;
+    @InjectMocks private AdminViewController controller;
 
     private MockMvc mockMvc;
     private User adminUser;
@@ -60,10 +53,8 @@ class AdminViewControllerTest {
         viewResolver.setPrefix("/WEB-INF/views/");
         viewResolver.setSuffix(".jsp");
 
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .setViewResolvers(viewResolver)
-                .build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver).build();
 
         adminUser = TestDataBuilder.createAdminUser();
     }
@@ -92,15 +83,14 @@ class AdminViewControllerTest {
     void shouldLoadUsersManagement() throws Exception {
         // Given
         when(securityUtil.getCurrentUser()).thenReturn(adminUser);
-        
-        List<User> users = List.of(
-                TestDataBuilder.createUser(1, "user1", org.criticizer.entity.Role.USER),
-                TestDataBuilder.createUser(2, "user2", org.criticizer.entity.Role.USER)
-        );
+
+        List<User> users =
+                List.of(
+                        TestDataBuilder.createUser(1, "user1", org.criticizer.entity.Role.USER),
+                        TestDataBuilder.createUser(2, "user2", org.criticizer.entity.Role.USER));
         PageResponse<User> pageResponse = TestDataBuilder.createPageResponse(users, 1, 20);
-        
-        when(userService.getUsersPage(isNull(), eq(1), eq(20), eq(false)))
-                .thenReturn(pageResponse);
+
+        when(userService.getUsersPage(isNull(), eq(1), eq(20), eq(false))).thenReturn(pageResponse);
 
         // When & Then
         mockMvc.perform(get("/admin/users"))
@@ -118,16 +108,16 @@ class AdminViewControllerTest {
     void shouldLoadUsersManagementWithSearch() throws Exception {
         // Given
         when(securityUtil.getCurrentUser()).thenReturn(adminUser);
-        
-        List<User> users = List.of(TestDataBuilder.createUser(1, "john", org.criticizer.entity.Role.USER));
+
+        List<User> users =
+                List.of(TestDataBuilder.createUser(1, "john", org.criticizer.entity.Role.USER));
         PageResponse<User> pageResponse = TestDataBuilder.createPageResponse(users, 1, 20);
-        
+
         when(userService.getUsersPage(eq("john"), eq(1), eq(20), eq(false)))
                 .thenReturn(pageResponse);
 
         // When & Then
-        mockMvc.perform(get("/admin/users")
-                        .param("search", "john"))
+        mockMvc.perform(get("/admin/users").param("search", "john"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/userList"))
                 .andExpect(model().attribute("searchTerm", "john"));
@@ -142,8 +132,7 @@ class AdminViewControllerTest {
         when(tagService.getAllTags()).thenReturn(List.of());
 
         // When & Then
-        mockMvc.perform(get("/admin/management")
-                        .param("type", "tags"))
+        mockMvc.perform(get("/admin/management").param("type", "tags"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/management"))
                 .andExpect(model().attribute("type", "tags"))
@@ -160,8 +149,7 @@ class AdminViewControllerTest {
         when(genreService.getAllGenres()).thenReturn(List.of());
 
         // When & Then
-        mockMvc.perform(get("/admin/management")
-                        .param("type", "genres"))
+        mockMvc.perform(get("/admin/management").param("type", "genres"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/management"))
                 .andExpect(model().attribute("type", "genres"))
@@ -175,8 +163,7 @@ class AdminViewControllerTest {
     @DisplayName("GET /admin/management - Should redirect on invalid type")
     void shouldRedirectOnInvalidType() throws Exception {
         // When & Then
-        mockMvc.perform(get("/admin/management")
-                        .param("type", "invalid"))
+        mockMvc.perform(get("/admin/management").param("type", "invalid"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/management?type=tags"));
     }

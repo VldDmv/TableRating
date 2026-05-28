@@ -28,7 +28,9 @@ function makeSwitcher(search = '') {
 // ─── Form switching ───────────────────────────────────────────────────────────
 
 describe('FormSwitcher — form switching', () => {
-    beforeEach(() => { setupFullDOM(); });
+    beforeEach(() => {
+        setupFullDOM();
+    });
 
     afterEach(() => {
         document.body.innerHTML = '';
@@ -68,14 +70,14 @@ describe('FormSwitcher — form switching', () => {
 // ─── Username availability check ──────────────────────────────────────────────
 
 describe('FormSwitcher — username availability check', () => {
-   beforeEach(() => {
-       setupFullDOM();
-       jest.useFakeTimers();
-       global.fetch = jest.fn().mockResolvedValue({
-           ok: true,
-           json: async () => ({ available: true })
-       });
-   });
+    beforeEach(() => {
+        setupFullDOM();
+        jest.useFakeTimers();
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({ available: true }),
+        });
+    });
 
     afterEach(() => {
         document.body.innerHTML = '';
@@ -126,7 +128,7 @@ describe('FormSwitcher — username availability check', () => {
     test('shows available when API returns available: true', async () => {
         global.fetch.mockResolvedValue({
             ok: true,
-            json: async () => ({ available: true })
+            json: async () => ({ available: true }),
         });
 
         makeSwitcher();
@@ -142,7 +144,7 @@ describe('FormSwitcher — username availability check', () => {
     test('shows taken when API returns available: false', async () => {
         global.fetch.mockResolvedValue({
             ok: true,
-            json: async () => ({ available: false })
+            json: async () => ({ available: false }),
         });
 
         makeSwitcher();
@@ -172,8 +174,12 @@ describe('FormSwitcher — username availability check', () => {
 // ─── URL parameter handling ───────────────────────────────────────────────────
 
 describe('FormSwitcher — URL parameters', () => {
-    beforeEach(() => { setupFullDOM(); });
-    afterEach(() => { document.body.innerHTML = ''; });
+    beforeEach(() => {
+        setupFullDOM();
+    });
+    afterEach(() => {
+        document.body.innerHTML = '';
+    });
 
     test('showRegister param shows register form', () => {
         makeSwitcher('?showRegister=true');
@@ -202,7 +208,9 @@ describe('FormSwitcher — URL parameters', () => {
 // ─── Null safety ──────────────────────────────────────────────────────────────
 
 describe('FormSwitcher — null safety', () => {
-    afterEach(() => { document.body.innerHTML = ''; });
+    afterEach(() => {
+        document.body.innerHTML = '';
+    });
 
     test('does not throw when optional UI elements are missing', () => {
         document.body.innerHTML = `

@@ -1,5 +1,7 @@
 package org.criticizer.controller.category;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.criticizer.dto.game.GameResponse;
 import org.criticizer.entity.Game;
 import org.criticizer.security.SecurityUtil;
@@ -15,28 +17,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("GameController Tests")
 class GameControllerTest {
 
-    @Mock
-    private GameService gameService;
+    @Mock private GameService gameService;
 
-    @Mock
-    private SecurityUtil securityUtil;
+    @Mock private SecurityUtil securityUtil;
 
-    @InjectMocks
-    private GameController controller;
+    @InjectMocks private GameController controller;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
     @Test

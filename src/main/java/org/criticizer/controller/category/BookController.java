@@ -12,11 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/books")
-public class BookController extends AbstractMediaController<
-        Book,
-        BookResponse,
-        CreateBookRequest,
-        UpdateBookRequest> {
+public class BookController
+        extends AbstractMediaController<Book, BookResponse, CreateBookRequest, UpdateBookRequest> {
 
     public BookController(BookService bookService, SecurityUtil securityUtil) {
         super(bookService, securityUtil);
@@ -26,7 +23,6 @@ public class BookController extends AbstractMediaController<
     protected String getEntityName() {
         return "Book";
     }
-
 
     @Override
     protected BookResponse convertToResponse(Book entity) {

@@ -1,12 +1,9 @@
 package org.criticizer.entity;
 
 import jakarta.persistence.*;
-
 import java.util.Objects;
 
-/**
- * Represents a tag entity used to categorize games in the system.
- */
+/** Represents a tag entity used to categorize games in the system. */
 @Entity
 @Table(name = "tags")
 public class Tag {
@@ -18,15 +15,11 @@ public class Tag {
     @Column(name = "name", nullable = false, unique = true, length = 255)
     private String name;
 
-
     // Constructors
 
-    protected Tag() {
-    }
+    protected Tag() {}
 
-    /**
-     * Constructs a new Tag with the specified ID and name.
-     */
+    /** Constructs a new Tag with the specified ID and name. */
     public Tag(Integer id, String name) {
         this.id = id;
         this.name = name;

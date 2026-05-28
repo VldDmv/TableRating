@@ -2,7 +2,7 @@
  * Initializes registration and login form functionality with form switching.
  */
 
-export { FormSwitcher }
+export { FormSwitcher };
 
 class FormSwitcher {
     constructor() {
@@ -28,9 +28,9 @@ class FormSwitcher {
         const urlParams = new URLSearchParams(window.location.search);
 
         //  Handle both showRegister and showLogin parameters
-        if (urlParams.get("showRegister")) {
+        if (urlParams.get('showRegister')) {
             this.showRegister();
-        } else if (urlParams.get("showLogin")) {
+        } else if (urlParams.get('showLogin')) {
             this.showLogin();
         }
 
@@ -65,11 +65,13 @@ class FormSwitcher {
      *  Setup realtime username availability check
      */
     setupUsernameCheck() {
-
-        if (!this.usernameInput
-            || !this.usernameIndicator
-            || !this.usernameMessage
-            || !this.registerButton) return;
+        if (
+            !this.usernameInput ||
+            !this.usernameIndicator ||
+            !this.usernameMessage ||
+            !this.registerButton
+        )
+            return;
 
         // Check on input (with debounce to avoid too many requests)
         this.usernameInput.addEventListener('input', () => {
@@ -106,7 +108,9 @@ class FormSwitcher {
      */
     async checkUsernameAvailability(username) {
         try {
-            const response = await fetch(`/auth/check-username?username=${encodeURIComponent(username)}`);
+            const response = await fetch(
+                `/auth/check-username?username=${encodeURIComponent(username)}`
+            );
 
             if (!response.ok) {
                 throw new Error('Failed to check username');
@@ -120,7 +124,6 @@ class FormSwitcher {
             } else {
                 this.showTaken();
             }
-
         } catch (error) {
             console.error('Error checking username:', error);
             this.showError('Could not verify username availability');
@@ -161,7 +164,7 @@ class FormSwitcher {
     }
 
     /**
-    * Show error message
+     * Show error message
      */
     showError(message) {
         this.usernameIndicator.textContent = '!';

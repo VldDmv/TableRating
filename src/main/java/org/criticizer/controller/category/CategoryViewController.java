@@ -1,5 +1,6 @@
 package org.criticizer.controller.category;
 
+import java.util.Map;
 import org.criticizer.constants.ContentCategory;
 import org.criticizer.entity.User;
 import org.criticizer.security.SecurityUtil;
@@ -14,11 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.Map;
-
-/**
- * View controller for category pages (games, movies, books, shows).
- */
+/** View controller for category pages (games, movies, books, shows). */
 @Controller
 public class CategoryViewController {
 
@@ -41,9 +38,7 @@ public class CategoryViewController {
     }
 
     @GetMapping("/{mediaType:games|movies|books|shows}")
-    public String categoryPage(
-            @PathVariable String mediaType,
-            Model model) {
+    public String categoryPage(@PathVariable String mediaType, Model model) {
 
         ContentCategory type = ContentCategory.fromString(mediaType);
         User currentUser = securityUtil.getCurrentUser();
@@ -65,8 +60,8 @@ public class CategoryViewController {
 
         model.addAttribute("paramNames", getStandardParamNames());
 
-        var initialData = service.getUserItemsPage(
-                currentUser.getId(), 1, 10, null, null, "name", "asc");
+        var initialData =
+                service.getUserItemsPage(currentUser.getId(), 1, 10, null, null, "name", "asc");
 
         model.addAttribute("initialData", initialData);
 
@@ -77,7 +72,6 @@ public class CategoryViewController {
         return Map.of(
                 "addItemName", "name",
                 "addItemScore", "score",
-                "addItemTagIds", "selectedIds"
-        );
+                "addItemTagIds", "selectedIds");
     }
 }

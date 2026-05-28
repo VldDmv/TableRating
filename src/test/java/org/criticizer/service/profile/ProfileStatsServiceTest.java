@@ -1,5 +1,12 @@
 package org.criticizer.service.profile;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import org.criticizer.entity.Game;
 import org.criticizer.entity.Tag;
 import org.criticizer.exceptions.validation.InvalidInputException;
@@ -13,14 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProfileStatsService Tests")
@@ -44,11 +43,12 @@ class ProfileStatsServiceTest {
     @Test
     @DisplayName("Aggregates count, average and completion split")
     void aggregatesBasics() {
-        when(gameRepository.findByUserIdWithTags(USER_ID)).thenReturn(List.of(
-                game(1, "A", 10, true),
-                game(2, "B", 20, false),
-                game(3, "C", 90, true)
-        ));
+        when(gameRepository.findByUserIdWithTags(USER_ID))
+                .thenReturn(
+                        List.of(
+                                game(1, "A", 10, true),
+                                game(2, "B", 20, false),
+                                game(3, "C", 90, true)));
 
         Map<String, Object> stats = statsService.getStats("games", USER_ID);
 
@@ -61,12 +61,14 @@ class ProfileStatsServiceTest {
     @Test
     @DisplayName("Score buckets place items in 10-point bins, edges included")
     void scoreBuckets() {
-        when(gameRepository.findByUserIdWithTags(USER_ID)).thenReturn(List.of(
-                game(1, "min", 1, false),    // bucket 0  (1-10)
-                game(2, "ten", 10, false),   // bucket 0  (1-10)
-                game(3, "eleven", 11, false),// bucket 1  (11-20)
-                game(4, "max", 100, false)   // bucket 9  (91-100)
-        ));
+        when(gameRepository.findByUserIdWithTags(USER_ID))
+                .thenReturn(
+                        List.of(
+                                game(1, "min", 1, false), // bucket 0  (1-10)
+                                game(2, "ten", 10, false), // bucket 0  (1-10)
+                                game(3, "eleven", 11, false), // bucket 1  (11-20)
+                                game(4, "max", 100, false) // bucket 9  (91-100)
+                                ));
 
         int[] buckets = (int[]) statsService.getStats("games", USER_ID).get("scoreBuckets");
 
@@ -82,14 +84,16 @@ class ProfileStatsServiceTest {
     void categoryAverages() {
         Tag rpg = new Tag(1, "RPG");
         Tag casual = new Tag(2, "Casual");
-        when(gameRepository.findByUserIdWithTags(USER_ID)).thenReturn(List.of(
-                game(1, "A", 90, true, rpg),
-                game(2, "B", 80, true, rpg),
-                game(3, "C", 20, false, casual)
-        ));
+        when(gameRepository.findByUserIdWithTags(USER_ID))
+                .thenReturn(
+                        List.of(
+                                game(1, "A", 90, true, rpg),
+                                game(2, "B", 80, true, rpg),
+                                game(3, "C", 20, false, casual)));
 
-        var rows = (List<Map<String, Object>>) statsService.getStats("games", USER_ID)
-                .get("categoryAverages");
+        var rows =
+                (List<Map<String, Object>>)
+                        statsService.getStats("games", USER_ID).get("categoryAverages");
 
         assertThat(rows).hasSize(2);
         // RPG avg 85 should come before Casual avg 20.

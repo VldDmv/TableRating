@@ -7,10 +7,7 @@ import org.criticizer.service.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * REST API controller for public user operations.
- * Enhanced with sorting and statistics.
- */
+/** REST API controller for public user operations. Enhanced with sorting and statistics. */
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -24,7 +21,7 @@ public class UserController {
     /**
      * Gets paginated list of users with optional search, sort, and statistics.
      *
-     * GET /api/users?page=1&size=10&search=john&sortBy=totalItems&sortOrder=desc
+     * <p>GET /api/users?page=1&size=10&search=john&sortBy=totalItems&sortOrder=desc
      *
      * @param page Page number (default: 1)
      * @param size Page size (default: 20)
@@ -41,15 +38,15 @@ public class UserController {
             @RequestParam(defaultValue = "totalItems") String sortBy,
             @RequestParam(defaultValue = "desc") String sortOrder) {
 
-        PageResponse<UserPublicResponse> response = userService.getUsersPageWithStats(
-                search, page, size, sortBy, sortOrder);
+        PageResponse<UserPublicResponse> response =
+                userService.getUsersPageWithStats(search, page, size, sortBy, sortOrder);
         return ResponseEntity.ok(response);
     }
 
     /**
      * Checks if username exists.
      *
-     * GET /api/users/{username}/exists
+     * <p>GET /api/users/{username}/exists
      *
      * @param username Username to check
      * @return ExistsResponse with boolean exists field

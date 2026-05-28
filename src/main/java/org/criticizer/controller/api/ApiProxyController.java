@@ -25,9 +25,7 @@ public class ApiProxyController {
 
     @GetMapping("/games")
     public ResponseEntity<String> proxyGamesApi(
-            @RequestParam String search,
-            @RequestParam(defaultValue = "10") int pageSize
-    ) {
+            @RequestParam String search, @RequestParam(defaultValue = "10") int pageSize) {
         log.info("[ApiProxy] Games API called but DISABLED - search: {}", search);
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -50,14 +48,10 @@ public class ApiProxyController {
                 .body("{\"error\": \"Shows autocomplete is temporarily disabled.\"}");
     }
 
-    /**
-     * Open Library Books API
-     */
+    /** Open Library Books API */
     @GetMapping("/books")
     public ResponseEntity<String> proxyOpenLibraryApi(
-            @RequestParam String q,
-            @RequestParam(defaultValue = "10") int maxResults
-    ) {
+            @RequestParam String q, @RequestParam(defaultValue = "10") int maxResults) {
         log.info("[ApiProxy] Open Library API called - query: '{}'", q);
 
         String query = q.trim();
@@ -82,12 +76,10 @@ public class ApiProxyController {
         }
 
         try {
-            String body = externalApi.searchOpenLibrary(
-                    ExternalApiClient.normalize(query), maxResults);
+            String body =
+                    externalApi.searchOpenLibrary(ExternalApiClient.normalize(query), maxResults);
 
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(body);
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
 
         } catch (RestClientException e) {
             log.error("[ApiProxy] Open Library API error: {}", e.getMessage());

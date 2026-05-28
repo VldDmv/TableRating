@@ -1,5 +1,12 @@
 package org.criticizer.controller.auth;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import jakarta.servlet.http.HttpSession;
 import org.criticizer.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,28 +23,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AuthController Tests")
 class AuthControllerTest {
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
 
-    @Mock
-    private AuthenticationManager authenticationManager;
+    @Mock private AuthenticationManager authenticationManager;
 
-    @Mock
-    private HttpSession httpSession;
+    @Mock private HttpSession httpSession;
 
-    @InjectMocks
-    private AuthController controller;
+    @InjectMocks private AuthController controller;
 
     private MockMvc mockMvc;
 
@@ -47,10 +43,8 @@ class AuthControllerTest {
         viewResolver.setPrefix("/WEB-INF/views/");
         viewResolver.setSuffix(".jsp");
 
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .setViewResolvers(viewResolver)
-                .build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver).build();
     }
 
     @Test
@@ -63,11 +57,12 @@ class AuthControllerTest {
         doNothing().when(userService).registerUser(anyString(), anyString());
 
         // When & Then
-        mockMvc.perform(post("/auth/register")
-                        .param("username", "newuser")
-                        .param("password", "password123")
-                        .param("confirmPassword", "password123")
-                        .sessionAttr("SPRING_SECURITY_CONTEXT", httpSession))
+        mockMvc.perform(
+                        post("/auth/register")
+                                .param("username", "newuser")
+                                .param("password", "password123")
+                                .param("confirmPassword", "password123")
+                                .sessionAttr("SPRING_SECURITY_CONTEXT", httpSession))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/dashboard"));
 
@@ -79,10 +74,11 @@ class AuthControllerTest {
     @DisplayName("POST /auth/register - Should reject when passwords don't match")
     void shouldRejectWhenPasswordsDontMatch() throws Exception {
         // When & Then
-        mockMvc.perform(post("/auth/register")
-                        .param("username", "newuser")
-                        .param("password", "password123")
-                        .param("confirmPassword", "different"))
+        mockMvc.perform(
+                        post("/auth/register")
+                                .param("username", "newuser")
+                                .param("password", "password123")
+                                .param("confirmPassword", "different"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/index?showRegister=true"))
                 .andExpect(flash().attributeExists("flashErrorMessage"));
@@ -94,8 +90,7 @@ class AuthControllerTest {
     @DisplayName("POST /auth/register - Should reject when fields are missing")
     void shouldRejectWhenFieldsAreMissing() throws Exception {
         // When & Then
-        mockMvc.perform(post("/auth/register")
-                        .param("username", "newuser"))
+        mockMvc.perform(post("/auth/register").param("username", "newuser"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/index?showRegister=true"))
                 .andExpect(flash().attributeExists("flashErrorMessage"));
@@ -108,13 +103,15 @@ class AuthControllerTest {
     void shouldHandleRegistrationFailure() throws Exception {
         // Given
         doThrow(new RuntimeException("Username already exists"))
-                .when(userService).registerUser(anyString(), anyString());
+                .when(userService)
+                .registerUser(anyString(), anyString());
 
         // When & Then
-        mockMvc.perform(post("/auth/register")
-                        .param("username", "existinguser")
-                        .param("password", "password123")
-                        .param("confirmPassword", "password123"))
+        mockMvc.perform(
+                        post("/auth/register")
+                                .param("username", "existinguser")
+                                .param("password", "password123")
+                                .param("confirmPassword", "password123"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/index?showRegister=true"))
                 .andExpect(flash().attributeExists("flashErrorMessage"));
@@ -129,8 +126,7 @@ class AuthControllerTest {
         when(userService.existsByUsername("newuser")).thenReturn(false);
 
         // When & Then
-        mockMvc.perform(get("/auth/check-username")
-                        .param("username", "newuser"))
+        mockMvc.perform(get("/auth/check-username").param("username", "newuser"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.available").value(true));
 
@@ -144,8 +140,7 @@ class AuthControllerTest {
         when(userService.existsByUsername("existinguser")).thenReturn(true);
 
         // When & Then
-        mockMvc.perform(get("/auth/check-username")
-                        .param("username", "existinguser"))
+        mockMvc.perform(get("/auth/check-username").param("username", "existinguser"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.available").value(false));
 
@@ -156,8 +151,7 @@ class AuthControllerTest {
     @DisplayName("GET /auth/check-username - Should return available false for empty username")
     void shouldReturnAvailableForEmptyUsername() throws Exception {
         // When & Then
-        mockMvc.perform(get("/auth/check-username")
-                        .param("username", ""))
+        mockMvc.perform(get("/auth/check-username").param("username", ""))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.available").value(false));
 
@@ -171,8 +165,7 @@ class AuthControllerTest {
         when(userService.existsByUsername("newuser")).thenReturn(false);
 
         // When & Then
-        mockMvc.perform(get("/auth/check-username")
-                        .param("username", "  newuser  "))
+        mockMvc.perform(get("/auth/check-username").param("username", "  newuser  "))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.available").value(true));
 

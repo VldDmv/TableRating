@@ -1,5 +1,15 @@
 package org.criticizer.service.user;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.criticizer.dto.helper.PageResponse;
 import org.criticizer.dto.user.UserPublicResponse;
 import org.criticizer.entity.Role;
@@ -25,48 +35,29 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 /**
- * Comprehensive unit tests for UserService.
- * Uses Mockito for dependency mocking and AssertJ for fluent assertions.
+ * Comprehensive unit tests for UserService. Uses Mockito for dependency mocking and AssertJ for
+ * fluent assertions.
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UserService Tests")
 class UserServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
+    @Mock private UserRepository userRepository;
 
-    @Mock
-    private GameRepository gameRepository;
+    @Mock private GameRepository gameRepository;
 
-    @Mock
-    private MovieRepository movieRepository;
+    @Mock private MovieRepository movieRepository;
 
-    @Mock
-    private BookRepository bookRepository;
+    @Mock private BookRepository bookRepository;
 
-    @Mock
-    private ShowRepository showRepository;
+    @Mock private ShowRepository showRepository;
 
-    @Mock
-    private ServiceValidator validator;
+    @Mock private ServiceValidator validator;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
+    @Mock private PasswordEncoder passwordEncoder;
 
-    @InjectMocks
-    private UserService userService;
+    @InjectMocks private UserService userService;
 
     private User testUser;
     private User adminUser;
@@ -95,8 +86,7 @@ class UserServiceTest {
         @DisplayName("Should return user when exists")
         void shouldReturnUserWhenExists() {
             // Given
-            when(userRepository.findByNameIgnoreCase("testuser"))
-                    .thenReturn(Optional.of(testUser));
+            when(userRepository.findByNameIgnoreCase("testuser")).thenReturn(Optional.of(testUser));
 
             // When
             User result = userService.getUser("testuser");
@@ -113,8 +103,7 @@ class UserServiceTest {
         @DisplayName("Should be case-insensitive")
         void shouldBeCaseInsensitive() {
             // Given
-            when(userRepository.findByNameIgnoreCase("TESTUSER"))
-                    .thenReturn(Optional.of(testUser));
+            when(userRepository.findByNameIgnoreCase("TESTUSER")).thenReturn(Optional.of(testUser));
 
             // When
             User result = userService.getUser("TESTUSER");
@@ -128,8 +117,7 @@ class UserServiceTest {
         @DisplayName("Should throw UserNotFoundException when user does not exist")
         void shouldThrowWhenUserNotFound() {
             // Given
-            when(userRepository.findByNameIgnoreCase("nonexistent"))
-                    .thenReturn(Optional.empty());
+            when(userRepository.findByNameIgnoreCase("nonexistent")).thenReturn(Optional.empty());
 
             // When & Then
             assertThatThrownBy(() -> userService.getUser("nonexistent"))
@@ -169,12 +157,14 @@ class UserServiceTest {
             verify(validator).validatePassword(password);
             verify(userRepository).existsByNameIgnoreCase(trimmed);
             verify(passwordEncoder).encode(password);
-            verify(userRepository).save(argThat(user ->
-                    user.getName().equals(trimmed) &&
-                            user.getPassword().equals(hashedPassword) &&
-                            user.getRole() == Role.USER &&
-                            !user.isProfileIsPublic()
-            ));
+            verify(userRepository)
+                    .save(
+                            argThat(
+                                    user ->
+                                            user.getName().equals(trimmed)
+                                                    && user.getPassword().equals(hashedPassword)
+                                                    && user.getRole() == Role.USER
+                                                    && !user.isProfileIsPublic()));
         }
 
         @Test
@@ -209,10 +199,12 @@ class UserServiceTest {
             userService.registerUser("newuser", "password");
 
             // Then
-            verify(userRepository).save(argThat(user ->
-                    user.getRole() == Role.USER &&
-                            !user.isProfileIsPublic()
-            ));
+            verify(userRepository)
+                    .save(
+                            argThat(
+                                    user ->
+                                            user.getRole() == Role.USER
+                                                    && !user.isProfileIsPublic()));
         }
     }
 
@@ -304,8 +296,7 @@ class UserServiceTest {
 
             when(validator.validatePagination(1, 10)).thenReturn(params);
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
-            when(userRepository.findUsers(eq(true), any(Pageable.class)))
-                    .thenReturn(userPage);
+            when(userRepository.findUsers(eq(true), any(Pageable.class))).thenReturn(userPage);
 
             // Mock statistics
             when(gameRepository.countByUserIds(anyList())).thenReturn(Map.of(1, 5L));
@@ -378,8 +369,7 @@ class UserServiceTest {
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
             Page<User> userPage = new PageImpl<>(Arrays.asList(user1, user2));
-            when(userRepository.findUsers(eq(true), any(Pageable.class)))
-                    .thenReturn(userPage);
+            when(userRepository.findUsers(eq(true), any(Pageable.class))).thenReturn(userPage);
 
             // user1 has 10 total items
             when(gameRepository.countByUserIds(anyList())).thenReturn(Map.of(1, 5L));
@@ -420,17 +410,15 @@ class UserServiceTest {
             userService.changeUserRole(1, Role.ADMIN, adminUser);
 
             // Then
-            verify(userRepository).save(argThat(user ->
-                    user.getId() == 1 && user.getRole() == Role.ADMIN
-            ));
+            verify(userRepository)
+                    .save(argThat(user -> user.getId() == 1 && user.getRole() == Role.ADMIN));
         }
 
         @Test
         @DisplayName("Should throw when non-admin tries to change role")
         void shouldThrowWhenNonAdminTriesChange() {
             // When & Then
-            assertThatThrownBy(() ->
-                    userService.changeUserRole(1, Role.ADMIN, testUser))
+            assertThatThrownBy(() -> userService.changeUserRole(1, Role.ADMIN, testUser))
                     .isInstanceOf(InsufficientPermissionsException.class);
 
             verify(userRepository, never()).save(any());
@@ -440,8 +428,7 @@ class UserServiceTest {
         @DisplayName("Should throw when admin tries to remove own admin role")
         void shouldThrowWhenAdminRemovesOwnRole() {
             // When & Then
-            assertThatThrownBy(() ->
-                    userService.changeUserRole(2, Role.USER, adminUser))
+            assertThatThrownBy(() -> userService.changeUserRole(2, Role.USER, adminUser))
                     .isInstanceOf(OperationNotPermittedException.class)
                     .hasMessageContaining("cannot remove their own admin role");
 
@@ -455,8 +442,7 @@ class UserServiceTest {
             when(userRepository.findById(999)).thenReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(() ->
-                    userService.changeUserRole(999, Role.ADMIN, adminUser))
+            assertThatThrownBy(() -> userService.changeUserRole(999, Role.ADMIN, adminUser))
                     .isInstanceOf(UserNotFoundException.class);
         }
 
@@ -464,8 +450,7 @@ class UserServiceTest {
         @DisplayName("Should throw when new role is null")
         void shouldThrowWhenRoleIsNull() {
             // When & Then
-            assertThatThrownBy(() ->
-                    userService.changeUserRole(1, null, adminUser))
+            assertThatThrownBy(() -> userService.changeUserRole(1, null, adminUser))
                     .isInstanceOf(InvalidInputException.class)
                     .hasMessageContaining("newRole");
         }
@@ -503,8 +488,7 @@ class UserServiceTest {
         @DisplayName("Should throw when non-admin tries to delete user")
         void shouldThrowWhenNonAdminTriesDelete() {
             // When & Then
-            assertThatThrownBy(() ->
-                    userService.deleteUser(2, testUser))
+            assertThatThrownBy(() -> userService.deleteUser(2, testUser))
                     .isInstanceOf(InsufficientPermissionsException.class);
 
             verify(userRepository, never()).deleteById(any());
@@ -514,8 +498,7 @@ class UserServiceTest {
         @DisplayName("Should throw when admin tries to delete themselves")
         void shouldThrowWhenAdminDeletesSelf() {
             // When & Then
-            assertThatThrownBy(() ->
-                    userService.deleteUser(2, adminUser))
+            assertThatThrownBy(() -> userService.deleteUser(2, adminUser))
                     .isInstanceOf(OperationNotPermittedException.class)
                     .hasMessageContaining("cannot delete your own account");
 
@@ -529,8 +512,7 @@ class UserServiceTest {
             when(userRepository.existsById(999)).thenReturn(false);
 
             // When & Then
-            assertThatThrownBy(() ->
-                    userService.deleteUser(999, adminUser))
+            assertThatThrownBy(() -> userService.deleteUser(999, adminUser))
                     .isInstanceOf(UserNotFoundException.class);
         }
     }
@@ -553,9 +535,8 @@ class UserServiceTest {
             userService.updateUserPrivacy(1, true);
 
             // Then
-            verify(userRepository).save(argThat(user ->
-                    user.getId() == 1 && user.isProfileIsPublic()
-            ));
+            verify(userRepository)
+                    .save(argThat(user -> user.getId() == 1 && user.isProfileIsPublic()));
         }
 
         @Test
@@ -570,9 +551,8 @@ class UserServiceTest {
             userService.updateUserPrivacy(1, false);
 
             // Then
-            verify(userRepository).save(argThat(user ->
-                    user.getId() == 1 && !user.isProfileIsPublic()
-            ));
+            verify(userRepository)
+                    .save(argThat(user -> user.getId() == 1 && !user.isProfileIsPublic()));
         }
 
         @Test
@@ -582,8 +562,7 @@ class UserServiceTest {
             when(userRepository.findById(999)).thenReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(() ->
-                    userService.updateUserPrivacy(999, true))
+            assertThatThrownBy(() -> userService.updateUserPrivacy(999, true))
                     .isInstanceOf(UserNotFoundException.class);
         }
     }

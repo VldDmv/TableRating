@@ -15,7 +15,7 @@ describe('CoverClickHandler', () => {
 
         tableBody = document.createElement('tbody');
         const row = document.createElement('tr');
-        row.dataset.originalName     = 'Test Game';
+        row.dataset.originalName = 'Test Game';
         row.dataset.originalCoverUrl = 'http://example.com/old.jpg';
         row.innerHTML = `
             <td><img class="cover-thumbnail" src="http://example.com/old.jpg" alt="Test Game"/></td>
@@ -30,7 +30,7 @@ describe('CoverClickHandler', () => {
         handler = new CoverClickHandler(tableBody, mockConfig, onCoverUpdated);
         global.fetch = jest.fn();
         global.prompt = jest.fn();
-        global.alert  = jest.fn();
+        global.alert = jest.fn();
     });
 
     afterEach(() => {
@@ -73,7 +73,7 @@ describe('CoverClickHandler', () => {
             handler.init();
             const img = tableBody.querySelector('.cover-thumbnail');
             img.dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
-            await new Promise(r => setTimeout(r, 0));
+            await new Promise((r) => setTimeout(r, 0));
             expect(global.prompt).toHaveBeenCalled();
         });
 
@@ -86,7 +86,7 @@ describe('CoverClickHandler', () => {
             handler.init();
             const placeholder = tableBody.querySelector('.cover-placeholder');
             placeholder.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-            await new Promise(r => setTimeout(r, 0));
+            await new Promise((r) => setTimeout(r, 0));
             expect(global.prompt).toHaveBeenCalled();
         });
     });
@@ -162,10 +162,12 @@ describe('CoverClickHandler', () => {
         test('should handle coverEditRequested custom event', async () => {
             global.prompt.mockReturnValue(null);
             handler.init();
-            document.dispatchEvent(new CustomEvent('coverEditRequested', {
-                detail: { itemName: 'Test Game', currentUrl: 'http://old.com/img.jpg' }
-            }));
-            await new Promise(r => setTimeout(r, 0));
+            document.dispatchEvent(
+                new CustomEvent('coverEditRequested', {
+                    detail: { itemName: 'Test Game', currentUrl: 'http://old.com/img.jpg' },
+                })
+            );
+            await new Promise((r) => setTimeout(r, 0));
             expect(global.prompt).toHaveBeenCalled();
         });
     });

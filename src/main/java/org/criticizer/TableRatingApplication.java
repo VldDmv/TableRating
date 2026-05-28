@@ -6,12 +6,10 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 /**
- * Main Spring Boot Application Class
- *
- * @SpringBootApplication combines:
- * - @Configuration: Tags the class as a source of bean definitions
- * - @EnableAutoConfiguration: Enables Spring Boot's auto-configuration
- * - @ComponentScan: Enables component scanning in the package and all sub-packages
+ * Main Spring Boot Application Class @SpringBootApplication combines: - @Configuration: Tags the
+ * class as a source of bean definitions - @EnableAutoConfiguration: Enables Spring Boot's
+ * auto-configuration - @ComponentScan: Enables component scanning in the package and all
+ * sub-packages
  */
 @SpringBootApplication
 public class TableRatingApplication extends SpringBootServletInitializer {
@@ -21,12 +19,11 @@ public class TableRatingApplication extends SpringBootServletInitializer {
     }
 
     /**
-     * Configure the application when deployed as WAR
-     * (optional - only needed if you want WAR deployment)
+     * Configure the application when deployed as WAR (optional - only needed if you want WAR
+     * deployment)
      */
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(TableRatingApplication.class);
     }
-
 }

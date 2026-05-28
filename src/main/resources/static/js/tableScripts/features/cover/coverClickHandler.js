@@ -6,24 +6,26 @@
 import { securityUtils } from '../../core/utils.js';
 
 export class CoverClickHandler {
-  /**
-  * @param {HTMLElement} tableBody
-  * @param {Object} config
-  * @param {Function} onCoverUpdated — callback called after the cover is successfully updated
-  */
+    /**
+     * @param {HTMLElement} tableBody
+     * @param {Object} config
+     * @param {Function} onCoverUpdated — callback called after the cover is successfully updated
+     */
     constructor(tableBody, config, onCoverUpdated) {
-        this.tableBody       = tableBody;
-        this.config          = config;
-        this.onCoverUpdated  = onCoverUpdated;
+        this.tableBody = tableBody;
+        this.config = config;
+        this.onCoverUpdated = onCoverUpdated;
 
         if (typeof onCoverUpdated !== 'function') {
-            console.warn('[CoverClickHandler] onCoverUpdated not passed - will hard reload after update');
+            console.warn(
+                '[CoverClickHandler] onCoverUpdated not passed - will hard reload after update'
+            );
         }
     }
 
     init() {
         this.tableBody.addEventListener('click', (e) => {
-            const coverImg         = e.target.closest('.cover-thumbnail');
+            const coverImg = e.target.closest('.cover-thumbnail');
             const coverPlaceholder = e.target.closest('.cover-placeholder');
 
             if (!coverImg && !coverPlaceholder) return;
@@ -41,7 +43,6 @@ export class CoverClickHandler {
                 e.stopPropagation();
                 this.handleCoverEdit(row);
             }
-
         });
 
         document.addEventListener('coverEditRequested', (e) => {
@@ -53,10 +54,7 @@ export class CoverClickHandler {
     // ─── Edit flow ────────────────────────────────────────────────────────────
 
     async handleCoverEdit(row) {
-        await this._showEditPrompt(
-            row.dataset.originalName,
-            row.dataset.originalCoverUrl || ''
-        );
+        await this._showEditPrompt(row.dataset.originalName, row.dataset.originalCoverUrl || '');
     }
 
     async handleCoverEditByName(itemName, currentUrl) {
@@ -95,26 +93,24 @@ export class CoverClickHandler {
             const response = await fetch(
                 `/api/${this.config.entityType}/${encodeURIComponent(itemName)}/cover`,
                 {
-                    method:  'PATCH',
+                    method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-XSRF-TOKEN': csrfToken
+                        'X-XSRF-TOKEN': csrfToken,
                     },
-                    body: JSON.stringify({ coverUrl })
+                    body: JSON.stringify({ coverUrl }),
                 }
             );
 
             if (!response.ok) {
-                throw new Error(await response.text() || 'Failed to update cover');
+                throw new Error((await response.text()) || 'Failed to update cover');
             }
-
 
             if (typeof this.onCoverUpdated === 'function') {
                 await this.onCoverUpdated();
             } else {
                 location.reload();
             }
-
         } catch (error) {
             console.error('[CoverClickHandler] Cover update error:', error);
             alert(`Failed to update cover: ${error.message}`);

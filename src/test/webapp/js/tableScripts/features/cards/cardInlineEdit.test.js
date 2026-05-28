@@ -1,52 +1,57 @@
-
-
 import { jest } from '@jest/globals';
 
 // ─── Mock dependencies ────────────────────────────────────────────────────────
 
 jest.unstable_mockModule('@/tableScripts/core/utils.js', () => ({
-    htmlUtils:     { escape: (s) => s, decode: (s) => s },
-    entityUtils:   {
+    htmlUtils: { escape: (s) => s, decode: (s) => s },
+    entityUtils: {
         getAvailableItems: jest.fn(() => [
             { id: 1, name: 'Action' },
-            { id: 2, name: 'RPG' }
+            { id: 2, name: 'RPG' },
         ]),
-        getItemTypeName: (t) => t === 'games' ? 'Tags' : 'Genres'
+        getItemTypeName: (t) => (t === 'games' ? 'Tags' : 'Genres'),
     },
     securityUtils: { getCsrfToken: jest.fn(() => 'mock-csrf') },
-    ICONS:         { SAVE: '💾', EDIT: '✏️', DELETE: '🗑️', CANCEL: '❌', COMPLETED: '✅', NOT_COMPLETED: '❌' }
+    ICONS: {
+        SAVE: '💾',
+        EDIT: '✏️',
+        DELETE: '🗑️',
+        CANCEL: '❌',
+        COMPLETED: '✅',
+        NOT_COMPLETED: '❌',
+    },
 }));
 
 jest.unstable_mockModule('@/tableScripts/core/errorHandler.js', () => ({
     ErrorHandler: {
         parseErrorResponse: jest.fn(async () => 'Error'),
-        handle:             jest.fn()
-    }
+        handle: jest.fn(),
+    },
 }));
 
 const { CardInlineEditManager } = await import('@/tableScripts/features/cards/cardInlineEdit.js');
-const { entityUtils }           = await import('@/tableScripts/core/utils.js');
+const { entityUtils } = await import('@/tableScripts/core/utils.js');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function makeConfig(overrides = {}) {
     return {
-        entityType:        'games',
-        entityNameSingular:'Game',
-        hideActions:        false,
-        applyScoreStyling:  jest.fn(),
-        ...overrides
+        entityType: 'games',
+        entityNameSingular: 'Game',
+        hideActions: false,
+        applyScoreStyling: jest.fn(),
+        ...overrides,
     };
 }
 
 function makeCard(options = {}) {
     const card = document.createElement('div');
     card.className = 'media-card';
-    card.dataset.originalName     = options.name     ?? 'Test Game';
-    card.dataset.originalScore    = options.score    ?? '75';
-    card.dataset.originalTagIds   = options.tagIds   ?? '1,2';
+    card.dataset.originalName = options.name ?? 'Test Game';
+    card.dataset.originalScore = options.score ?? '75';
+    card.dataset.originalTagIds = options.tagIds ?? '1,2';
     card.dataset.originalCoverUrl = options.coverUrl ?? '';
-    card.dataset.completed        = options.completed ?? 'false';
+    card.dataset.completed = options.completed ?? 'false';
 
     const coverDiv = document.createElement('div');
     coverDiv.className = 'card-cover';
@@ -85,9 +90,9 @@ describe('CardInlineEditManager.toggleCardEdit', () => {
     });
 
     test('switches to edit mode when card is not editing', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard();
-        const spy  = jest.spyOn(m, 'switchToEditMode');
+        const spy = jest.spyOn(m, 'switchToEditMode');
 
         m.toggleCardEdit(card);
 
@@ -96,7 +101,7 @@ describe('CardInlineEditManager.toggleCardEdit', () => {
     });
 
     test('calls saveCard when card is already editing', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard();
         card.classList.add('is-editing');
 
@@ -107,7 +112,7 @@ describe('CardInlineEditManager.toggleCardEdit', () => {
     });
 
     test('switches previous card to view mode before editing new card', () => {
-        const m     = makeManager();
+        const m = makeManager();
         const card1 = makeCard({ name: 'Card 1' });
         const card2 = makeCard({ name: 'Card 2' });
 
@@ -131,7 +136,7 @@ describe('CardInlineEditManager.switchToEditMode', () => {
     });
 
     test('adds is-editing class to card', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard();
 
         m.switchToEditMode(card);
@@ -140,7 +145,7 @@ describe('CardInlineEditManager.switchToEditMode', () => {
     });
 
     test('renders name input with original value', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard({ name: 'Dark Souls' });
 
         m.switchToEditMode(card);
@@ -151,7 +156,7 @@ describe('CardInlineEditManager.switchToEditMode', () => {
     });
 
     test('renders score input with original value', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard({ score: '88' });
 
         m.switchToEditMode(card);
@@ -162,7 +167,7 @@ describe('CardInlineEditManager.switchToEditMode', () => {
     });
 
     test('renders cover URL input', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard({ coverUrl: 'https://example.com/img.jpg' });
 
         m.switchToEditMode(card);
@@ -173,7 +178,7 @@ describe('CardInlineEditManager.switchToEditMode', () => {
     });
 
     test('renders save and cancel buttons', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard();
 
         m.switchToEditMode(card);
@@ -183,7 +188,7 @@ describe('CardInlineEditManager.switchToEditMode', () => {
     });
 
     test('labels tags field correctly for games', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard();
 
         m.switchToEditMode(card);
@@ -213,7 +218,7 @@ describe('CardInlineEditManager.switchToViewMode', () => {
     });
 
     test('removes is-editing class', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard();
         card.classList.add('is-editing');
 
@@ -223,7 +228,7 @@ describe('CardInlineEditManager.switchToViewMode', () => {
     });
 
     test('renders card title with original name', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard({ name: 'Elden Ring' });
         card.classList.add('is-editing');
 
@@ -234,7 +239,7 @@ describe('CardInlineEditManager.switchToViewMode', () => {
     });
 
     test('renders score cell', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard({ score: '92' });
 
         m.switchToViewMode(card);
@@ -244,7 +249,7 @@ describe('CardInlineEditManager.switchToViewMode', () => {
     });
 
     test('clears currentEditCard when it matches', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard();
         m.currentEditCard = card;
 
@@ -254,7 +259,7 @@ describe('CardInlineEditManager.switchToViewMode', () => {
     });
 
     test('calls applyScoreStyling when defined', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard();
 
         m.switchToViewMode(card);
@@ -263,7 +268,7 @@ describe('CardInlineEditManager.switchToViewMode', () => {
     });
 
     test('renders cover image when coverUrl is set', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard({ coverUrl: 'https://cover.jpg' });
 
         m.switchToViewMode(card);
@@ -274,7 +279,7 @@ describe('CardInlineEditManager.switchToViewMode', () => {
     });
 
     test('renders placeholder when no coverUrl', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard({ coverUrl: '' });
 
         m.switchToViewMode(card);
@@ -292,12 +297,12 @@ describe('CardInlineEditManager.renderTagsEditDisplay', () => {
         entityUtils.getAvailableItems.mockReturnValue([
             { id: 1, name: 'Action' },
             { id: 2, name: 'RPG' },
-            { id: 3, name: 'Strategy' }
+            { id: 3, name: 'Strategy' },
         ]);
     });
 
     test('returns "No tags selected" when no tagIds', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard({ tagIds: '' });
 
         const html = m.renderTagsEditDisplay(card);
@@ -305,7 +310,7 @@ describe('CardInlineEditManager.renderTagsEditDisplay', () => {
     });
 
     test('renders tag badges for matching ids', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard({ tagIds: '1,2' });
 
         const html = m.renderTagsEditDisplay(card);
@@ -315,7 +320,7 @@ describe('CardInlineEditManager.renderTagsEditDisplay', () => {
     });
 
     test('renders empty when tagIds do not match available items', () => {
-        const m    = makeManager();
+        const m = makeManager();
         const card = makeCard({ tagIds: '99,100' });
 
         const html = m.renderTagsEditDisplay(card);
@@ -341,7 +346,7 @@ describe('CardInlineEditManager.saveTagsFromModal', () => {
 
     test('updates currentModalCard dataset with checked ids', () => {
         const container = document.createElement('div');
-        const m  = new CardInlineEditManager(container, makeConfig());
+        const m = new CardInlineEditManager(container, makeConfig());
         const card = makeCard({ tagIds: '' });
         m.currentModalCard = card;
 
@@ -353,7 +358,7 @@ describe('CardInlineEditManager.saveTagsFromModal', () => {
 
     test('closes modal after saving', () => {
         const container = document.createElement('div');
-        const m   = new CardInlineEditManager(container, makeConfig());
+        const m = new CardInlineEditManager(container, makeConfig());
         const card = makeCard();
         m.currentModalCard = card;
 
@@ -365,7 +370,7 @@ describe('CardInlineEditManager.saveTagsFromModal', () => {
 
     test('does nothing when currentModalCard is null', () => {
         const container = document.createElement('div');
-        const m   = new CardInlineEditManager(container, makeConfig());
+        const m = new CardInlineEditManager(container, makeConfig());
         m.currentModalCard = null;
 
         expect(() => m.saveTagsFromModal()).not.toThrow();

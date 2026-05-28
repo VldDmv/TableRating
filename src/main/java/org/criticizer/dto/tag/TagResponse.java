@@ -2,9 +2,7 @@ package org.criticizer.dto.tag;
 
 import org.criticizer.entity.Tag;
 
-/**
- * Response DTO for a tag.
- */
+/** Response DTO for a tag. */
 public class TagResponse {
 
     private final Integer id;

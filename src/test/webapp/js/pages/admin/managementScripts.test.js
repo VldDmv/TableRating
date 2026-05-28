@@ -7,24 +7,32 @@ const { ManagementPage } = await import('@/pages/admin/managementScripts.js');
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function setupDOM(items = []) {
-    const cardItems = items.map(({ name, mediaTypes = [] }) => `
+    const cardItems = items
+        .map(
+            ({ name, mediaTypes = [] }) => `
         <div class="management-item">
             <span class="item-name">${name}</span>
             <div class="item-media-types">
-                ${mediaTypes.map(t => `<span class="media-badge">${t}</span>`).join('')}
+                ${mediaTypes.map((t) => `<span class="media-badge">${t}</span>`).join('')}
             </div>
         </div>
-    `).join('');
+    `
+        )
+        .join('');
 
-    const tableRows = items.map(({ name, mediaTypes = [] }) => `
+    const tableRows = items
+        .map(
+            ({ name, mediaTypes = [] }) => `
         <tr>
             <td>-</td>
             <td>${name}</td>
             <td><div class="table-media-types">
-                ${mediaTypes.map(t => `<span class="media-badge">${t}</span>`).join('')}
+                ${mediaTypes.map((t) => `<span class="media-badge">${t}</span>`).join('')}
             </div></td>
         </tr>
-    `).join('');
+    `
+        )
+        .join('');
 
     document.body.innerHTML = `
         <button id="cardsViewBtn" class="active"></button>
@@ -57,7 +65,8 @@ function setupDOM(items = []) {
 function makeManager(items = []) {
     setupDOM(items);
     global.fetch = jest.fn().mockResolvedValue({
-        ok: true, json: async () => ({ items: [], totalPages: 1 })
+        ok: true,
+        json: async () => ({ items: [], totalPages: 1 }),
     });
     return new ManagementPage();
 }
@@ -73,7 +82,9 @@ afterEach(() => {
 describe('ManagementPage._applyView', () => {
     let manager;
 
-    beforeEach(() => { manager = makeManager(); });
+    beforeEach(() => {
+        manager = makeManager();
+    });
 
     test('cards: itemsCards=grid, itemsTable=none', () => {
         manager._applyView('cards');
@@ -118,25 +129,30 @@ describe('ManagementPage.setFilter', () => {
 
     test('activates the clicked filter badge', () => {
         manager.setFilter('games');
-        expect(document.querySelector('[data-filter="games"]').classList.contains('active'))
-            .toBe(true);
+        expect(document.querySelector('[data-filter="games"]').classList.contains('active')).toBe(
+            true
+        );
     });
 
     test('deactivates all other badges', () => {
         manager.setFilter('games');
-        expect(document.querySelector('[data-filter="all"]').classList.contains('active'))
-            .toBe(false);
-        expect(document.querySelector('[data-filter="movies"]').classList.contains('active'))
-            .toBe(false);
+        expect(document.querySelector('[data-filter="all"]').classList.contains('active')).toBe(
+            false
+        );
+        expect(document.querySelector('[data-filter="movies"]').classList.contains('active')).toBe(
+            false
+        );
     });
 
     test('switching back to "all" activates only the all badge', () => {
         manager.setFilter('games');
         manager.setFilter('all');
-        expect(document.querySelector('[data-filter="all"]').classList.contains('active'))
-            .toBe(true);
-        expect(document.querySelector('[data-filter="games"]').classList.contains('active'))
-            .toBe(false);
+        expect(document.querySelector('[data-filter="all"]').classList.contains('active')).toBe(
+            true
+        );
+        expect(document.querySelector('[data-filter="games"]').classList.contains('active')).toBe(
+            false
+        );
     });
 });
 
@@ -145,13 +161,15 @@ describe('ManagementPage.setFilter', () => {
 describe('ManagementPage._itemMatchesFilters', () => {
     let manager;
 
-    beforeEach(() => { manager = makeManager(); });
+    beforeEach(() => {
+        manager = makeManager();
+    });
 
     function makeBadges(types) {
         const div = document.createElement('div');
-        types.forEach(t => {
+        types.forEach((t) => {
             const s = document.createElement('span');
-            s.className   = 'media-badge';
+            s.className = 'media-badge';
             s.textContent = t;
             div.appendChild(s);
         });
@@ -175,13 +193,15 @@ describe('ManagementPage._itemMatchesFilters', () => {
     });
 
     test('specific filter matches badge content', () => {
-        expect(manager._itemMatchesFilters('test', makeBadges(['games', 'movies']), '', 'games'))
-            .toBe(true);
+        expect(
+            manager._itemMatchesFilters('test', makeBadges(['games', 'movies']), '', 'games')
+        ).toBe(true);
     });
 
     test('specific filter → no match when badge missing', () => {
-        expect(manager._itemMatchesFilters('test', makeBadges(['movies']), '', 'games'))
-            .toBe(false);
+        expect(manager._itemMatchesFilters('test', makeBadges(['movies']), '', 'games')).toBe(
+            false
+        );
     });
 
     test('filter match is case-insensitive', () => {
@@ -191,7 +211,7 @@ describe('ManagementPage._itemMatchesFilters', () => {
     test('both search AND filter must match', () => {
         const el = makeBadges(['games']);
         expect(manager._itemMatchesFilters('my item', el, 'other', 'games')).toBe(false);
-        expect(manager._itemMatchesFilters('my item', el, 'my',    'games')).toBe(true);
+        expect(manager._itemMatchesFilters('my item', el, 'my', 'games')).toBe(true);
     });
 
     // Design decision: items without a badges element are treated as universally
@@ -208,40 +228,41 @@ describe('ManagementPage.applyFilters', () => {
 
     beforeEach(() => {
         manager = makeManager([
-            { name: 'Action',  mediaTypes: ['games']           },
-            { name: 'Drama',   mediaTypes: ['movies']          },
-            { name: 'Fantasy', mediaTypes: ['games', 'movies'] }
+            { name: 'Action', mediaTypes: ['games'] },
+            { name: 'Drama', mediaTypes: ['movies'] },
+            { name: 'Fantasy', mediaTypes: ['games', 'movies'] },
         ]);
     });
 
     test('empty search + "all" → all items visible', () => {
         manager.applyFilters('', 'all', 'cards');
-        document.querySelectorAll('.management-item')
-            .forEach(i => expect(i.style.display).not.toBe('none'));
+        document
+            .querySelectorAll('.management-item')
+            .forEach((i) => expect(i.style.display).not.toBe('none'));
     });
 
     test('search filters by name (case-insensitive)', () => {
         manager.applyFilters('drama', 'all', 'cards');
         const items = document.querySelectorAll('.management-item');
-        expect(items[0].style.display).toBe('none');       // Action
-        expect(items[1].style.display).not.toBe('none');   // Drama
-        expect(items[2].style.display).toBe('none');       // Fantasy
+        expect(items[0].style.display).toBe('none'); // Action
+        expect(items[1].style.display).not.toBe('none'); // Drama
+        expect(items[2].style.display).toBe('none'); // Fantasy
     });
 
     test('media type filter shows only matching items', () => {
         manager.applyFilters('', 'movies', 'cards');
         const items = document.querySelectorAll('.management-item');
-        expect(items[0].style.display).toBe('none');       // Action (games only)
-        expect(items[1].style.display).not.toBe('none');   // Drama
-        expect(items[2].style.display).not.toBe('none');   // Fantasy (games+movies)
+        expect(items[0].style.display).toBe('none'); // Action (games only)
+        expect(items[1].style.display).not.toBe('none'); // Drama
+        expect(items[2].style.display).not.toBe('none'); // Fantasy (games+movies)
     });
 
     test('combined filter + search narrows results', () => {
         manager.applyFilters('fantasy', 'games', 'cards');
         const items = document.querySelectorAll('.management-item');
-        expect(items[0].style.display).toBe('none');       // Action (name mismatch)
-        expect(items[1].style.display).toBe('none');       // Drama (type mismatch)
-        expect(items[2].style.display).not.toBe('none');   // Fantasy ✓
+        expect(items[0].style.display).toBe('none'); // Action (name mismatch)
+        expect(items[1].style.display).toBe('none'); // Drama (type mismatch)
+        expect(items[2].style.display).not.toBe('none'); // Fantasy ✓
     });
 
     test('no matches → shows emptyState', () => {
@@ -263,8 +284,8 @@ describe('ManagementPage.applyFilters', () => {
     test('table rows are also filtered', () => {
         manager.applyFilters('drama', 'all', 'table');
         const rows = document.querySelectorAll('#itemsTable tbody tr');
-        expect(rows[0].style.display).toBe('none');       // Action
-        expect(rows[1].style.display).not.toBe('none');   // Drama
+        expect(rows[0].style.display).toBe('none'); // Action
+        expect(rows[1].style.display).not.toBe('none'); // Drama
     });
 });
 
@@ -273,7 +294,9 @@ describe('ManagementPage.applyFilters', () => {
 describe('ManagementPage modal helpers', () => {
     let manager;
 
-    beforeEach(() => { manager = makeManager(); });
+    beforeEach(() => {
+        manager = makeManager();
+    });
 
     test('closeEditModal removes show class and hides modal', () => {
         const modal = document.getElementById('editModal');
@@ -299,11 +322,13 @@ describe('ManagementPage modal helpers', () => {
 describe('ManagementPage.editItem', () => {
     let manager;
 
-    beforeEach(() => { manager = makeManager(); });
+    beforeEach(() => {
+        manager = makeManager();
+    });
 
     function makeBtn(id, name, mediaTypes) {
         const btn = document.createElement('button');
-        btn.dataset.id   = id;
+        btn.dataset.id = id;
         btn.dataset.name = name;
         if (mediaTypes) btn.dataset.mediaTypes = mediaTypes;
         return btn;
@@ -318,18 +343,18 @@ describe('ManagementPage.editItem', () => {
     test('checks correct media type checkboxes', () => {
         manager.editItem(makeBtn('1', 'Test', 'games,movies'));
         const cbs = document.querySelectorAll('#edit-media-types input');
-        expect(cbs[0].checked).toBe(true);   // games
-        expect(cbs[1].checked).toBe(true);   // movies
-        expect(cbs[2].checked).toBe(false);  // books
+        expect(cbs[0].checked).toBe(true); // games
+        expect(cbs[1].checked).toBe(true); // movies
+        expect(cbs[2].checked).toBe(false); // books
     });
 
     test('unchecks non-matching checkboxes that were previously checked', () => {
-        document.querySelectorAll('#edit-media-types input').forEach(cb => cb.checked = true);
+        document.querySelectorAll('#edit-media-types input').forEach((cb) => (cb.checked = true));
         manager.editItem(makeBtn('1', 'Test', 'games'));
         const cbs = document.querySelectorAll('#edit-media-types input');
-        expect(cbs[0].checked).toBe(true);   // games
-        expect(cbs[1].checked).toBe(false);  // movies
-        expect(cbs[2].checked).toBe(false);  // books
+        expect(cbs[0].checked).toBe(true); // games
+        expect(cbs[1].checked).toBe(false); // movies
+        expect(cbs[2].checked).toBe(false); // books
     });
 
     test('opens editModal', () => {
@@ -347,11 +372,13 @@ describe('ManagementPage.editItem', () => {
 describe('ManagementPage.deleteItem', () => {
     let manager;
 
-    beforeEach(() => { manager = makeManager(); });
+    beforeEach(() => {
+        manager = makeManager();
+    });
 
     function makeBtn(id, name) {
         const btn = document.createElement('button');
-        btn.dataset.id   = id;
+        btn.dataset.id = id;
         btn.dataset.name = name;
         return btn;
     }

@@ -11,10 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 /**
- * REST API for AJAX data requests for category pages.
- * Single endpoint handles all four media types via MediaTypeResolver.
+ * REST API for AJAX data requests for category pages. Single endpoint handles all four media types
+ * via MediaTypeResolver.
  */
 @RestController
 @RequestMapping("/api/category")
@@ -32,8 +31,8 @@ public class CategoryDataController {
 
     /**
      * GET /api/category/{type} — games, movies, books, shows.
-     * <p>
-     * Games use categoryId as tag ID; movies/books/shows use it as genre ID..
+     *
+     * <p>Games use categoryId as tag ID; movies/books/shows use it as genre ID..
      */
     @GetMapping("/{type:games|movies|books|shows}")
     public ResponseEntity<PageResponse<?>> getCategoryData(
@@ -50,14 +49,26 @@ public class CategoryDataController {
         User currentUser = securityUtil.getCurrentUser();
         ContentCategory category = ContentCategory.fromString(type);
 
-        log.debug("AJAX request for {} - page: {}, rows: {}, user: {}",
-                type, page, rows, currentUser.getName());
+        log.debug(
+                "AJAX request for {} - page: {}, rows: {}, user: {}",
+                type,
+                page,
+                rows,
+                currentUser.getName());
 
         AbstractMediaService<?, ?> service = mediaTypeResolver.resolve(category);
 
-        PageResponse<?> result = service.getUserItemsPageAsDto(
-                currentUser.getId(), page, rows, categoryId, search, sortBy, sortOrder,
-                minScore, maxScore);
+        PageResponse<?> result =
+                service.getUserItemsPageAsDto(
+                        currentUser.getId(),
+                        page,
+                        rows,
+                        categoryId,
+                        search,
+                        sortBy,
+                        sortOrder,
+                        minScore,
+                        maxScore);
 
         return ResponseEntity.ok(result);
     }

@@ -1,6 +1,7 @@
 package org.criticizer.controller.category;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import org.criticizer.dto.genre.CreateGenreRequest;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.dto.genre.UpdateGenreRequest;
@@ -11,11 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/genres")
@@ -39,8 +37,7 @@ public class GenreController {
 
     @GetMapping("/available/{mediaType}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<GenreResponse>> getAvailableGenres(
-            @PathVariable String mediaType) {
+    public ResponseEntity<List<GenreResponse>> getAvailableGenres(@PathVariable String mediaType) {
 
         log.debug("GET /api/genres/available/{} - Fetching available genres", mediaType);
         List<GenreResponse> genres = genreService.getAvailableGenresFor(mediaType);
@@ -49,8 +46,7 @@ public class GenreController {
 
     @GetMapping("/movie/{movieId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<GenreResponse>> getGenresForMovie(
-            @PathVariable Integer movieId) {
+    public ResponseEntity<List<GenreResponse>> getGenresForMovie(@PathVariable Integer movieId) {
 
         log.debug("GET /api/genres/movie/{} - Fetching genres", movieId);
         List<GenreResponse> genres = genreService.getGenresForMovie(movieId);
@@ -59,8 +55,7 @@ public class GenreController {
 
     @GetMapping("/book/{bookId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<GenreResponse>> getGenresForBook(
-            @PathVariable Integer bookId) {
+    public ResponseEntity<List<GenreResponse>> getGenresForBook(@PathVariable Integer bookId) {
 
         log.debug("GET /api/genres/book/{} - Fetching genres", bookId);
         List<GenreResponse> genres = genreService.getGenresForBook(bookId);
@@ -69,8 +64,7 @@ public class GenreController {
 
     @GetMapping("/show/{showId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<GenreResponse>> getGenresForShow(
-            @PathVariable Integer showId) {
+    public ResponseEntity<List<GenreResponse>> getGenresForShow(@PathVariable Integer showId) {
 
         log.debug("GET /api/genres/show/{} - Fetching genres", showId);
         List<GenreResponse> genres = genreService.getGenresForShow(showId);
@@ -83,22 +77,15 @@ public class GenreController {
 
         log.info("POST /api/genres - Creating genre: {}", request.name());
         GenreResponse created = genreService.createGenre(request);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<GenreResponse> updateGenre(
-            @PathVariable Integer id,
-            @Valid @RequestBody UpdateGenreRequest request) {
+            @PathVariable Integer id, @Valid @RequestBody UpdateGenreRequest request) {
 
-
-        UpdateGenreRequest updatedRequest = new UpdateGenreRequest(
-                id,
-                request.name(),
-                request.mediaTypes()
-        );
+        UpdateGenreRequest updatedRequest =
+                new UpdateGenreRequest(id, request.name(), request.mediaTypes());
 
         log.info("PUT /api/genres/{} - Updating genre", id);
         GenreResponse updated = genreService.updateGenre(updatedRequest);
@@ -114,8 +101,7 @@ public class GenreController {
 
     @GetMapping("/{id}/in-use")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ExistsResponse> checkGenreInUse(
-            @PathVariable Integer id) {
+    public ResponseEntity<ExistsResponse> checkGenreInUse(@PathVariable Integer id) {
 
         log.debug("GET /api/genres/{}/in-use - Checking if genre is in use", id);
         boolean inUse = genreService.isGenreInUse(id);

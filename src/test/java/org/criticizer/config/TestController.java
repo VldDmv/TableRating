@@ -49,8 +49,7 @@ public class TestController {
 
     @PostMapping("/validate")
     public void validateDto(
-            @org.springframework.validation.annotation.Validated @RequestBody TestDto dto) {
-    }
+            @org.springframework.validation.annotation.Validated @RequestBody TestDto dto) {}
 
     public static class TestDto {
         @jakarta.validation.constraints.NotBlank(message = "Name is required")

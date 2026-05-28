@@ -1,13 +1,10 @@
 package org.criticizer.dto.show;
 
+import java.util.List;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.entity.Show;
 
-import java.util.List;
-
-/**
- * Response DTO for a show.
- */
+/** Response DTO for a show. */
 public class ShowResponse {
 
     private final int id;
@@ -17,8 +14,13 @@ public class ShowResponse {
     private final boolean completed;
     private final List<GenreResponse> genres;
 
-    public ShowResponse(int id, String name, String coverUrl, int score,
-                        boolean completed, List<GenreResponse> genres) {
+    public ShowResponse(
+            int id,
+            String name,
+            String coverUrl,
+            int score,
+            boolean completed,
+            List<GenreResponse> genres) {
         this.id = id;
         this.name = name;
         this.coverUrl = coverUrl;
@@ -34,10 +36,7 @@ public class ShowResponse {
                 show.getCoverUrl(),
                 show.getScore(),
                 show.isCompleted(),
-                show.getGenres().stream()
-                        .map(GenreResponse::from)
-                        .toList()
-        );
+                show.getGenres().stream().map(GenreResponse::from).toList());
     }
 
     public int getId() {

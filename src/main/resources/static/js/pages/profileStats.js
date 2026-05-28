@@ -4,8 +4,18 @@
  */
 
 const charts = {};
-const BUCKET_LABELS = ['1-10', '11-20', '21-30', '31-40', '41-50',
-    '51-60', '61-70', '71-80', '81-90', '91-100'];
+const BUCKET_LABELS = [
+    '1-10',
+    '11-20',
+    '21-30',
+    '31-40',
+    '41-50',
+    '51-60',
+    '61-70',
+    '71-80',
+    '81-90',
+    '91-100',
+];
 
 function destroyChart(key) {
     if (charts[key]) {
@@ -63,13 +73,15 @@ function renderScoreDistribution(buckets) {
         type: 'bar',
         data: {
             labels: BUCKET_LABELS,
-            datasets: [{
-                label: 'Items',
-                data: buckets,
-                backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                borderColor: 'rgba(59, 130, 246, 1)',
-                borderWidth: 1,
-            }],
+            datasets: [
+                {
+                    label: 'Items',
+                    data: buckets,
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1,
+                },
+            ],
         },
         options: {
             responsive: true,
@@ -87,11 +99,13 @@ function renderCompleted(completed, notCompleted) {
         type: 'doughnut',
         data: {
             labels: ['Completed', 'Not completed'],
-            datasets: [{
-                data: [completed, notCompleted],
-                backgroundColor: ['rgba(34, 197, 94, 0.8)', 'rgba(148, 163, 184, 0.6)'],
-                borderWidth: 1,
-            }],
+            datasets: [
+                {
+                    data: [completed, notCompleted],
+                    backgroundColor: ['rgba(34, 197, 94, 0.8)', 'rgba(148, 163, 184, 0.6)'],
+                    borderWidth: 1,
+                },
+            ],
         },
         options: {
             responsive: true,
@@ -108,13 +122,15 @@ function renderCategoryAverages(rows) {
         type: 'bar',
         data: {
             labels: rows.map((r) => r.name),
-            datasets: [{
-                label: 'Average score',
-                data: rows.map((r) => r.avg),
-                backgroundColor: 'rgba(249, 115, 22, 0.7)',
-                borderColor: 'rgba(249, 115, 22, 1)',
-                borderWidth: 1,
-            }],
+            datasets: [
+                {
+                    label: 'Average score',
+                    data: rows.map((r) => r.avg),
+                    backgroundColor: 'rgba(249, 115, 22, 0.7)',
+                    borderColor: 'rgba(249, 115, 22, 1)',
+                    borderWidth: 1,
+                },
+            ],
         },
         options: {
             indexAxis: 'y',
