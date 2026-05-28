@@ -331,7 +331,7 @@ class ShowServiceTest {
                     PageRequest.of(0, 10),
                     2
             );
-            when(showRepository.findItemIds(eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any(), any()))
+            when(showRepository.findItemIds(eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
                     .thenReturn(showIds);
 
             Show show1 = new Show(1, "Show 1", TEST_USER_ID, 80, false);
@@ -366,7 +366,7 @@ class ShowServiceTest {
                     1
             );
             when(showRepository.findItemIds(
-                    eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any(), any()))
+                    eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any()))
                     .thenReturn(showIds);
 
             when(showRepository.findByIdsWithCategories(List.of(1)))
@@ -379,7 +379,7 @@ class ShowServiceTest {
 
             // Then
             assertThat(result.getItems()).hasSize(1);
-            verify(showRepository).findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any(), any());
+            verify(showRepository).findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any());
         }
     }
 

@@ -24,7 +24,6 @@ public interface BookRepository extends MediaRepository<Book> {
             "AND (:searchTerm IS NULL OR LOWER(b.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
             "AND (:minScore IS NULL OR b.score >= :minScore) " +
             "AND (:maxScore IS NULL OR b.score <= :maxScore) " +
-            "AND (:completed IS NULL OR b.completed = :completed) " +
             "GROUP BY b.id")
     Page<Integer> findItemIds(
             @Param("userId") Integer userId,
@@ -32,7 +31,6 @@ public interface BookRepository extends MediaRepository<Book> {
             @Param("searchTerm") String searchTerm,
             @Param("minScore") Integer minScore,
             @Param("maxScore") Integer maxScore,
-            @Param("completed") Boolean completed,
             Pageable pageable
     );
 
