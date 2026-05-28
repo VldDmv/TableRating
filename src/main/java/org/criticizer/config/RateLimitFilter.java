@@ -60,10 +60,17 @@ public class RateLimitFilter extends OncePerRequestFilter {
         }
 
         log.warn("Rate limit exceeded for {} on {}", clientKey, path);
-        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
         response.setHeader("Retry-After", String.valueOf(WINDOW.toSeconds()));
-        response.setContentType("application/json");
-        response.getWriter().write("{\"error\":\"Too many requests. Try again later.\"}");
+
+        if (path.startsWith("/api/")) {
+            // JSON clients get a proper 429 with a machine-readable body.
+            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"Too many requests. Try again later.\"}");
+        } else {
+            // Browser form posts get redirected back to the login page with a message.
+            response.sendRedirect(request.getContextPath() + "/index?ratelimit=true");
+        }
     }
 
     private Bucket newBucket() {
