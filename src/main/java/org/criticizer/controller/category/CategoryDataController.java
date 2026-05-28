@@ -45,8 +45,7 @@ public class CategoryDataController {
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) Integer minScore,
-            @RequestParam(required = false) Integer maxScore,
-            @RequestParam(required = false) Boolean completed) {
+            @RequestParam(required = false) Integer maxScore) {
 
         User currentUser = securityUtil.getCurrentUser();
         ContentCategory category = ContentCategory.fromString(type);
@@ -58,7 +57,7 @@ public class CategoryDataController {
 
         PageResponse<?> result = service.getUserItemsPageAsDto(
                 currentUser.getId(), page, rows, categoryId, search, sortBy, sortOrder,
-                minScore, maxScore, completed);
+                minScore, maxScore);
 
         return ResponseEntity.ok(result);
     }

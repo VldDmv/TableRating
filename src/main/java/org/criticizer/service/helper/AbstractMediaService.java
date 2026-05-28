@@ -65,17 +65,17 @@ public abstract class AbstractMediaService<T extends MediaEntity, R> {
             Integer categoryId, String searchTerm,
             String sortBy, String sortOrder) {
         return getUserItemsPage(userId, page, pageSize, categoryId, searchTerm,
-                sortBy, sortOrder, null, null, null);
+                sortBy, sortOrder, null, null);
     }
 
     /**
-     * Get paginated items with filtering, search, score range and completion state.
+     * Get paginated items with filtering, search and score range.
      */
     public PageResponse<T> getUserItemsPage(
             Integer userId, Integer page, Integer pageSize,
             Integer categoryId, String searchTerm,
             String sortBy, String sortOrder,
-            Integer minScore, Integer maxScore, Boolean completed) {
+            Integer minScore, Integer maxScore) {
 
         ServiceValidator.PaginationParams params = validator.validatePagination(page, pageSize);
         String sanitizedSearch = validator.sanitizeSearchTerm(searchTerm);
@@ -85,7 +85,7 @@ public abstract class AbstractMediaService<T extends MediaEntity, R> {
 
         //  Get only IDs with pagination (SQL-level LIMIT works correctly)
         Page<Integer> itemIds = repository.findItemIds(
-                userId, categoryId, sanitizedSearch, minScore, maxScore, completed, pageable
+                userId, categoryId, sanitizedSearch, minScore, maxScore, pageable
         );
 
         //  Fetch full entities with categories using IDs
@@ -287,21 +287,21 @@ public abstract class AbstractMediaService<T extends MediaEntity, R> {
             Integer categoryId, String searchTerm,
             String sortBy, String sortOrder) {
         return getUserItemsPageAsDto(userId, page, pageSize, categoryId, searchTerm,
-                sortBy, sortOrder, null, null, null);
+                sortBy, sortOrder, null, null);
     }
 
     /**
-     * Returns a paginated page of DTOs with score range and completion filters.
+     * Returns a paginated page of DTOs with score range filter.
      */
     public PageResponse<R> getUserItemsPageAsDto(
             Integer userId, Integer page, Integer pageSize,
             Integer categoryId, String searchTerm,
             String sortBy, String sortOrder,
-            Integer minScore, Integer maxScore, Boolean completed) {
+            Integer minScore, Integer maxScore) {
 
         PageResponse<T> entityPage = getUserItemsPage(
                 userId, page, pageSize, categoryId, searchTerm, sortBy, sortOrder,
-                minScore, maxScore, completed);
+                minScore, maxScore);
 
         List<R> dtos = entityPage.getItems().stream()
                 .map(this::toResponse)

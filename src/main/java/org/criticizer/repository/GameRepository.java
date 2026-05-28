@@ -24,7 +24,6 @@ public interface GameRepository extends MediaRepository<Game> {
             "AND (:searchTerm IS NULL OR LOWER(g.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
             "AND (:minScore IS NULL OR g.score >= :minScore) " +
             "AND (:maxScore IS NULL OR g.score <= :maxScore) " +
-            "AND (:completed IS NULL OR g.completed = :completed) " +
             "GROUP BY g.id")
     Page<Integer> findItemIds(
             @Param("userId") Integer userId,
@@ -32,7 +31,6 @@ public interface GameRepository extends MediaRepository<Game> {
             @Param("searchTerm") String searchTerm,
             @Param("minScore") Integer minScore,
             @Param("maxScore") Integer maxScore,
-            @Param("completed") Boolean completed,
             Pageable pageable
     );
 

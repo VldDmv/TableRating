@@ -24,7 +24,6 @@ public interface MovieRepository extends MediaRepository<Movie> {
             "AND (:searchTerm IS NULL OR LOWER(m.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
             "AND (:minScore IS NULL OR m.score >= :minScore) " +
             "AND (:maxScore IS NULL OR m.score <= :maxScore) " +
-            "AND (:completed IS NULL OR m.completed = :completed) " +
             "GROUP BY m.id")
     Page<Integer> findItemIds(
             @Param("userId") Integer userId,
@@ -32,7 +31,6 @@ public interface MovieRepository extends MediaRepository<Movie> {
             @Param("searchTerm") String searchTerm,
             @Param("minScore") Integer minScore,
             @Param("maxScore") Integer maxScore,
-            @Param("completed") Boolean completed,
             Pageable pageable
     );
 
