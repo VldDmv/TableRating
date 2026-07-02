@@ -1,12 +1,10 @@
 package org.criticizer.service.profile;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.criticizer.entity.Book;
+import org.criticizer.entity.Game;
 import org.criticizer.entity.Genre;
+import org.criticizer.entity.Movie;
+import org.criticizer.entity.Show;
 import org.criticizer.entity.Tag;
 import org.criticizer.exceptions.validation.InvalidInputException;
 import org.criticizer.repository.BookRepository;
@@ -16,9 +14,16 @@ import org.criticizer.repository.ShowRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
- * Computes per-category rating statistics for a user's profile: score distribution, completed vs
- * not, and average score per tag/genre.
+ * Computes per-category rating statistics for a user's profile:
+ * score distribution, completed vs not, and average score per tag/genre.
  */
 @Service
 public class ProfileStatsService {
@@ -28,11 +33,10 @@ public class ProfileStatsService {
     private final BookRepository bookRepository;
     private final ShowRepository showRepository;
 
-    public ProfileStatsService(
-            GameRepository gameRepository,
-            MovieRepository movieRepository,
-            BookRepository bookRepository,
-            ShowRepository showRepository) {
+    public ProfileStatsService(GameRepository gameRepository,
+                               MovieRepository movieRepository,
+                               BookRepository bookRepository,
+                               ShowRepository showRepository) {
         this.gameRepository = gameRepository;
         this.movieRepository = movieRepository;
         this.bookRepository = bookRepository;
@@ -90,50 +94,24 @@ public class ProfileStatsService {
             row.put("count", c);
             rows.add(row);
         }
-        rows.sort(
-                Comparator.comparingDouble((Map<String, Object> r) -> (double) r.get("avg"))
-                        .reversed());
+        rows.sort(Comparator.comparingDouble((Map<String, Object> r) -> (double) r.get("avg")).reversed());
         return rows.size() > 8 ? rows.subList(0, 8) : rows;
     }
 
     private List<Item> loadItems(String category, Integer userId) {
         return switch (validateCategory(category)) {
-            case "games" ->
-                    gameRepository.findByUserIdWithTags(userId).stream()
-                            .map(
-                                    g ->
-                                            new Item(
-                                                    g.getScore(),
-                                                    g.isCompleted(),
-                                                    tagNames(g.getTags())))
-                            .toList();
-            case "movies" ->
-                    movieRepository.findByUserIdWithGenres(userId).stream()
-                            .map(
-                                    m ->
-                                            new Item(
-                                                    m.getScore(),
-                                                    m.isCompleted(),
-                                                    genreNames(m.getGenres())))
-                            .toList();
-            case "books" ->
-                    bookRepository.findByUserIdWithGenres(userId).stream()
-                            .map(
-                                    b ->
-                                            new Item(
-                                                    b.getScore(),
-                                                    b.isCompleted(),
-                                                    genreNames(b.getGenres())))
-                            .toList();
-            case "shows" ->
-                    showRepository.findByUserIdWithGenres(userId).stream()
-                            .map(
-                                    s ->
-                                            new Item(
-                                                    s.getScore(),
-                                                    s.isCompleted(),
-                                                    genreNames(s.getGenres())))
-                            .toList();
+            case "games" -> gameRepository.findByUserIdWithTags(userId).stream()
+                    .map(g -> new Item(g.getScore(), g.isCompleted(), tagNames(g.getTags())))
+                    .toList();
+            case "movies" -> movieRepository.findByUserIdWithGenres(userId).stream()
+                    .map(m -> new Item(m.getScore(), m.isCompleted(), genreNames(m.getGenres())))
+                    .toList();
+            case "books" -> bookRepository.findByUserIdWithGenres(userId).stream()
+                    .map(b -> new Item(b.getScore(), b.isCompleted(), genreNames(b.getGenres())))
+                    .toList();
+            case "shows" -> showRepository.findByUserIdWithGenres(userId).stream()
+                    .map(s -> new Item(s.getScore(), s.isCompleted(), genreNames(s.getGenres())))
+                    .toList();
             default -> List.of();
         };
     }

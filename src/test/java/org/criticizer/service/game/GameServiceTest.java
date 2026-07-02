@@ -1,13 +1,5 @@
 package org.criticizer.service.game;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import org.criticizer.dto.game.GameResponse;
 import org.criticizer.entity.Game;
 import org.criticizer.entity.Tag;
@@ -28,19 +20,32 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 /**
- * Comprehensive unit tests for GameService. Tests the concrete implementation of
- * AbstractMediaService.
+ * Comprehensive unit tests for GameService.
+ * Tests the concrete implementation of AbstractMediaService.
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("GameService Tests")
 class GameServiceTest {
 
     private final int TEST_USER_ID = 1;
-    @Mock private GameRepository gameRepository;
-    @Mock private TagRepository tagRepository;
-    @Mock private ServiceValidator validator;
-    @InjectMocks private GameService gameService;
+    @Mock
+    private GameRepository gameRepository;
+    @Mock
+    private TagRepository tagRepository;
+    @Mock
+    private ServiceValidator validator;
+    @InjectMocks
+    private GameService gameService;
     private Game testGame;
     private Tag testTag;
 
@@ -78,24 +83,18 @@ class GameServiceTest {
 
             // Mock saving entity and returning it with ID
             when(gameRepository.save(any(Game.class)))
-                    .thenAnswer(
-                            invocation -> {
-                                Game game = invocation.getArgument(0);
-                                if (game.getId() == null) {
-                                    // First save - set ID
-                                    Game savedGame =
-                                            new Game(
-                                                    100,
-                                                    game.getName(),
-                                                    game.getUserId(),
-                                                    game.getScore(),
-                                                    game.isCompleted());
-                                    savedGame.setCoverUrl(game.getCoverUrl());
-                                    savedGame.setTags(game.getTags());
-                                    return savedGame;
-                                }
-                                return game;
-                            });
+                    .thenAnswer(invocation -> {
+                        Game game = invocation.getArgument(0);
+                        if (game.getId() == null) {
+                            // First save - set ID
+                            Game savedGame = new Game(100, game.getName(), game.getUserId(),
+                                    game.getScore(), game.isCompleted());
+                            savedGame.setCoverUrl(game.getCoverUrl());
+                            savedGame.setTags(game.getTags());
+                            return savedGame;
+                        }
+                        return game;
+                    });
 
             when(tagRepository.findAllById(tagIds)).thenReturn(Arrays.asList(tag1, tag2));
 
@@ -109,14 +108,12 @@ class GameServiceTest {
             verify(tagRepository).findAllById(tagIds);
 
             // Verify save was called twice (once for entity, once for tags)
-            verify(gameRepository, times(2))
-                    .save(
-                            argThat(
-                                    game ->
-                                            game.getName().equals(name)
-                                                    && game.getCoverUrl().equals(coverUrl)
-                                                    && game.getScore() == score
-                                                    && game.getUserId() == TEST_USER_ID));
+            verify(gameRepository, times(2)).save(argThat(game ->
+                    game.getName().equals(name) &&
+                            game.getCoverUrl().equals(coverUrl) &&
+                            game.getScore() == score &&
+                            game.getUserId() == TEST_USER_ID
+            ));
         }
 
         @Test
@@ -127,18 +124,17 @@ class GameServiceTest {
             when(validator.validateName(name, "Game name")).thenReturn(name);
             when(gameRepository.existsByNameIgnoreCaseAndUserId(name, TEST_USER_ID))
                     .thenReturn(false);
-            when(gameRepository.save(any(Game.class))).thenAnswer(i -> i.getArgument(0));
+            when(gameRepository.save(any(Game.class)))
+                    .thenAnswer(i -> i.getArgument(0));
 
             // When
             gameService.addItem(name, null, TEST_USER_ID, 85, null);
 
             // Then
-            verify(gameRepository)
-                    .save(
-                            argThat(
-                                    game ->
-                                            game.getName().equals(name)
-                                                    && game.getCoverUrl() == null));
+            verify(gameRepository).save(argThat(game ->
+                    game.getName().equals(name) &&
+                            game.getCoverUrl() == null
+            ));
             verify(tagRepository, never()).findAllById(any());
         }
 
@@ -152,7 +148,8 @@ class GameServiceTest {
                     .thenReturn(true);
 
             // When & Then
-            assertThatThrownBy(() -> gameService.addItem(name, null, TEST_USER_ID, 80, null))
+            assertThatThrownBy(() ->
+                    gameService.addItem(name, null, TEST_USER_ID, 80, null))
                     .isInstanceOf(ItemAlreadyExistsException.class)
                     .hasMessageContaining(name);
 
@@ -167,15 +164,13 @@ class GameServiceTest {
             int invalidScore = 150;
 
             when(validator.validateName(name, "Game name")).thenReturn(name);
-            doThrow(
-                            new org.criticizer.exceptions.validation.InvalidScoreException(
-                                    invalidScore, "Game"))
-                    .when(validator)
-                    .validateScore(invalidScore, TEST_USER_ID, "Game");
+            doThrow(new org.criticizer.exceptions.validation.InvalidScoreException(
+                    invalidScore, "Game"))
+                    .when(validator).validateScore(invalidScore, TEST_USER_ID, "Game");
 
             // When & Then
-            assertThatThrownBy(
-                            () -> gameService.addItem(name, null, TEST_USER_ID, invalidScore, null))
+            assertThatThrownBy(() ->
+                    gameService.addItem(name, null, TEST_USER_ID, invalidScore, null))
                     .isInstanceOf(org.criticizer.exceptions.validation.InvalidScoreException.class);
 
             verify(gameRepository, never()).save(any());
@@ -212,18 +207,16 @@ class GameServiceTest {
             when(gameRepository.save(any(Game.class))).thenAnswer(i -> i.getArgument(0));
 
             // When
-            gameService.updateItem(
-                    oldName, newName, newCoverUrl, newScore, TEST_USER_ID, newTagIds);
+            gameService.updateItem(oldName, newName, newCoverUrl, newScore,
+                    TEST_USER_ID, newTagIds);
 
             // Then
-            verify(gameRepository)
-                    .save(
-                            argThat(
-                                    game ->
-                                            game.getName().equals(newName)
-                                                    && game.getCoverUrl().equals(newCoverUrl)
-                                                    && game.getScore() == newScore
-                                                    && game.getTags().contains(newTag)));
+            verify(gameRepository).save(argThat(game ->
+                    game.getName().equals(newName) &&
+                            game.getCoverUrl().equals(newCoverUrl) &&
+                            game.getScore() == newScore &&
+                            game.getTags().contains(newTag)
+            ));
         }
 
         @Test
@@ -239,10 +232,8 @@ class GameServiceTest {
                     .thenReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(
-                            () ->
-                                    gameService.updateItem(
-                                            oldName, newName, null, 80, TEST_USER_ID, null))
+            assertThatThrownBy(() ->
+                    gameService.updateItem(oldName, newName, null, 80, TEST_USER_ID, null))
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessageContaining(oldName);
         }
@@ -262,10 +253,8 @@ class GameServiceTest {
                     .thenReturn(true);
 
             // When & Then
-            assertThatThrownBy(
-                            () ->
-                                    gameService.updateItem(
-                                            oldName, newName, null, 80, TEST_USER_ID, null))
+            assertThatThrownBy(() ->
+                    gameService.updateItem(oldName, newName, null, 80, TEST_USER_ID, null))
                     .isInstanceOf(ItemAlreadyExistsException.class)
                     .hasMessageContaining(newName);
         }
@@ -284,10 +273,8 @@ class GameServiceTest {
             when(gameRepository.save(any(Game.class))).thenAnswer(i -> i.getArgument(0));
 
             // When & Then (should not throw)
-            assertThatCode(
-                            () ->
-                                    gameService.updateItem(
-                                            oldName, newName, null, 80, TEST_USER_ID, null))
+            assertThatCode(() ->
+                    gameService.updateItem(oldName, newName, null, 80, TEST_USER_ID, null))
                     .doesNotThrowAnyException();
         }
     }
@@ -397,9 +384,12 @@ class GameServiceTest {
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
             // Mock ID pagination step
-            Page<Integer> gameIds = new PageImpl<>(Arrays.asList(1, 2), PageRequest.of(0, 10), 2);
-            when(gameRepository.findItemIds(
-                            eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
+            Page<Integer> gameIds = new PageImpl<>(
+                    Arrays.asList(1, 2),
+                    PageRequest.of(0, 10),
+                    2
+            );
+            when(gameRepository.findItemIds(eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
                     .thenReturn(gameIds);
 
             // Mock fetching full entities
@@ -409,8 +399,9 @@ class GameServiceTest {
                     .thenReturn(Arrays.asList(game1, game2));
 
             // When
-            var result =
-                    gameService.getUserItemsPage(TEST_USER_ID, 1, 10, null, null, "name", "asc");
+            var result = gameService.getUserItemsPage(
+                    TEST_USER_ID, 1, 10, null, null, "name", "asc"
+            );
 
             // Then
             assertThat(result).isNotNull();
@@ -429,17 +420,22 @@ class GameServiceTest {
             when(validator.validatePagination(1, 10)).thenReturn(params);
             when(validator.sanitizeSearchTerm("witcher")).thenReturn("witcher");
 
-            Page<Integer> gameIds = new PageImpl<>(List.of(1), PageRequest.of(0, 10), 1);
+            Page<Integer> gameIds = new PageImpl<>(
+                    List.of(1),
+                    PageRequest.of(0, 10),
+                    1
+            );
             when(gameRepository.findItemIds(
-                            eq(TEST_USER_ID), isNull(), eq("witcher"), any(), any(), any()))
+                    eq(TEST_USER_ID), isNull(), eq("witcher"), any(), any(), any()))
                     .thenReturn(gameIds);
 
-            when(gameRepository.findByIdsWithCategories(List.of(1))).thenReturn(List.of(testGame));
+            when(gameRepository.findByIdsWithCategories(List.of(1)))
+                    .thenReturn(List.of(testGame));
 
             // When
-            var result =
-                    gameService.getUserItemsPage(
-                            TEST_USER_ID, 1, 10, null, "witcher", "name", "asc");
+            var result = gameService.getUserItemsPage(
+                    TEST_USER_ID, 1, 10, null, "witcher", "name", "asc"
+            );
 
             // Then
             assertThat(result.getItems()).hasSize(1);
@@ -456,19 +452,26 @@ class GameServiceTest {
             when(validator.validatePagination(1, 10)).thenReturn(params);
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
-            Page<Integer> gameIds = new PageImpl<>(List.of(1), PageRequest.of(0, 10), 1);
-            when(gameRepository.findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any()))
+            Page<Integer> gameIds = new PageImpl<>(
+                    List.of(1),
+                    PageRequest.of(0, 10),
+                    1
+            );
+            when(gameRepository.findItemIds(
+                    eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any()))
                     .thenReturn(gameIds);
 
-            when(gameRepository.findByIdsWithCategories(List.of(1))).thenReturn(List.of(testGame));
+            when(gameRepository.findByIdsWithCategories(List.of(1)))
+                    .thenReturn(List.of(testGame));
 
             // When
-            var result = gameService.getUserItemsPage(TEST_USER_ID, 1, 10, 1, null, "name", "asc");
+            var result = gameService.getUserItemsPage(
+                    TEST_USER_ID, 1, 10, 1, null, "name", "asc"
+            );
 
             // Then
             assertThat(result.getItems()).hasSize(1);
-            verify(gameRepository)
-                    .findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any());
+            verify(gameRepository).findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any());
         }
     }
 
@@ -494,7 +497,9 @@ class GameServiceTest {
             gameService.updateCover(name, newCoverUrl, TEST_USER_ID);
 
             // Then
-            verify(gameRepository).save(argThat(game -> game.getCoverUrl().equals(newCoverUrl)));
+            verify(gameRepository).save(argThat(game ->
+                    game.getCoverUrl().equals(newCoverUrl)
+            ));
         }
 
         @Test
@@ -512,7 +517,9 @@ class GameServiceTest {
             gameService.updateCover(name, null, TEST_USER_ID);
 
             // Then
-            verify(gameRepository).save(argThat(game -> game.getCoverUrl() == null));
+            verify(gameRepository).save(argThat(game ->
+                    game.getCoverUrl() == null
+            ));
         }
 
         @Test
@@ -530,7 +537,9 @@ class GameServiceTest {
             gameService.updateCover(name, "   ", TEST_USER_ID);
 
             // Then
-            verify(gameRepository).save(argThat(game -> game.getCoverUrl() == null));
+            verify(gameRepository).save(argThat(game ->
+                    game.getCoverUrl() == null
+            ));
         }
     }
 
