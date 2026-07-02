@@ -1,12 +1,5 @@
 package org.criticizer.controller.category;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.Collections;
 import org.criticizer.constants.ContentCategory;
 import org.criticizer.dto.helper.PageResponse;
 import org.criticizer.entity.User;
@@ -25,24 +18,38 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Collections;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CategoryDataController Tests")
 class CategoryDataControllerTest {
 
-    @Mock private MediaTypeResolver mediaTypeResolver;
+    @Mock
+    private MediaTypeResolver mediaTypeResolver;
 
-    @Mock private AbstractMediaService mediaServiceMock;
+    @Mock
+    private AbstractMediaService mediaServiceMock;
 
-    @Mock private SecurityUtil securityUtil;
+    @Mock
+    private SecurityUtil securityUtil;
 
-    @InjectMocks private CategoryDataController controller;
+    @InjectMocks
+    private CategoryDataController controller;
 
     private MockMvc mockMvc;
     private User testUser;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(controller)
+                .build();
 
         testUser = TestDataBuilder.createRegularUser();
     }
@@ -54,39 +61,20 @@ class CategoryDataControllerTest {
         when(securityUtil.getCurrentUser()).thenReturn(testUser);
         when(mediaTypeResolver.resolve(ContentCategory.GAMES)).thenReturn(mediaServiceMock);
 
-        PageResponse pageResponse =
-                TestDataBuilder.createPageResponse(Collections.emptyList(), 1, 10);
+        PageResponse pageResponse = TestDataBuilder.createPageResponse(Collections.emptyList(), 1, 10);
 
         when(mediaServiceMock.getUserItemsPageAsDto(
-                        eq(testUser.getId()),
-                        eq(1),
-                        eq(10),
-                        isNull(),
-                        isNull(),
-                        eq("name"),
-                        eq("asc"),
-                        isNull(),
-                        isNull()))
+                eq(testUser.getId()), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"), isNull(), isNull()))
                 .thenReturn(pageResponse);
 
-        mockMvc.perform(
-                        get("/api/category/games")
-                                .param("page", "1")
-                                .param("rows", "10")
-                                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/category/games")
+                        .param("page", "1")
+                        .param("rows", "10")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(mediaServiceMock)
-                .getUserItemsPageAsDto(
-                        eq(testUser.getId()),
-                        eq(1),
-                        eq(10),
-                        isNull(),
-                        isNull(),
-                        eq("name"),
-                        eq("asc"),
-                        isNull(),
-                        isNull());
+        verify(mediaServiceMock).getUserItemsPageAsDto(
+                eq(testUser.getId()), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"), isNull(), isNull());
     }
 
     @Test
@@ -98,36 +86,18 @@ class CategoryDataControllerTest {
 
         PageResponse pageResponse = TestDataBuilder.createEmptyPageResponse(1, 10);
         when(mediaServiceMock.getUserItemsPageAsDto(
-                        eq(testUser.getId()),
-                        eq(1),
-                        eq(10),
-                        eq(1),
-                        isNull(),
-                        eq("name"),
-                        eq("asc"),
-                        isNull(),
-                        isNull()))
+                eq(testUser.getId()), eq(1), eq(10), eq(1), isNull(), eq("name"), eq("asc"), isNull(), isNull()))
                 .thenReturn(pageResponse);
 
-        mockMvc.perform(
-                        get("/api/category/games")
-                                .param("page", "1")
-                                .param("rows", "10")
-                                .param("categoryId", "1")
-                                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/category/games")
+                        .param("page", "1")
+                        .param("rows", "10")
+                        .param("categoryId", "1")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(mediaServiceMock)
-                .getUserItemsPageAsDto(
-                        eq(testUser.getId()),
-                        eq(1),
-                        eq(10),
-                        eq(1),
-                        isNull(),
-                        eq("name"),
-                        eq("asc"),
-                        isNull(),
-                        isNull());
+        verify(mediaServiceMock).getUserItemsPageAsDto(
+                eq(testUser.getId()), eq(1), eq(10), eq(1), isNull(), eq("name"), eq("asc"), isNull(), isNull());
     }
 
     @Test
@@ -138,31 +108,13 @@ class CategoryDataControllerTest {
         when(mediaTypeResolver.resolve(ContentCategory.MOVIES)).thenReturn(mediaServiceMock);
 
         PageResponse pageResponse = TestDataBuilder.createEmptyPageResponse(1, 10);
-        when(mediaServiceMock.getUserItemsPageAsDto(
-                        anyInt(),
-                        eq(1),
-                        eq(10),
-                        isNull(),
-                        isNull(),
-                        eq("name"),
-                        eq("asc"),
-                        isNull(),
-                        isNull()))
+        when(mediaServiceMock.getUserItemsPageAsDto(anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"), isNull(), isNull()))
                 .thenReturn(pageResponse);
 
-        mockMvc.perform(get("/api/category/movies").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/category/movies")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(mediaServiceMock)
-                .getUserItemsPageAsDto(
-                        anyInt(),
-                        eq(1),
-                        eq(10),
-                        isNull(),
-                        isNull(),
-                        eq("name"),
-                        eq("asc"),
-                        isNull(),
-                        isNull());
+        verify(mediaServiceMock).getUserItemsPageAsDto(anyInt(), eq(1), eq(10), isNull(), isNull(), eq("name"), eq("asc"), isNull(), isNull());
     }
 }

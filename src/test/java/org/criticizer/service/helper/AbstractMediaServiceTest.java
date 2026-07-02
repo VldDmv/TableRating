@@ -1,12 +1,5 @@
 package org.criticizer.service.helper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-import java.util.List;
-import java.util.Optional;
 import org.criticizer.dto.helper.PageResponse;
 import org.criticizer.exceptions.data.ItemAlreadyExistsException;
 import org.criticizer.exceptions.data.ResourceNotFoundException;
@@ -27,21 +20,33 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 /**
- * Comprehensive unit tests for AbstractMediaService. Tests the core business logic that all media
- * services inherit.
+ * Comprehensive unit tests for AbstractMediaService.
+ * Tests the core business logic that all media services inherit.
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AbstractMediaService Tests")
 class AbstractMediaServiceTest {
 
-    @Mock private MediaRepository<TestMediaEntity> repository;
+    @Mock
+    private MediaRepository<TestMediaEntity> repository;
 
-    @Mock private ServiceValidator validator;
+    @Mock
+    private ServiceValidator validator;
 
-    @Captor private ArgumentCaptor<TestMediaEntity> entityCaptor;
+    @Captor
+    private ArgumentCaptor<TestMediaEntity> entityCaptor;
 
-    @Captor private ArgumentCaptor<Pageable> pageableCaptor;
+    @Captor
+    private ArgumentCaptor<Pageable> pageableCaptor;
 
     private TestMediaService service;
 
@@ -71,20 +76,20 @@ class AbstractMediaServiceTest {
 
             List<Integer> itemIds = List.of(1, 2, 3);
             Page<Integer> idsPage = new PageImpl<>(itemIds, PageRequest.of(0, 10), 3);
-            when(repository.findItemIds(
-                            eq(USER_ID), isNull(), isNull(), any(), any(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(), any(), any(Pageable.class)))
                     .thenReturn(idsPage);
 
-            List<TestMediaEntity> entities =
-                    List.of(
-                            createEntity(1, "Item1", 90),
-                            createEntity(2, "Item2", 85),
-                            createEntity(3, "Item3", 80));
+            List<TestMediaEntity> entities = List.of(
+                    createEntity(1, "Item1", 90),
+                    createEntity(2, "Item2", 85),
+                    createEntity(3, "Item3", 80)
+            );
             when(repository.findByIdsWithCategories(itemIds)).thenReturn(entities);
 
             // When
-            PageResponse<TestMediaEntity> result =
-                    service.getUserItemsPage(USER_ID, 1, 10, null, null, "name", "asc");
+            PageResponse<TestMediaEntity> result = service.getUserItemsPage(
+                    USER_ID, 1, 10, null, null, "name", "asc"
+            );
 
             // Then
             assertThat(result).isNotNull();
@@ -92,9 +97,7 @@ class AbstractMediaServiceTest {
             assertThat(result.getCurrentPage()).isEqualTo(1);
             assertThat(result.getTotalItems()).isEqualTo(3);
 
-            verify(repository)
-                    .findItemIds(
-                            eq(USER_ID), isNull(), isNull(), any(), any(), any(Pageable.class));
+            verify(repository).findItemIds(eq(USER_ID), isNull(), isNull(), any(), any(), any(Pageable.class));
             verify(repository).findByIdsWithCategories(itemIds);
         }
 
@@ -107,8 +110,7 @@ class AbstractMediaServiceTest {
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
             Page<Integer> idsPage = new PageImpl<>(List.of(1), PageRequest.of(0, 10), 1);
-            when(repository.findItemIds(
-                            eq(USER_ID), eq(5), isNull(), any(), any(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), eq(5), isNull(), any(), any(), any(Pageable.class)))
                     .thenReturn(idsPage);
 
             List<TestMediaEntity> entities = List.of(createEntity(1, "FilteredItem", 90));
@@ -118,8 +120,7 @@ class AbstractMediaServiceTest {
             service.getUserItemsPage(USER_ID, 1, 10, 5, null, "name", "asc");
 
             // Then
-            verify(repository)
-                    .findItemIds(eq(USER_ID), eq(5), isNull(), any(), any(), any(Pageable.class));
+            verify(repository).findItemIds(eq(USER_ID), eq(5), isNull(), any(), any(), any(Pageable.class));
         }
 
         @Test
@@ -131,8 +132,7 @@ class AbstractMediaServiceTest {
             when(validator.sanitizeSearchTerm("dark")).thenReturn("dark");
 
             Page<Integer> idsPage = new PageImpl<>(List.of(1), PageRequest.of(0, 10), 1);
-            when(repository.findItemIds(
-                            eq(USER_ID), isNull(), eq("dark"), any(), any(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), isNull(), eq("dark"), any(), any(), any(Pageable.class)))
                     .thenReturn(idsPage);
 
             List<TestMediaEntity> entities = List.of(createEntity(1, "Dark Souls", 95));
@@ -142,9 +142,7 @@ class AbstractMediaServiceTest {
             service.getUserItemsPage(USER_ID, 1, 10, null, "dark", "name", "asc");
 
             // Then
-            verify(repository)
-                    .findItemIds(
-                            eq(USER_ID), isNull(), eq("dark"), any(), any(), any(Pageable.class));
+            verify(repository).findItemIds(eq(USER_ID), isNull(), eq("dark"), any(), any(), any(Pageable.class));
             verify(validator).sanitizeSearchTerm("dark");
         }
 
@@ -157,13 +155,13 @@ class AbstractMediaServiceTest {
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
             Page<Integer> emptyPage = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
-            when(repository.findItemIds(
-                            eq(USER_ID), isNull(), isNull(), any(), any(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(), any(), any(Pageable.class)))
                     .thenReturn(emptyPage);
 
             // When
-            PageResponse<TestMediaEntity> result =
-                    service.getUserItemsPage(USER_ID, 1, 10, null, null, "name", "asc");
+            PageResponse<TestMediaEntity> result = service.getUserItemsPage(
+                    USER_ID, 1, 10, null, null, "name", "asc"
+            );
 
             // Then
             assertThat(result.getItems()).isEmpty();
@@ -182,20 +180,20 @@ class AbstractMediaServiceTest {
             List<Integer> sortedItemIds = List.of(2, 3, 1);
             Page<Integer> idsPage = new PageImpl<>(sortedItemIds, PageRequest.of(0, 10), 3);
 
-            when(repository.findItemIds(
-                            eq(USER_ID), isNull(), isNull(), any(), any(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(), any(), any(Pageable.class)))
                     .thenReturn(idsPage);
 
-            List<TestMediaEntity> entities =
-                    List.of(
-                            createEntity(1, "Low", 60),
-                            createEntity(2, "High", 95),
-                            createEntity(3, "Medium", 75));
+            List<TestMediaEntity> entities = List.of(
+                    createEntity(1, "Low", 60),
+                    createEntity(2, "High", 95),
+                    createEntity(3, "Medium", 75)
+            );
             when(repository.findByIdsWithCategories(anyList())).thenReturn(entities);
 
             // When
-            PageResponse<TestMediaEntity> result =
-                    service.getUserItemsPage(USER_ID, 1, 10, null, null, "score", "desc");
+            PageResponse<TestMediaEntity> result = service.getUserItemsPage(
+                    USER_ID, 1, 10, null, null, "score", "desc"
+            );
 
             // Then
             assertThat(result.getItems().get(0).getScore()).isEqualTo(95);
@@ -214,20 +212,20 @@ class AbstractMediaServiceTest {
             List<Integer> sortedItemIds = List.of(2, 3, 1);
             Page<Integer> idsPage = new PageImpl<>(sortedItemIds, PageRequest.of(0, 10), 3);
 
-            when(repository.findItemIds(
-                            eq(USER_ID), isNull(), isNull(), any(), any(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(), any(), any(Pageable.class)))
                     .thenReturn(idsPage);
 
-            List<TestMediaEntity> entities =
-                    List.of(
-                            createEntity(1, "Zebra", 80),
-                            createEntity(2, "Alpha", 85),
-                            createEntity(3, "Beta", 90));
+            List<TestMediaEntity> entities = List.of(
+                    createEntity(1, "Zebra", 80),
+                    createEntity(2, "Alpha", 85),
+                    createEntity(3, "Beta", 90)
+            );
             when(repository.findByIdsWithCategories(anyList())).thenReturn(entities);
 
             // When
-            PageResponse<TestMediaEntity> result =
-                    service.getUserItemsPage(USER_ID, 1, 10, null, null, "name", "asc");
+            PageResponse<TestMediaEntity> result = service.getUserItemsPage(
+                    USER_ID, 1, 10, null, null, "name", "asc"
+            );
 
             // Then
             assertThat(result.getItems().get(0).getName()).isEqualTo("Alpha");
@@ -244,16 +242,16 @@ class AbstractMediaServiceTest {
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
             Page<Integer> idsPage = new PageImpl<>(List.of(1), PageRequest.of(0, 10), 1);
-            when(repository.findItemIds(
-                            eq(USER_ID), isNull(), isNull(), any(), any(), any(Pageable.class)))
+            when(repository.findItemIds(eq(USER_ID), isNull(), isNull(), any(), any(), any(Pageable.class)))
                     .thenReturn(idsPage);
 
             List<TestMediaEntity> entities = List.of(createEntity(1, "Item", 80));
             when(repository.findByIdsWithCategories(List.of(1))).thenReturn(entities);
 
             // When - invalid sort column should default to "name"
-            PageResponse<TestMediaEntity> result =
-                    service.getUserItemsPage(USER_ID, 1, 10, null, null, "invalid_column", "asc");
+            PageResponse<TestMediaEntity> result = service.getUserItemsPage(
+                    USER_ID, 1, 10, null, null, "invalid_column", "asc"
+            );
 
             // Then - should not throw, defaults to name
             assertThat(result.getItems()).hasSize(1);
@@ -271,8 +269,7 @@ class AbstractMediaServiceTest {
         void shouldAddNewItem() {
             // Given
             when(validator.validateName(ENTITY_NAME, "TestMedia name")).thenReturn(ENTITY_NAME);
-            when(repository.existsByNameIgnoreCaseAndUserId(ENTITY_NAME, USER_ID))
-                    .thenReturn(false);
+            when(repository.existsByNameIgnoreCaseAndUserId(ENTITY_NAME, USER_ID)).thenReturn(false);
 
             TestMediaEntity savedEntity = createEntity(1, ENTITY_NAME, SCORE);
             when(repository.save(any(TestMediaEntity.class))).thenReturn(savedEntity);
@@ -292,8 +289,7 @@ class AbstractMediaServiceTest {
         void shouldAddItemWithCategories() {
             // Given
             when(validator.validateName(ENTITY_NAME, "TestMedia name")).thenReturn(ENTITY_NAME);
-            when(repository.existsByNameIgnoreCaseAndUserId(ENTITY_NAME, USER_ID))
-                    .thenReturn(false);
+            when(repository.existsByNameIgnoreCaseAndUserId(ENTITY_NAME, USER_ID)).thenReturn(false);
 
             TestMediaEntity savedEntity = createEntity(1, ENTITY_NAME, SCORE);
             when(repository.save(any(TestMediaEntity.class))).thenReturn(savedEntity);
@@ -316,10 +312,9 @@ class AbstractMediaServiceTest {
             when(repository.existsByNameIgnoreCaseAndUserId(ENTITY_NAME, USER_ID)).thenReturn(true);
 
             // When & Then
-            assertThatThrownBy(
-                            () ->
-                                    service.addItem(
-                                            ENTITY_NAME, COVER_URL, USER_ID, SCORE, List.of()))
+            assertThatThrownBy(() ->
+                    service.addItem(ENTITY_NAME, COVER_URL, USER_ID, SCORE, List.of())
+            )
                     .isInstanceOf(ItemAlreadyExistsException.class)
                     .hasMessageContaining(ENTITY_NAME);
 
@@ -334,7 +329,9 @@ class AbstractMediaServiceTest {
                     .thenThrow(new EmptyNameException("TestMedia name"));
 
             // When & Then
-            assertThatThrownBy(() -> service.addItem("  ", COVER_URL, USER_ID, SCORE, List.of()))
+            assertThatThrownBy(() ->
+                    service.addItem("  ", COVER_URL, USER_ID, SCORE, List.of())
+            )
                     .isInstanceOf(EmptyNameException.class);
 
             verify(repository, never()).save(any());
@@ -347,12 +344,12 @@ class AbstractMediaServiceTest {
             when(validator.validateName(ENTITY_NAME, "TestMedia name")).thenReturn(ENTITY_NAME);
 
             doThrow(new InvalidScoreException(150))
-                    .when(validator)
-                    .validateScore(150, USER_ID, "TestMedia");
+                    .when(validator).validateScore(150, USER_ID, "TestMedia");
 
             // When & Then
-            assertThatThrownBy(
-                            () -> service.addItem(ENTITY_NAME, COVER_URL, USER_ID, 150, List.of()))
+            assertThatThrownBy(() ->
+                    service.addItem(ENTITY_NAME, COVER_URL, USER_ID, 150, List.of())
+            )
                     .isInstanceOf(InvalidScoreException.class);
 
             verify(repository, never()).save(any());
@@ -364,8 +361,7 @@ class AbstractMediaServiceTest {
             // Given
             String nameWithSpaces = "  Item Name  ";
             when(validator.validateName(nameWithSpaces, "TestMedia name")).thenReturn("Item Name");
-            when(repository.existsByNameIgnoreCaseAndUserId("Item Name", USER_ID))
-                    .thenReturn(false);
+            when(repository.existsByNameIgnoreCaseAndUserId("Item Name", USER_ID)).thenReturn(false);
 
             TestMediaEntity savedEntity = createEntity(1, "Item Name", SCORE);
             when(repository.save(any(TestMediaEntity.class))).thenReturn(savedEntity);
@@ -473,10 +469,9 @@ class AbstractMediaServiceTest {
             when(repository.existsByNameIgnoreCaseAndUserId(newName, USER_ID)).thenReturn(true);
 
             // When & Then
-            assertThatThrownBy(
-                            () ->
-                                    service.updateItem(
-                                            oldName, newName, COVER_URL, SCORE, USER_ID, List.of()))
+            assertThatThrownBy(() ->
+                    service.updateItem(oldName, newName, COVER_URL, SCORE, USER_ID, List.of())
+            )
                     .isInstanceOf(ItemAlreadyExistsException.class)
                     .hasMessageContaining(newName);
 
@@ -497,10 +492,9 @@ class AbstractMediaServiceTest {
                     .thenReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(
-                            () ->
-                                    service.updateItem(
-                                            oldName, newName, COVER_URL, SCORE, USER_ID, List.of()))
+            assertThatThrownBy(() ->
+                    service.updateItem(oldName, newName, COVER_URL, SCORE, USER_ID, List.of())
+            )
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessageContaining(oldName);
 
@@ -698,7 +692,9 @@ class AbstractMediaServiceTest {
                     .thenReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(() -> service.updateCover(ENTITY_NAME, COVER_URL, USER_ID))
+            assertThatThrownBy(() ->
+                    service.updateCover(ENTITY_NAME, COVER_URL, USER_ID)
+            )
                     .isInstanceOf(ResourceNotFoundException.class);
 
             verify(repository, never()).save(any());
@@ -730,8 +726,7 @@ class AbstractMediaServiceTest {
         void shouldReturnFalseWhenNotExists() {
             // Given
             when(validator.validateName(ENTITY_NAME, "TestMedia name")).thenReturn(ENTITY_NAME);
-            when(repository.existsByNameIgnoreCaseAndUserId(ENTITY_NAME, USER_ID))
-                    .thenReturn(false);
+            when(repository.existsByNameIgnoreCaseAndUserId(ENTITY_NAME, USER_ID)).thenReturn(false);
 
             // When
             boolean result = service.isItemExists(ENTITY_NAME, USER_ID);
@@ -797,7 +792,9 @@ class AbstractMediaServiceTest {
 
     // ==================== TEST IMPLEMENTATION CLASSES ====================
 
-    /** Test entity implementing MediaEntity interface */
+    /**
+     * Test entity implementing MediaEntity interface
+     */
     static class TestMediaEntity implements MediaEntity {
         private Integer id;
         private String name;
@@ -865,7 +862,9 @@ class AbstractMediaServiceTest {
         }
     }
 
-    /** Test service implementation */
+    /**
+     * Test service implementation
+     */
     static class TestMediaService extends AbstractMediaService<TestMediaEntity, String> {
         List<Integer> lastAssignedCategoryIds;
 
@@ -879,8 +878,7 @@ class AbstractMediaServiceTest {
         }
 
         @Override
-        protected TestMediaEntity createEntity(
-                String name, String coverUrl, Integer userId, Integer score) {
+        protected TestMediaEntity createEntity(String name, String coverUrl, Integer userId, Integer score) {
             TestMediaEntity entity = new TestMediaEntity();
             entity.setName(name);
             entity.setCoverUrl(coverUrl);
@@ -906,7 +904,9 @@ class AbstractMediaServiceTest {
         }
     }
 
-    /** Helper method to create test entities */
+    /**
+     * Helper method to create test entities
+     */
     private TestMediaEntity createEntity(int id, String name, int score) {
         TestMediaEntity entity = new TestMediaEntity();
         entity.setId(id);
