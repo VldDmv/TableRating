@@ -18,6 +18,14 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
 
+  # Schema migrations (src/main/resources/db/migration).
+  # Fresh database: Flyway creates the schema (V1) and seeds tags/genres (V2).
+  # Existing database that already has the tables: baseline-on-migrate marks
+  # it as already at version 2, so nothing is re-applied.
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 2
+
   # JPA/Hibernate Configuration
   jpa:
     show-sql: false

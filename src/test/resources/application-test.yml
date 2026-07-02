@@ -2,6 +2,11 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+  # migrations are MySQL-flavoured; tests build the schema from the
+  # entities on in-memory H2 instead
+  flyway:
+    enabled: false
+
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
