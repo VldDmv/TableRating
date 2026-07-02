@@ -1,0 +1,14 @@
+# never bake a local config (real DB credentials) into the image —
+# the container is configured via environment variables instead
+src/main/resources/application.yml
+
+target/
+node/
+node_modules/
+.git/
+.github/
+.idea/
+*.iml
+database/
+docker-compose.yml
+README.md

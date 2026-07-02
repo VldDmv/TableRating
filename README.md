@@ -39,11 +39,12 @@ A media collection tracker for **Games, Movies, Books, and TV Shows** — rate, 
 ## Tech Stack
 
 **Backend**
-- Java 17
-- Spring Boot 3.x
+- Java 21
+- Spring Boot 3.5
 - Spring Security (session-based auth, CSRF protection)
 - Spring Data JPA (Hibernate)
 - MySQL 8.0 with HikariCP connection pooling
+- Flyway schema migrations
 - Thymeleaf templates
 - BCrypt password encoding
 - SLF4J + Logback
@@ -63,19 +64,35 @@ A media collection tracker for **Games, Movies, Books, and TV Shows** — rate, 
 
 ## Getting Started
 
-### Prerequisites
-- Java 17+
-- Maven 3.9+
-- MySQL 8.0+
-- Node.js (for running frontend tests)
-
-### Run
+### Quick start (Docker)
 
 ```bash
+docker compose up --build
+```
+
+MySQL 8 starts alongside the app; Flyway creates the schema and seeds the
+tag/genre reference data on first run. App starts at `http://localhost:8080`.
+
+### Local run (without Docker)
+
+Prerequisites: Java 21+, Maven 3.9+, MySQL 8.0+, Node.js (for frontend tests).
+
+```bash
+# copy src/main/resources/application.yml.example to application.yml
+# and fill in your MySQL credentials, then:
 mvn spring-boot:run
 ```
 
 App starts at `http://localhost:8080`
+
+### Database migrations
+
+Schema is managed by Flyway (`src/main/resources/db/migration`). A fresh
+database is created from `V1__baseline_schema.sql` and seeded with the
+curated tag/genre lists (`V2__seed_tags_and_genres.sql`). An existing
+database that already has the tables is baselined at version 2 on the first
+start (`baseline-on-migrate`), so nothing is re-applied. New schema changes
+go in as `V3__...`, `V4__...` files.
 
 ### Frontend Tests
 
