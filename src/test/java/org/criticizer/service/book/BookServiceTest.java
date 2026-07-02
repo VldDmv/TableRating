@@ -1,5 +1,14 @@
 package org.criticizer.service.book;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import org.criticizer.dto.book.BookResponse;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.entity.Book;
@@ -21,34 +30,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-/**
- * Unit tests for BookService.
- */
+/** Unit tests for BookService. */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BookService Tests")
 class BookServiceTest {
 
-    @Mock
-    private BookRepository bookRepository;
+    @Mock private BookRepository bookRepository;
 
-    @Mock
-    private GenreRepository genreRepository;
+    @Mock private GenreRepository genreRepository;
 
-    @Mock
-    private ServiceValidator validator;
+    @Mock private ServiceValidator validator;
 
-    @InjectMocks
-    private BookService bookService;
+    @InjectMocks private BookService bookService;
 
     private Book testBook;
     private Genre testGenre;
@@ -83,19 +76,24 @@ class BookServiceTest {
             when(bookRepository.existsByNameIgnoreCaseAndUserId(name, TEST_USER_ID))
                     .thenReturn(false);
             when(bookRepository.save(any(Book.class)))
-                    .thenAnswer(invocation -> {
-                        Book book = invocation.getArgument(0);
-                        if (book.getId() == null) {
-                            Book savedBook = new Book(100, book.getName(),
-                                    book.getUserId(), book.getScore(), book.isCompleted());
-                            savedBook.setCoverUrl(book.getCoverUrl());
-                            savedBook.setGenres(book.getGenres());
-                            return savedBook;
-                        }
-                        return book;
-                    });
-            when(genreRepository.findAllById(genreIds))
-                    .thenReturn(Arrays.asList(genre1, genre2));
+                    .thenAnswer(
+                            invocation -> {
+                                Book book = invocation.getArgument(0);
+                                if (book.getId() == null) {
+                                    Book savedBook =
+                                            new Book(
+                                                    100,
+                                                    book.getName(),
+                                                    book.getUserId(),
+                                                    book.getScore(),
+                                                    book.isCompleted());
+                                    savedBook.setCoverUrl(book.getCoverUrl());
+                                    savedBook.setGenres(book.getGenres());
+                                    return savedBook;
+                                }
+                                return book;
+                            });
+            when(genreRepository.findAllById(genreIds)).thenReturn(Arrays.asList(genre1, genre2));
 
             // When
             bookService.addItem(name, "url", TEST_USER_ID, 90, genreIds);
@@ -115,17 +113,18 @@ class BookServiceTest {
             when(validator.validateName(name, "Book name")).thenReturn(name);
             when(bookRepository.existsByNameIgnoreCaseAndUserId(name, TEST_USER_ID))
                     .thenReturn(false);
-            when(bookRepository.save(any(Book.class)))
-                    .thenAnswer(i -> i.getArgument(0));
+            when(bookRepository.save(any(Book.class))).thenAnswer(i -> i.getArgument(0));
 
             // When
             bookService.addItem(name, null, TEST_USER_ID, 88, null);
 
             // Then
-            verify(bookRepository).save(argThat(book ->
-                    book.getName().equals(name) &&
-                            book.getCoverUrl() == null
-            ));
+            verify(bookRepository)
+                    .save(
+                            argThat(
+                                    book ->
+                                            book.getName().equals(name)
+                                                    && book.getCoverUrl() == null));
             verify(genreRepository, never()).findAllById(any());
         }
 
@@ -139,8 +138,7 @@ class BookServiceTest {
                     .thenReturn(true);
 
             // When & Then
-            assertThatThrownBy(() ->
-                    bookService.addItem(name, null, TEST_USER_ID, 90, null))
+            assertThatThrownBy(() -> bookService.addItem(name, null, TEST_USER_ID, 90, null))
                     .isInstanceOf(ItemAlreadyExistsException.class);
             verify(bookRepository, never()).save(any());
         }
@@ -176,15 +174,18 @@ class BookServiceTest {
             when(bookRepository.save(any(Book.class))).thenAnswer(i -> i.getArgument(0));
 
             // When
-            bookService.updateItem(oldName, newName, newCoverUrl, newScore, TEST_USER_ID, newGenreIds);
+            bookService.updateItem(
+                    oldName, newName, newCoverUrl, newScore, TEST_USER_ID, newGenreIds);
 
             // Then
-            verify(bookRepository).save(argThat(book ->
-                    book.getName().equals(newName) &&
-                            book.getCoverUrl().equals(newCoverUrl) &&
-                            book.getScore() == newScore &&
-                            book.getGenres().contains(newGenre)
-            ));
+            verify(bookRepository)
+                    .save(
+                            argThat(
+                                    book ->
+                                            book.getName().equals(newName)
+                                                    && book.getCoverUrl().equals(newCoverUrl)
+                                                    && book.getScore() == newScore
+                                                    && book.getGenres().contains(newGenre)));
         }
 
         @Test
@@ -196,8 +197,10 @@ class BookServiceTest {
                     .thenReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(() ->
-                    bookService.updateItem("old", "new", null, 80, TEST_USER_ID, null))
+            assertThatThrownBy(
+                            () ->
+                                    bookService.updateItem(
+                                            "old", "new", null, 80, TEST_USER_ID, null))
                     .isInstanceOf(ResourceNotFoundException.class);
         }
     }
@@ -301,12 +304,9 @@ class BookServiceTest {
             when(validator.validatePagination(1, 10)).thenReturn(params);
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
-            Page<Integer> bookIds = new PageImpl<>(
-                    Arrays.asList(1, 2),
-                    PageRequest.of(0, 10),
-                    2
-            );
-            when(bookRepository.findItemIds(eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
+            Page<Integer> bookIds = new PageImpl<>(Arrays.asList(1, 2), PageRequest.of(0, 10), 2);
+            when(bookRepository.findItemIds(
+                            eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
                     .thenReturn(bookIds);
 
             Book book1 = new Book(1, "Book 1", TEST_USER_ID, 80, false);
@@ -315,9 +315,8 @@ class BookServiceTest {
                     .thenReturn(Arrays.asList(book1, book2));
 
             // When
-            var result = bookService.getUserItemsPage(
-                    TEST_USER_ID, 1, 10, null, null, "name", "asc"
-            );
+            var result =
+                    bookService.getUserItemsPage(TEST_USER_ID, 1, 10, null, null, "name", "asc");
 
             // Then
             assertThat(result).isNotNull();
@@ -335,26 +334,19 @@ class BookServiceTest {
             when(validator.validatePagination(1, 10)).thenReturn(params);
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
-            Page<Integer> bookIds = new PageImpl<>(
-                    List.of(1),
-                    PageRequest.of(0, 10),
-                    1
-            );
-            when(bookRepository.findItemIds(
-                    eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any()))
+            Page<Integer> bookIds = new PageImpl<>(List.of(1), PageRequest.of(0, 10), 1);
+            when(bookRepository.findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any()))
                     .thenReturn(bookIds);
 
-            when(bookRepository.findByIdsWithCategories(List.of(1)))
-                    .thenReturn(List.of(testBook));
+            when(bookRepository.findByIdsWithCategories(List.of(1))).thenReturn(List.of(testBook));
 
             // When
-            var result = bookService.getUserItemsPage(
-                    TEST_USER_ID, 1, 10, 1, null, "name", "asc"
-            );
+            var result = bookService.getUserItemsPage(TEST_USER_ID, 1, 10, 1, null, "name", "asc");
 
             // Then
             assertThat(result.getItems()).hasSize(1);
-            verify(bookRepository).findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any());
+            verify(bookRepository)
+                    .findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any());
         }
     }
 
@@ -380,9 +372,7 @@ class BookServiceTest {
             bookService.updateCover(name, newCoverUrl, TEST_USER_ID);
 
             // Then
-            verify(bookRepository).save(argThat(book ->
-                    book.getCoverUrl().equals(newCoverUrl)
-            ));
+            verify(bookRepository).save(argThat(book -> book.getCoverUrl().equals(newCoverUrl)));
         }
 
         @Test
@@ -400,9 +390,7 @@ class BookServiceTest {
             bookService.updateCover(name, null, TEST_USER_ID);
 
             // Then
-            verify(bookRepository).save(argThat(book ->
-                    book.getCoverUrl() == null
-            ));
+            verify(bookRepository).save(argThat(book -> book.getCoverUrl() == null));
         }
     }
 

@@ -1,5 +1,14 @@
 package org.criticizer.service.movie;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.dto.movie.MovieResponse;
 import org.criticizer.entity.Genre;
@@ -21,34 +30,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-/**
- * Unit tests for MovieService.
- */
+/** Unit tests for MovieService. */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("MovieService Tests")
 class MovieServiceTest {
 
-    @Mock
-    private MovieRepository movieRepository;
+    @Mock private MovieRepository movieRepository;
 
-    @Mock
-    private GenreRepository genreRepository;
+    @Mock private GenreRepository genreRepository;
 
-    @Mock
-    private ServiceValidator validator;
+    @Mock private ServiceValidator validator;
 
-    @InjectMocks
-    private MovieService movieService;
+    @InjectMocks private MovieService movieService;
 
     private Movie testMovie;
     private Genre testGenre;
@@ -87,20 +80,25 @@ class MovieServiceTest {
                     .thenReturn(false);
 
             when(movieRepository.save(any(Movie.class)))
-                    .thenAnswer(invocation -> {
-                        Movie movie = invocation.getArgument(0);
-                        if (movie.getId() == null) {
-                            Movie savedMovie = new Movie(100, movie.getName(),
-                                    movie.getUserId(), movie.getScore(), movie.isCompleted());
-                            savedMovie.setCoverUrl(movie.getCoverUrl());
-                            savedMovie.setGenres(movie.getGenres());
-                            return savedMovie;
-                        }
-                        return movie;
-                    });
+                    .thenAnswer(
+                            invocation -> {
+                                Movie movie = invocation.getArgument(0);
+                                if (movie.getId() == null) {
+                                    Movie savedMovie =
+                                            new Movie(
+                                                    100,
+                                                    movie.getName(),
+                                                    movie.getUserId(),
+                                                    movie.getScore(),
+                                                    movie.isCompleted());
+                                    savedMovie.setCoverUrl(movie.getCoverUrl());
+                                    savedMovie.setGenres(movie.getGenres());
+                                    return savedMovie;
+                                }
+                                return movie;
+                            });
 
-            when(genreRepository.findAllById(genreIds))
-                    .thenReturn(Arrays.asList(genre1, genre2));
+            when(genreRepository.findAllById(genreIds)).thenReturn(Arrays.asList(genre1, genre2));
 
             // When
             movieService.addItem(name, coverUrl, TEST_USER_ID, score, genreIds);
@@ -120,17 +118,18 @@ class MovieServiceTest {
             when(validator.validateName(name, "Movie name")).thenReturn(name);
             when(movieRepository.existsByNameIgnoreCaseAndUserId(name, TEST_USER_ID))
                     .thenReturn(false);
-            when(movieRepository.save(any(Movie.class)))
-                    .thenAnswer(i -> i.getArgument(0));
+            when(movieRepository.save(any(Movie.class))).thenAnswer(i -> i.getArgument(0));
 
             // When
             movieService.addItem(name, null, TEST_USER_ID, 88, null);
 
             // Then
-            verify(movieRepository).save(argThat(movie ->
-                    movie.getName().equals(name) &&
-                            movie.getCoverUrl() == null
-            ));
+            verify(movieRepository)
+                    .save(
+                            argThat(
+                                    movie ->
+                                            movie.getName().equals(name)
+                                                    && movie.getCoverUrl() == null));
             verify(genreRepository, never()).findAllById(any());
         }
 
@@ -144,8 +143,7 @@ class MovieServiceTest {
                     .thenReturn(true);
 
             // When & Then
-            assertThatThrownBy(() ->
-                    movieService.addItem(name, null, TEST_USER_ID, 90, null))
+            assertThatThrownBy(() -> movieService.addItem(name, null, TEST_USER_ID, 90, null))
                     .isInstanceOf(ItemAlreadyExistsException.class)
                     .hasMessageContaining(name);
 
@@ -183,16 +181,18 @@ class MovieServiceTest {
             when(movieRepository.save(any(Movie.class))).thenAnswer(i -> i.getArgument(0));
 
             // When
-            movieService.updateItem(oldName, newName, newCoverUrl, newScore,
-                    TEST_USER_ID, newGenreIds);
+            movieService.updateItem(
+                    oldName, newName, newCoverUrl, newScore, TEST_USER_ID, newGenreIds);
 
             // Then
-            verify(movieRepository).save(argThat(movie ->
-                    movie.getName().equals(newName) &&
-                            movie.getCoverUrl().equals(newCoverUrl) &&
-                            movie.getScore() == newScore &&
-                            movie.getGenres().contains(newGenre)
-            ));
+            verify(movieRepository)
+                    .save(
+                            argThat(
+                                    movie ->
+                                            movie.getName().equals(newName)
+                                                    && movie.getCoverUrl().equals(newCoverUrl)
+                                                    && movie.getScore() == newScore
+                                                    && movie.getGenres().contains(newGenre)));
         }
 
         @Test
@@ -208,8 +208,10 @@ class MovieServiceTest {
                     .thenReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(() ->
-                    movieService.updateItem(oldName, newName, null, 80, TEST_USER_ID, null))
+            assertThatThrownBy(
+                            () ->
+                                    movieService.updateItem(
+                                            oldName, newName, null, 80, TEST_USER_ID, null))
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessageContaining(oldName);
         }
@@ -318,12 +320,9 @@ class MovieServiceTest {
             when(validator.validatePagination(1, 10)).thenReturn(params);
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
-            Page<Integer> movieIds = new PageImpl<>(
-                    Arrays.asList(1, 2),
-                    PageRequest.of(0, 10),
-                    2
-            );
-            when(movieRepository.findItemIds(eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
+            Page<Integer> movieIds = new PageImpl<>(Arrays.asList(1, 2), PageRequest.of(0, 10), 2);
+            when(movieRepository.findItemIds(
+                            eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
                     .thenReturn(movieIds);
 
             Movie movie1 = new Movie(1, "Movie 1", TEST_USER_ID, 80, false);
@@ -332,9 +331,8 @@ class MovieServiceTest {
                     .thenReturn(Arrays.asList(movie1, movie2));
 
             // When
-            var result = movieService.getUserItemsPage(
-                    TEST_USER_ID, 1, 10, null, null, "name", "asc"
-            );
+            var result =
+                    movieService.getUserItemsPage(TEST_USER_ID, 1, 10, null, null, "name", "asc");
 
             // Then
             assertThat(result).isNotNull();
@@ -352,26 +350,21 @@ class MovieServiceTest {
             when(validator.validatePagination(1, 10)).thenReturn(params);
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
-            Page<Integer> movieIds = new PageImpl<>(
-                    List.of(1),
-                    PageRequest.of(0, 10),
-                    1
-            );
+            Page<Integer> movieIds = new PageImpl<>(List.of(1), PageRequest.of(0, 10), 1);
             when(movieRepository.findItemIds(
-                    eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any()))
+                            eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any()))
                     .thenReturn(movieIds);
 
             when(movieRepository.findByIdsWithCategories(List.of(1)))
                     .thenReturn(List.of(testMovie));
 
             // When
-            var result = movieService.getUserItemsPage(
-                    TEST_USER_ID, 1, 10, 1, null, "name", "asc"
-            );
+            var result = movieService.getUserItemsPage(TEST_USER_ID, 1, 10, 1, null, "name", "asc");
 
             // Then
             assertThat(result.getItems()).hasSize(1);
-            verify(movieRepository).findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any());
+            verify(movieRepository)
+                    .findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any());
         }
     }
 
@@ -397,9 +390,7 @@ class MovieServiceTest {
             movieService.updateCover(name, newCoverUrl, TEST_USER_ID);
 
             // Then
-            verify(movieRepository).save(argThat(movie ->
-                    movie.getCoverUrl().equals(newCoverUrl)
-            ));
+            verify(movieRepository).save(argThat(movie -> movie.getCoverUrl().equals(newCoverUrl)));
         }
 
         @Test
@@ -417,9 +408,7 @@ class MovieServiceTest {
             movieService.updateCover(name, null, TEST_USER_ID);
 
             // Then
-            verify(movieRepository).save(argThat(movie ->
-                    movie.getCoverUrl() == null
-            ));
+            verify(movieRepository).save(argThat(movie -> movie.getCoverUrl() == null));
         }
     }
 

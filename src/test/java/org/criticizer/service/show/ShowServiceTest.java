@@ -1,5 +1,14 @@
 package org.criticizer.service.show;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.dto.show.ShowResponse;
 import org.criticizer.entity.Genre;
@@ -21,34 +30,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-/**
- * Unit tests for ShowService.
- */
+/** Unit tests for ShowService. */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ShowService Tests")
 class ShowServiceTest {
 
-    @Mock
-    private ShowRepository showRepository;
+    @Mock private ShowRepository showRepository;
 
-    @Mock
-    private GenreRepository genreRepository;
+    @Mock private GenreRepository genreRepository;
 
-    @Mock
-    private ServiceValidator validator;
+    @Mock private ServiceValidator validator;
 
-    @InjectMocks
-    private ShowService showService;
+    @InjectMocks private ShowService showService;
 
     private Show testShow;
     private Genre testGenre;
@@ -83,19 +76,24 @@ class ShowServiceTest {
             when(showRepository.existsByNameIgnoreCaseAndUserId(name, TEST_USER_ID))
                     .thenReturn(false);
             when(showRepository.save(any(Show.class)))
-                    .thenAnswer(invocation -> {
-                        Show show = invocation.getArgument(0);
-                        if (show.getId() == null) {
-                            Show savedShow = new Show(100, show.getName(),
-                                    show.getUserId(), show.getScore(), show.isCompleted());
-                            savedShow.setCoverUrl(show.getCoverUrl());
-                            savedShow.setGenres(show.getGenres());
-                            return savedShow;
-                        }
-                        return show;
-                    });
-            when(genreRepository.findAllById(genreIds))
-                    .thenReturn(Arrays.asList(genre1, genre2));
+                    .thenAnswer(
+                            invocation -> {
+                                Show show = invocation.getArgument(0);
+                                if (show.getId() == null) {
+                                    Show savedShow =
+                                            new Show(
+                                                    100,
+                                                    show.getName(),
+                                                    show.getUserId(),
+                                                    show.getScore(),
+                                                    show.isCompleted());
+                                    savedShow.setCoverUrl(show.getCoverUrl());
+                                    savedShow.setGenres(show.getGenres());
+                                    return savedShow;
+                                }
+                                return show;
+                            });
+            when(genreRepository.findAllById(genreIds)).thenReturn(Arrays.asList(genre1, genre2));
 
             // When
             showService.addItem(name, "url", TEST_USER_ID, 95, genreIds);
@@ -121,10 +119,12 @@ class ShowServiceTest {
             showService.addItem(name, null, TEST_USER_ID, 88, null);
 
             // Then
-            verify(showRepository).save(argThat(show ->
-                    show.getName().equals(name) &&
-                            show.getCoverUrl() == null
-            ));
+            verify(showRepository)
+                    .save(
+                            argThat(
+                                    show ->
+                                            show.getName().equals(name)
+                                                    && show.getCoverUrl() == null));
             verify(genreRepository, never()).findAllById(any());
         }
 
@@ -138,8 +138,7 @@ class ShowServiceTest {
                     .thenReturn(true);
 
             // When & Then
-            assertThatThrownBy(() ->
-                    showService.addItem(name, null, TEST_USER_ID, 90, null))
+            assertThatThrownBy(() -> showService.addItem(name, null, TEST_USER_ID, 90, null))
                     .isInstanceOf(ItemAlreadyExistsException.class)
                     .hasMessageContaining(name);
 
@@ -176,11 +175,13 @@ class ShowServiceTest {
             showService.updateItem(oldName, newName, newCoverUrl, newScore, TEST_USER_ID, null);
 
             // Then
-            verify(showRepository).save(argThat(show ->
-                    show.getName().equals(newName) &&
-                            show.getScore() == newScore &&
-                            show.getCoverUrl().equals(newCoverUrl)
-            ));
+            verify(showRepository)
+                    .save(
+                            argThat(
+                                    show ->
+                                            show.getName().equals(newName)
+                                                    && show.getScore() == newScore
+                                                    && show.getCoverUrl().equals(newCoverUrl)));
         }
 
         @Test
@@ -192,8 +193,10 @@ class ShowServiceTest {
                     .thenReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(() ->
-                    showService.updateItem("old", "new", null, 80, TEST_USER_ID, null))
+            assertThatThrownBy(
+                            () ->
+                                    showService.updateItem(
+                                            "old", "new", null, 80, TEST_USER_ID, null))
                     .isInstanceOf(ResourceNotFoundException.class);
         }
 
@@ -217,11 +220,13 @@ class ShowServiceTest {
 
             // Then
             verify(genreRepository).findAllById(newGenreIds);
-            verify(showRepository).save(argThat(show ->
-                    show.getGenres().size() == 2 &&
-                            show.getGenres().contains(genre2) &&
-                            show.getGenres().contains(genre3)
-            ));
+            verify(showRepository)
+                    .save(
+                            argThat(
+                                    show ->
+                                            show.getGenres().size() == 2
+                                                    && show.getGenres().contains(genre2)
+                                                    && show.getGenres().contains(genre3)));
         }
     }
 
@@ -276,8 +281,7 @@ class ShowServiceTest {
         void shouldToggleToWatched() {
             // Given
             testShow.setCompleted(false);
-            when(validator.validateName("Breaking Bad", "Show name"))
-                    .thenReturn("Breaking Bad");
+            when(validator.validateName("Breaking Bad", "Show name")).thenReturn("Breaking Bad");
             when(showRepository.findByNameIgnoreCaseAndUserId("Breaking Bad", TEST_USER_ID))
                     .thenReturn(Optional.of(testShow));
             when(showRepository.save(any(Show.class))).thenAnswer(i -> i.getArgument(0));
@@ -295,8 +299,7 @@ class ShowServiceTest {
         void shouldToggleToUnwatched() {
             // Given
             testShow.setCompleted(true);
-            when(validator.validateName("Breaking Bad", "Show name"))
-                    .thenReturn("Breaking Bad");
+            when(validator.validateName("Breaking Bad", "Show name")).thenReturn("Breaking Bad");
             when(showRepository.findByNameIgnoreCaseAndUserId("Breaking Bad", TEST_USER_ID))
                     .thenReturn(Optional.of(testShow));
             when(showRepository.save(any(Show.class))).thenAnswer(i -> i.getArgument(0));
@@ -326,12 +329,9 @@ class ShowServiceTest {
             when(validator.validatePagination(1, 10)).thenReturn(params);
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
-            Page<Integer> showIds = new PageImpl<>(
-                    Arrays.asList(1, 2),
-                    PageRequest.of(0, 10),
-                    2
-            );
-            when(showRepository.findItemIds(eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
+            Page<Integer> showIds = new PageImpl<>(Arrays.asList(1, 2), PageRequest.of(0, 10), 2);
+            when(showRepository.findItemIds(
+                            eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
                     .thenReturn(showIds);
 
             Show show1 = new Show(1, "Show 1", TEST_USER_ID, 80, false);
@@ -340,9 +340,8 @@ class ShowServiceTest {
                     .thenReturn(Arrays.asList(show1, show2));
 
             // When
-            var result = showService.getUserItemsPage(
-                    TEST_USER_ID, 1, 10, null, null, "name", "asc"
-            );
+            var result =
+                    showService.getUserItemsPage(TEST_USER_ID, 1, 10, null, null, "name", "asc");
 
             // Then
             assertThat(result).isNotNull();
@@ -360,26 +359,19 @@ class ShowServiceTest {
             when(validator.validatePagination(1, 10)).thenReturn(params);
             when(validator.sanitizeSearchTerm(null)).thenReturn(null);
 
-            Page<Integer> showIds = new PageImpl<>(
-                    List.of(1),
-                    PageRequest.of(0, 10),
-                    1
-            );
-            when(showRepository.findItemIds(
-                    eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any()))
+            Page<Integer> showIds = new PageImpl<>(List.of(1), PageRequest.of(0, 10), 1);
+            when(showRepository.findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any()))
                     .thenReturn(showIds);
 
-            when(showRepository.findByIdsWithCategories(List.of(1)))
-                    .thenReturn(List.of(testShow));
+            when(showRepository.findByIdsWithCategories(List.of(1))).thenReturn(List.of(testShow));
 
             // When
-            var result = showService.getUserItemsPage(
-                    TEST_USER_ID, 1, 10, 1, null, "name", "asc"
-            );
+            var result = showService.getUserItemsPage(TEST_USER_ID, 1, 10, 1, null, "name", "asc");
 
             // Then
             assertThat(result.getItems()).hasSize(1);
-            verify(showRepository).findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any());
+            verify(showRepository)
+                    .findItemIds(eq(TEST_USER_ID), eq(1), isNull(), any(), any(), any());
         }
     }
 
@@ -405,9 +397,7 @@ class ShowServiceTest {
             showService.updateCover(name, newCover, TEST_USER_ID);
 
             // Then
-            verify(showRepository).save(argThat(show ->
-                    show.getCoverUrl().equals(newCover)
-            ));
+            verify(showRepository).save(argThat(show -> show.getCoverUrl().equals(newCover)));
         }
 
         @Test
@@ -425,9 +415,7 @@ class ShowServiceTest {
             showService.updateCover(name, null, TEST_USER_ID);
 
             // Then
-            verify(showRepository).save(argThat(show ->
-                    show.getCoverUrl() == null
-            ));
+            verify(showRepository).save(argThat(show -> show.getCoverUrl() == null));
         }
     }
 
@@ -445,8 +433,7 @@ class ShowServiceTest {
             Genre genre3 = new Genre(3, "Thriller");
             testShow.setGenres(new HashSet<>(Arrays.asList(testGenre, genre2, genre3)));
 
-            when(validator.validateName("Breaking Bad", "Show name"))
-                    .thenReturn("Breaking Bad");
+            when(validator.validateName("Breaking Bad", "Show name")).thenReturn("Breaking Bad");
             when(showRepository.findByNameIgnoreCaseAndUserId("Breaking Bad", TEST_USER_ID))
                     .thenReturn(Optional.of(testShow));
             when(showRepository.save(any(Show.class))).thenAnswer(i -> i.getArgument(0));
@@ -471,8 +458,7 @@ class ShowServiceTest {
             // Given
             testShow.setGenres(new HashSet<>());
 
-            when(validator.validateName("Breaking Bad", "Show name"))
-                    .thenReturn("Breaking Bad");
+            when(validator.validateName("Breaking Bad", "Show name")).thenReturn("Breaking Bad");
             when(showRepository.findByNameIgnoreCaseAndUserId("Breaking Bad", TEST_USER_ID))
                     .thenReturn(Optional.of(testShow));
             when(showRepository.save(any(Show.class))).thenAnswer(i -> i.getArgument(0));
@@ -523,8 +509,7 @@ class ShowServiceTest {
         @Test
         @DisplayName("Should check if show exists")
         void shouldCheckIfShowExists() {
-            when(validator.validateName("Breaking Bad", "Show name"))
-                    .thenReturn("Breaking Bad");
+            when(validator.validateName("Breaking Bad", "Show name")).thenReturn("Breaking Bad");
             when(showRepository.existsByNameIgnoreCaseAndUserId("Breaking Bad", TEST_USER_ID))
                     .thenReturn(true);
 
@@ -539,8 +524,7 @@ class ShowServiceTest {
             // Given
             testShow.setCompleted(true);
 
-            when(validator.validateName("Breaking Bad", "Show name"))
-                    .thenReturn("Breaking Bad");
+            when(validator.validateName("Breaking Bad", "Show name")).thenReturn("Breaking Bad");
             when(showRepository.findByNameIgnoreCaseAndUserId("Breaking Bad", TEST_USER_ID))
                     .thenReturn(Optional.of(testShow));
 

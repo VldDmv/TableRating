@@ -16,7 +16,7 @@ const contextPath = config.contextPath || '';
 // State management
 let currentCategory = 'games';
 let currentViewMode = 'table'; // 'table' or 'cards'
-let cachedData = {}; // Cache for API responses
+const cachedData = {}; // Cache for API responses
 
 // Filter & Search & Sort state
 let currentPage = 1;
