@@ -10,7 +10,9 @@ A media collection tracker for **Games, Movies, Books, and TV Shows** — rate, 
 - Track Games, Movies, Books, and TV Shows in separate categories
 - Add scores (0–100), tags/genres, and completion status to each entry
 - Cover image support via Ctrl+Click inline editing or cover modal
-- Autocomplete powered by external APIs: RAWG (games), TMDB (movies & shows), OpenLibrary (books)
+- Book title autocomplete via the OpenLibrary API (no key required). Game/movie/show
+  autocomplete via RAWG/TMDB is wired in the UI but disabled server-side — the
+  `/api/proxy` endpoints for them return 503 until an API key is configured
 
 **Views & Navigation**
 - Switch between Table view and Card view per category
@@ -53,12 +55,13 @@ A media collection tracker for **Games, Movies, Books, and TV Shows** — rate, 
 - Vanilla JavaScript (ES6 modules)
 - Chart.js (admin dashboard)
 - Jest + jsdom (unit tests)
+- Playwright (browser end-to-end tests)
 - CSS custom properties with dark mode via `[data-theme="dark"]`
 
 **External APIs**
-- [RAWG](https://rawg.io/apidocs) — game search
-- [TMDB](https://developer.themoviedb.org/) — movies & shows search
-- [OpenLibrary](https://openlibrary.org/developers/api) — book search
+- [OpenLibrary](https://openlibrary.org/developers/api) — book search (active, no key)
+- [RAWG](https://rawg.io/apidocs) — game search (proxy present but disabled)
+- [TMDB](https://developer.themoviedb.org/) — movies & shows search (proxy present but disabled)
 
 ---
 
@@ -100,6 +103,24 @@ go in as `V3__...`, `V4__...` files.
 npm install
 npm test
 ```
+
+### End-to-End Tests
+
+Browser tests (Playwright) drive the real app on an in-memory H2 database —
+Playwright boots the server itself, so no MySQL is needed:
+
+```bash
+npm install
+npx playwright install chromium
+npm run e2e
+```
+
+### Integration Tests
+
+`MySqlMigrationIntegrationTest` runs the Flyway migrations against a real
+MySQL 8 via Testcontainers and validates the entities against the resulting
+schema. It runs automatically under `mvn verify` when Docker is available and
+skips otherwise.
 
 ---
 
