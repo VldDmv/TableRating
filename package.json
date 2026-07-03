@@ -8,9 +8,11 @@
     "lint": "eslint \"src/main/resources/static/js/**/*.js\" \"src/test/webapp/js/**/*.js\"",
     "lint:fix": "eslint --fix \"src/main/resources/static/js/**/*.js\" \"src/test/webapp/js/**/*.js\"",
     "format": "prettier --write \"src/main/resources/static/js/**/*.js\" \"src/test/webapp/js/**/*.js\"",
-    "format:check": "prettier --check \"src/main/resources/static/js/**/*.js\" \"src/test/webapp/js/**/*.js\""
+    "format:check": "prettier --check \"src/main/resources/static/js/**/*.js\" \"src/test/webapp/js/**/*.js\"",
+    "e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "eslint": "^8.57.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
