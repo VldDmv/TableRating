@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.dto.movie.MovieResponse;
 import org.criticizer.entity.Genre;
+import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.Movie;
 import org.criticizer.exceptions.data.ItemAlreadyExistsException;
 import org.criticizer.exceptions.data.ResourceNotFoundException;
@@ -49,7 +50,7 @@ class MovieServiceTest {
 
     @BeforeEach
     void setUp() {
-        testMovie = new Movie(1, "Inception", TEST_USER_ID, 90, false);
+        testMovie = new Movie(1, "Inception", TEST_USER_ID, 90, MediaStatus.PLANNED);
         testMovie.setCoverUrl("http://example.com/inception.jpg");
 
         testGenre = new Genre(1, "Sci-Fi");
@@ -90,7 +91,7 @@ class MovieServiceTest {
                                                     movie.getName(),
                                                     movie.getUserId(),
                                                     movie.getScore(),
-                                                    movie.isCompleted());
+                                                    movie.getStatus());
                                     savedMovie.setCoverUrl(movie.getCoverUrl());
                                     savedMovie.setGenres(movie.getGenres());
                                     return savedMovie;
@@ -264,10 +265,10 @@ class MovieServiceTest {
     class ToggleStatusTests {
 
         @Test
-        @DisplayName("Should toggle from incomplete to complete")
-        void shouldToggleToComplete() {
+        @DisplayName("Should advance PLANNED to IN_PROGRESS")
+        void shouldAdvancePlannedToInProgress() {
             // Given
-            testMovie.setCompleted(false);
+            testMovie.setStatus(MediaStatus.PLANNED);
             String name = "Inception";
 
             when(validator.validateName(name, "Movie name")).thenReturn(name);
@@ -279,15 +280,16 @@ class MovieServiceTest {
             MovieResponse result = movieService.toggleStatus(name, TEST_USER_ID);
 
             // Then
-            assertThat(result.isCompleted()).isTrue();
-            verify(movieRepository).save(argThat(Movie::isCompleted));
+            assertThat(result.getStatus()).isEqualTo("IN_PROGRESS");
+            verify(movieRepository)
+                    .save(argThat(movie -> movie.getStatus() == MediaStatus.IN_PROGRESS));
         }
 
         @Test
-        @DisplayName("Should toggle from complete to incomplete")
-        void shouldToggleToIncomplete() {
+        @DisplayName("Should advance COMPLETED to DROPPED")
+        void shouldAdvanceCompletedToDropped() {
             // Given
-            testMovie.setCompleted(true);
+            testMovie.setStatus(MediaStatus.COMPLETED);
             String name = "Inception";
 
             when(validator.validateName(name, "Movie name")).thenReturn(name);
@@ -299,8 +301,9 @@ class MovieServiceTest {
             MovieResponse result = movieService.toggleStatus(name, TEST_USER_ID);
 
             // Then
-            assertThat(result.isCompleted()).isFalse();
-            verify(movieRepository).save(argThat(movie -> !movie.isCompleted()));
+            assertThat(result.getStatus()).isEqualTo("DROPPED");
+            verify(movieRepository)
+                    .save(argThat(movie -> movie.getStatus() == MediaStatus.DROPPED));
         }
     }
 
@@ -325,8 +328,8 @@ class MovieServiceTest {
                             eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
                     .thenReturn(movieIds);
 
-            Movie movie1 = new Movie(1, "Movie 1", TEST_USER_ID, 80, false);
-            Movie movie2 = new Movie(2, "Movie 2", TEST_USER_ID, 85, false);
+            Movie movie1 = new Movie(1, "Movie 1", TEST_USER_ID, 80, MediaStatus.PLANNED);
+            Movie movie2 = new Movie(2, "Movie 2", TEST_USER_ID, 85, MediaStatus.PLANNED);
             when(movieRepository.findByIdsWithCategories(Arrays.asList(1, 2)))
                     .thenReturn(Arrays.asList(movie1, movie2));
 
@@ -467,7 +470,7 @@ class MovieServiceTest {
         @DisplayName("Should include all movie properties in response")
         void shouldIncludeAllProperties() {
             // Given
-            testMovie.setCompleted(true);
+            testMovie.setStatus(MediaStatus.COMPLETED);
             String name = "Inception";
 
             when(validator.validateName(name, "Movie name")).thenReturn(name);
@@ -483,7 +486,7 @@ class MovieServiceTest {
             assertThat(result.getName()).isEqualTo(testMovie.getName());
             assertThat(result.getCoverUrl()).isEqualTo(testMovie.getCoverUrl());
             assertThat(result.getScore()).isEqualTo(testMovie.getScore());
-            assertThat(result.isCompleted()).isFalse();
+            assertThat(result.getStatus()).isEqualTo("DROPPED");
         }
     }
 
@@ -514,17 +517,17 @@ class MovieServiceTest {
         void shouldGetMovieStatus() {
             // Given
             String name = "Inception";
-            testMovie.setCompleted(true);
+            testMovie.setStatus(MediaStatus.COMPLETED);
 
             when(validator.validateName(name, "Movie name")).thenReturn(name);
             when(movieRepository.findByNameIgnoreCaseAndUserId(name, TEST_USER_ID))
                     .thenReturn(Optional.of(testMovie));
 
             // When
-            boolean result = movieService.getItemStatus(name, TEST_USER_ID);
+            MediaStatus result = movieService.getItemStatus(name, TEST_USER_ID);
 
             // Then
-            assertThat(result).isTrue();
+            assertThat(result).isEqualTo(MediaStatus.COMPLETED);
         }
 
         @Test

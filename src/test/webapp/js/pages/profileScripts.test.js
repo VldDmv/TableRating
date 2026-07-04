@@ -17,7 +17,7 @@ function makeItem(overrides = {}) {
     return {
         name: 'Test Game',
         score: 75,
-        completed: false,
+        status: 'PLANNED',
         coverUrl: '',
         tags: [],
         genres: [],
@@ -190,14 +190,14 @@ describe('renderTableRow', () => {
 
     test('shows ✅ for completed items', () => {
         expect(
-            parse(makeItem({ completed: true })).querySelector('.col-completed').textContent
+            parse(makeItem({ status: 'COMPLETED' })).querySelector('.col-completed').textContent
         ).toBe('✅');
     });
 
-    test('shows ❌ for incomplete items', () => {
+    test('shows 📋 for planned items', () => {
         expect(
-            parse(makeItem({ completed: false })).querySelector('.col-completed').textContent
-        ).toBe('❌');
+            parse(makeItem({ status: 'PLANNED' })).querySelector('.col-completed').textContent
+        ).toBe('📋');
     });
 
     test('shows comma-joined tag names for games', () => {
@@ -278,14 +278,14 @@ describe('renderCard', () => {
 
     test('shows ✅ for completed items', () => {
         expect(
-            parse(makeItem({ completed: true })).querySelector('.card-status').textContent
+            parse(makeItem({ status: 'COMPLETED' })).querySelector('.card-status').textContent
         ).toContain('✅');
     });
 
-    test('shows ❌ for incomplete items', () => {
+    test('shows 📋 for planned items', () => {
         expect(
-            parse(makeItem({ completed: false })).querySelector('.card-status').textContent
-        ).toContain('❌');
+            parse(makeItem({ status: 'PLANNED' })).querySelector('.card-status').textContent
+        ).toContain('📋');
     });
 
     test('escapes XSS in item name', () => {

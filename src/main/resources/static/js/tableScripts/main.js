@@ -2,7 +2,7 @@ import { ENTITY_CONFIGS } from './core/config.js';
 import { StateManager } from './core/stateManager.js';
 import { DataService } from './core/dataService.js';
 import { ErrorHandler } from './core/errorHandler.js';
-import { htmlUtils, CONSTANTS, securityUtils } from './core/utils.js';
+import { htmlUtils, CONSTANTS, securityUtils, statusMeta } from './core/utils.js';
 
 import { PaginationManager } from './features/table/tablePagination.js';
 import { SortManager } from './features/table/tableSorting.js';
@@ -359,7 +359,7 @@ class CategoryPageController {
                 card.dataset.originalCoverUrl = newData.coverUrl || '';
                 card.dataset.originalTagIds = newData.tagIds.join(',');
                 card.dataset.initialTagIds = newData.tagIds.join(',');
-                if (item) card.dataset.completed = item.completed ? 'true' : 'false';
+                if (item) card.dataset.status = item.status || 'PLANNED';
                 this.cardInlineEditManager?.switchToViewMode(card);
             }
 
@@ -376,19 +376,20 @@ class CategoryPageController {
             }
         };
 
-        window.syncItemCompleted = (itemName, newCompleted) => {
+        window.syncItemStatus = (itemName, newStatus) => {
             const item = this.lastItems.find((i) => i.name === itemName);
-            if (item) item.completed = newCompleted;
+            if (item) item.status = newStatus;
 
+            const meta = statusMeta(newStatus);
             const card = document.querySelector(
                 `.media-card[data-original-name="${CSS.escape(itemName)}"]`
             );
             if (card) {
-                card.dataset.completed = newCompleted ? 'true' : 'false';
+                card.dataset.status = newStatus;
                 const btn = card.querySelector('.status-button');
-                if (btn) btn.textContent = newCompleted ? '✅' : '❌';
+                if (btn) btn.textContent = meta.icon;
                 const label = card.querySelector('.status-label');
-                if (label) label.textContent = newCompleted ? 'Completed' : 'Not Completed';
+                if (label) label.textContent = meta.label;
             }
         };
     }
@@ -485,23 +486,22 @@ class CategoryPageController {
 
             if (!response.ok) throw new Error(await ErrorHandler.parseErrorResponse(response));
 
-            const { completed: newCompleted } = await response.json();
+            const { status: newStatus } = await response.json();
 
             const item = this.lastItems.find((i) => i.name === itemName);
-            if (item) item.completed = newCompleted;
+            if (item) item.status = newStatus;
 
-            const ICON_OK = '✅';
-            const ICON_X = '❌';
+            const meta = statusMeta(newStatus);
 
             const card = document.querySelector(
                 `.media-card[data-original-name="${CSS.escape(itemName)}"]`
             );
             if (card) {
-                card.dataset.completed = newCompleted ? 'true' : 'false';
+                card.dataset.status = newStatus;
                 const btn = card.querySelector('.status-button');
-                if (btn) btn.textContent = newCompleted ? ICON_OK : ICON_X;
+                if (btn) btn.textContent = meta.icon;
                 const label = card.querySelector('.status-label');
-                if (label) label.textContent = newCompleted ? 'Completed' : 'Not Completed';
+                if (label) label.textContent = meta.label;
             }
 
             const row = Array.from(this.elements.tableBody.querySelectorAll('tr')).find(
@@ -509,7 +509,10 @@ class CategoryPageController {
             );
             if (row) {
                 const btn = row.querySelector('.status-button');
-                if (btn) btn.textContent = newCompleted ? ICON_OK : ICON_X;
+                if (btn) {
+                    btn.textContent = meta.icon;
+                    btn.title = `${meta.label} — click to change`;
+                }
             }
         } catch (error) {
             ErrorHandler.handle(error, `Error toggling status: ${error.message}`);

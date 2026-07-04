@@ -1,3 +1,3 @@
 package org.criticizer.dto.helper;
 
-public record StatusToggleResponse(String message, boolean completed) {}
+public record StatusToggleResponse(String message, String status) {}

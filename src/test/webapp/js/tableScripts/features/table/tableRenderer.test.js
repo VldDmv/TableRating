@@ -1,6 +1,19 @@
 import { jest } from '@jest/globals';
 
 jest.unstable_mockModule('@/tableScripts/core/utils.js', () => ({
+    STATUS_META: {
+        PLANNED: { icon: '📋', label: 'Planned' },
+        IN_PROGRESS: { icon: '▶️', label: 'In Progress' },
+        COMPLETED: { icon: '✅', label: 'Completed' },
+        DROPPED: { icon: '🚫', label: 'Dropped' },
+    },
+    statusMeta: (status) =>
+        ({
+            PLANNED: { icon: '📋', label: 'Planned' },
+            IN_PROGRESS: { icon: '▶️', label: 'In Progress' },
+            COMPLETED: { icon: '✅', label: 'Completed' },
+            DROPPED: { icon: '🚫', label: 'Dropped' },
+        })[status] || { icon: '📋', label: 'Planned' },
     htmlUtils: { escape: (s) => s, decode: (s) => s },
     ICONS: {
         COMPLETED: '✅',
@@ -27,7 +40,7 @@ function makeItem(overrides = {}) {
     return {
         name: 'Witcher 3',
         score: 95,
-        completed: false,
+        status: 'PLANNED',
         coverUrl: '',
         tags: [],
         ...overrides,
@@ -165,16 +178,16 @@ describe('TableRenderer.createRow()', () => {
 
     test('status button shows COMPLETED icon for completed item', () => {
         const btn = renderer
-            .createRow(makeItem({ completed: true }))
+            .createRow(makeItem({ status: 'COMPLETED' }))
             .querySelector('.status-button');
         expect(btn.innerHTML.trim()).toBe('✅');
     });
 
-    test('status button shows NOT_COMPLETED icon for incomplete item', () => {
+    test('status button shows PLANNED icon for a planned item', () => {
         const btn = renderer
-            .createRow(makeItem({ completed: false }))
+            .createRow(makeItem({ status: 'PLANNED' }))
             .querySelector('.status-button');
-        expect(btn.innerHTML.trim()).toBe('❌');
+        expect(btn.innerHTML.trim()).toBe('📋');
     });
 });
 

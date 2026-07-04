@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import org.criticizer.dto.game.GameResponse;
 import org.criticizer.entity.Game;
+import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.Tag;
 import org.criticizer.exceptions.data.ItemAlreadyExistsException;
 import org.criticizer.exceptions.data.ResourceNotFoundException;
@@ -46,7 +47,7 @@ class GameServiceTest {
 
     @BeforeEach
     void setUp() {
-        testGame = new Game(1, "The Witcher 3", TEST_USER_ID, 95, false);
+        testGame = new Game(1, "The Witcher 3", TEST_USER_ID, 95, MediaStatus.PLANNED);
         testGame.setCoverUrl("http://example.com/cover.jpg");
 
         testTag = new Tag(1, "RPG");
@@ -89,7 +90,7 @@ class GameServiceTest {
                                                     game.getName(),
                                                     game.getUserId(),
                                                     game.getScore(),
-                                                    game.isCompleted());
+                                                    game.getStatus());
                                     savedGame.setCoverUrl(game.getCoverUrl());
                                     savedGame.setTags(game.getTags());
                                     return savedGame;
@@ -340,10 +341,10 @@ class GameServiceTest {
     class ToggleStatusTests {
 
         @Test
-        @DisplayName("Should toggle completion status from false to true")
-        void shouldToggleToCompleted() {
+        @DisplayName("Should advance PLANNED to IN_PROGRESS")
+        void shouldAdvancePlannedToInProgress() {
             // Given
-            testGame.setCompleted(false);
+            testGame.setStatus(MediaStatus.PLANNED);
             String name = "The Witcher 3";
 
             when(validator.validateName(name, "Game name")).thenReturn(name);
@@ -355,15 +356,16 @@ class GameServiceTest {
             GameResponse result = gameService.toggleStatus(name, TEST_USER_ID);
 
             // Then
-            assertThat(result.isCompleted()).isTrue();
-            verify(gameRepository).save(argThat(game -> game.isCompleted()));
+            assertThat(result.getStatus()).isEqualTo("IN_PROGRESS");
+            verify(gameRepository)
+                    .save(argThat(game -> game.getStatus() == MediaStatus.IN_PROGRESS));
         }
 
         @Test
-        @DisplayName("Should toggle completion status from true to false")
-        void shouldToggleToIncomplete() {
+        @DisplayName("Should advance COMPLETED to DROPPED")
+        void shouldAdvanceCompletedToDropped() {
             // Given
-            testGame.setCompleted(true);
+            testGame.setStatus(MediaStatus.COMPLETED);
             String name = "The Witcher 3";
 
             when(validator.validateName(name, "Game name")).thenReturn(name);
@@ -375,8 +377,8 @@ class GameServiceTest {
             GameResponse result = gameService.toggleStatus(name, TEST_USER_ID);
 
             // Then
-            assertThat(result.isCompleted()).isFalse();
-            verify(gameRepository).save(argThat(game -> !game.isCompleted()));
+            assertThat(result.getStatus()).isEqualTo("DROPPED");
+            verify(gameRepository).save(argThat(game -> game.getStatus() == MediaStatus.DROPPED));
         }
     }
 
@@ -403,8 +405,8 @@ class GameServiceTest {
                     .thenReturn(gameIds);
 
             // Mock fetching full entities
-            Game game1 = new Game(1, "Game 1", TEST_USER_ID, 80, false);
-            Game game2 = new Game(2, "Game 2", TEST_USER_ID, 85, false);
+            Game game1 = new Game(1, "Game 1", TEST_USER_ID, 80, MediaStatus.PLANNED);
+            Game game2 = new Game(2, "Game 2", TEST_USER_ID, 85, MediaStatus.PLANNED);
             when(gameRepository.findByIdsWithCategories(Arrays.asList(1, 2)))
                     .thenReturn(Arrays.asList(game1, game2));
 
@@ -561,17 +563,17 @@ class GameServiceTest {
         void shouldGetItemStatus() {
             // Given
             String name = "The Witcher 3";
-            testGame.setCompleted(true);
+            testGame.setStatus(MediaStatus.COMPLETED);
 
             when(validator.validateName(name, "Game name")).thenReturn(name);
             when(gameRepository.findByNameIgnoreCaseAndUserId(name, TEST_USER_ID))
                     .thenReturn(Optional.of(testGame));
 
             // When
-            boolean result = gameService.getItemStatus(name, TEST_USER_ID);
+            MediaStatus result = gameService.getItemStatus(name, TEST_USER_ID);
 
             // Then
-            assertThat(result).isTrue();
+            assertThat(result).isEqualTo(MediaStatus.COMPLETED);
         }
 
         @Test

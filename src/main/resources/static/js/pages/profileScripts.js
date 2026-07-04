@@ -1,3 +1,4 @@
+const STATUS_ICONS = { PLANNED: '📋', IN_PROGRESS: '▶️', COMPLETED: '✅', DROPPED: '🚫' };
 export {
     getScoreClass,
     getSortIcon,
@@ -474,7 +475,7 @@ function renderTable(items) {
                     <th class="col-name sortable" data-sort="name">${currentCategory.slice(0, -1).charAt(0).toUpperCase() + currentCategory.slice(1, -1)} ${getSortIcon('name')}</th>
                     <th class="col-score sortable" data-sort="score">Score ${getSortIcon('score')}</th>
                     <th class="col-tags">${categoryLabels[currentCategory]}</th>
-                    <th class="col-completed sortable" data-sort="completed">Completed ${getSortIcon('completed')}</th>
+                    <th class="col-completed sortable" data-sort="status">Status ${getSortIcon('status')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -525,7 +526,7 @@ function renderTableRow(item, category = currentCategory) {
             ? (item.tags || []).map((t) => t.name).join(', ')
             : (item.genres || []).map((g) => g.name).join(', ');
 
-    const completedIcon = item.completed ? '✅' : '❌';
+    const completedIcon = STATUS_ICONS[item.status] || STATUS_ICONS.PLANNED;
     const scoreClass = getScoreClass(item.score);
 
     return `
@@ -567,7 +568,7 @@ function renderCard(item, category = currentCategory) {
             ? (item.tags || []).map((t) => `<span class="tag-badge">${t.name}</span>`).join('')
             : (item.genres || []).map((g) => `<span class="tag-badge">${g.name}</span>`).join('');
 
-    const completedIcon = item.completed ? '✅' : '❌';
+    const completedIcon = STATUS_ICONS[item.status] || STATUS_ICONS.PLANNED;
     const scoreClass = getScoreClass(item.score);
 
     return `

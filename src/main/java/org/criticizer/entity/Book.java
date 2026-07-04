@@ -22,8 +22,8 @@ public class Book extends BaseEntity {
 
     protected Book() {}
 
-    public Book(Integer id, String name, Integer userId, Integer score, boolean completed) {
-        super(id, name, userId, score, completed);
+    public Book(Integer id, String name, Integer userId, Integer score, MediaStatus status) {
+        super(id, name, userId, score, status);
     }
 
     public Set<Genre> getGenres() {

@@ -2,7 +2,7 @@
  * Card Renderer — rendering data in the form of cards.
  */
 
-import { htmlUtils, ICONS } from '../../core/utils.js';
+import { htmlUtils, ICONS, statusMeta } from '../../core/utils.js';
 
 export class CardRenderer {
     /**
@@ -71,10 +71,10 @@ export class CardRenderer {
         card.dataset.originalTagIds = tagsOrGenres.map((t) => t.id).join(',');
         card.dataset.initialTagIds = card.dataset.originalTagIds;
         card.dataset.originalCoverUrl = item.coverUrl || '';
-        card.dataset.completed = item.completed ? 'true' : 'false';
+        card.dataset.status = item.status || 'PLANNED';
 
         const escapedName = htmlUtils.escape(item.name);
-        const completedIcon = item.completed ? ICONS.COMPLETED : ICONS.NOT_COMPLETED;
+        const status = statusMeta(item.status);
         const editIcon = ICONS.EDIT ?? '✏️';
         const deleteIcon = ICONS.DELETE ?? '🗑️';
 
@@ -96,9 +96,9 @@ export class CardRenderer {
                         : `
                 <div class="card-status">
                     <button class="status-button" data-item-name="${escapedName}">
-                        ${completedIcon}
+                        ${status.icon}
                     </button>
-                    <span class="status-label">${item.completed ? 'Completed' : 'Not Completed'}</span>
+                    <span class="status-label">${status.label}</span>
                 </div>
                 <div class="card-actions">
                     <button class="edit-button card-action-btn"

@@ -22,8 +22,8 @@ public class Game extends BaseEntity {
 
     protected Game() {}
 
-    public Game(Integer id, String name, Integer userId, Integer score, boolean completed) {
-        super(id, name, userId, score, completed);
+    public Game(Integer id, String name, Integer userId, Integer score, MediaStatus status) {
+        super(id, name, userId, score, status);
     }
 
     public Set<Tag> getTags() {

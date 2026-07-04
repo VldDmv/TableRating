@@ -3,7 +3,7 @@
  * Renders data as an HTML table.
  */
 
-import { htmlUtils, ICONS } from '../../core/utils.js';
+import { htmlUtils, ICONS, statusMeta } from '../../core/utils.js';
 
 export class TableRenderer {
     /**
@@ -68,7 +68,7 @@ export class TableRenderer {
         row.dataset.originalCoverUrl = item.coverUrl || '';
 
         const escapedName = htmlUtils.escape(item.name);
-        const completedIcon = item.completed ? ICONS.COMPLETED : ICONS.NOT_COMPLETED;
+        const status = statusMeta(item.status);
         const editIcon = ICONS.EDIT ?? '✏️';
         const deleteIcon = ICONS.DELETE ?? '🗑️';
 
@@ -76,7 +76,7 @@ export class TableRenderer {
         row.appendChild(this._createTextCell('col-name', item.name));
         row.appendChild(this._createScoreCell(item.score));
         row.appendChild(this._createTagsCell(tagsOrGenres));
-        row.appendChild(this._createCompletedCell(escapedName, completedIcon));
+        row.appendChild(this._createStatusCell(escapedName, status));
         row.appendChild(this._createActionsCell(escapedName, editIcon, deleteIcon));
 
         return row;
@@ -135,12 +135,12 @@ export class TableRenderer {
         return cell;
     }
 
-    _createCompletedCell(escapedName, completedIcon) {
+    _createStatusCell(escapedName, status) {
         const cell = document.createElement('td');
         cell.className = 'col-completed';
         cell.innerHTML = `
-            <button class="status-button" data-item-name="${escapedName}">
-                ${completedIcon}
+            <button class="status-button" data-item-name="${escapedName}" title="${status.label} — click to change">
+                ${status.icon}
             </button>
         `;
         return cell;

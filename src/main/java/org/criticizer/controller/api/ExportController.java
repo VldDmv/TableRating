@@ -16,16 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Exports a user's collection per category as a CSV download.
  *
- * <p>CSV columns: name, score, completed, coverUrl, categories (categories are semicolon-separated
- * to coexist with comma column delimiters).
+ * <p>CSV columns: name, score, status, coverUrl, categories (categories are semicolon-separated to
+ * coexist with comma column delimiters).
  */
 @RestController
 @RequestMapping("/api")
 public class ExportController {
 
-    private static final String[] HEADERS = {
-        "name", "score", "completed", "coverUrl", "categories"
-    };
+    private static final String[] HEADERS = {"name", "score", "status", "coverUrl", "categories"};
 
     private final ExportService service;
     private final SecurityUtil securityUtil;
@@ -47,7 +45,7 @@ public class ExportController {
                     .append(',')
                     .append(row.score() == null ? "" : row.score())
                     .append(',')
-                    .append(row.completed())
+                    .append(row.status())
                     .append(',')
                     .append(csvField(row.coverUrl()))
                     .append(',')

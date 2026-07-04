@@ -1,6 +1,19 @@
 import { jest } from '@jest/globals';
 
 jest.unstable_mockModule('@/tableScripts/core/utils.js', () => ({
+    STATUS_META: {
+        PLANNED: { icon: '📋', label: 'Planned' },
+        IN_PROGRESS: { icon: '▶️', label: 'In Progress' },
+        COMPLETED: { icon: '✅', label: 'Completed' },
+        DROPPED: { icon: '🚫', label: 'Dropped' },
+    },
+    statusMeta: (status) =>
+        ({
+            PLANNED: { icon: '📋', label: 'Planned' },
+            IN_PROGRESS: { icon: '▶️', label: 'In Progress' },
+            COMPLETED: { icon: '✅', label: 'Completed' },
+            DROPPED: { icon: '🚫', label: 'Dropped' },
+        })[status] || { icon: '📋', label: 'Planned' },
     htmlUtils: { escape: (s) => s, decode: (s) => s },
     ICONS: {
         COMPLETED: '✅',
@@ -27,7 +40,7 @@ function makeItem(overrides = {}) {
     return {
         name: 'Witcher 3',
         score: 95,
-        completed: false,
+        status: 'PLANNED',
         coverUrl: '',
         tags: [],
         ...overrides,
@@ -122,8 +135,10 @@ describe('CardRenderer.createCard()', () => {
         expect(renderer.createCard(makeItem({ score: 99 })).dataset.originalScore).toBe('99');
     });
 
-    test('stores completed status as string in dataset', () => {
-        expect(renderer.createCard(makeItem({ completed: true })).dataset.completed).toBe('true');
+    test('stores lifecycle status in dataset', () => {
+        expect(renderer.createCard(makeItem({ status: 'COMPLETED' })).dataset.status).toBe(
+            'COMPLETED'
+        );
     });
 
     test('renders .card-title with item name', () => {

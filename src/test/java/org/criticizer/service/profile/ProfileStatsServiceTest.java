@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import org.criticizer.entity.Game;
+import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.Tag;
 import org.criticizer.exceptions.validation.InvalidInputException;
 import org.criticizer.repository.BookRepository;
@@ -35,7 +36,13 @@ class ProfileStatsServiceTest {
     @InjectMocks private ProfileStatsService statsService;
 
     private Game game(int id, String name, int score, boolean completed, Tag... tags) {
-        Game g = new Game(id, name, USER_ID, score, completed);
+        Game g =
+                new Game(
+                        id,
+                        name,
+                        USER_ID,
+                        score,
+                        completed ? MediaStatus.COMPLETED : MediaStatus.PLANNED);
         g.setTags(new HashSet<>(List.of(tags)));
         return g;
     }

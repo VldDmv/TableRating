@@ -65,7 +65,9 @@ public interface MediaRepository<T> extends JpaRepository<T, Integer> {
     @Query("SELECT COALESCE(MIN(e.score), 0) FROM #{#entityName} e WHERE e.userId = :userId")
     Integer getMinScoreByUserId(@Param("userId") Integer userId);
 
-    @Query("SELECT COUNT(e) FROM #{#entityName} e WHERE e.userId = :userId AND e.completed = true")
+    @Query(
+            "SELECT COUNT(e) FROM #{#entityName} e WHERE e.userId = :userId AND e.status ="
+                    + " org.criticizer.entity.MediaStatus.COMPLETED")
     long countCompletedByUserId(@Param("userId") Integer userId);
 
     @Query(
@@ -75,7 +77,7 @@ public interface MediaRepository<T> extends JpaRepository<T, Integer> {
                 COALESCE(AVG(e.score), 0.0),
                 COALESCE(MAX(e.score), 0),
                 COALESCE(MIN(e.score), 0),
-                SUM(CASE WHEN e.completed = true THEN 1L ELSE 0L END)
+                SUM(CASE WHEN e.status = org.criticizer.entity.MediaStatus.COMPLETED THEN 1L ELSE 0L END)
             FROM #{#entityName} e
             WHERE e.userId = :userId
             """)

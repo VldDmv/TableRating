@@ -113,13 +113,13 @@ class E2EIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Game updated successfully"));
 
-        // 5. Toggle completion
+        // 5. Advance status (PLANNED -> IN_PROGRESS)
         mockMvc.perform(
                         patch("/api/games/Dark Souls Remastered/toggle")
                                 .with(user(auth(newUser)))
                                 .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.completed").value(true));
+                .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
 
         // 6. Delete game
         mockMvc.perform(

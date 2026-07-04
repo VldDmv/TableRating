@@ -1,3 +1,3 @@
 package org.criticizer.dto.helper;
 
-public record StatusResponse(boolean completed) {}
+public record StatusResponse(String status) {}

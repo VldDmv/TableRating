@@ -5,6 +5,7 @@ import java.util.List;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.dto.movie.MovieResponse;
 import org.criticizer.entity.Genre;
+import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.Movie;
 import org.criticizer.repository.GenreRepository;
 import org.criticizer.repository.MovieRepository;
@@ -32,7 +33,7 @@ public class MovieService extends AbstractMediaService<Movie, MovieResponse> {
 
     @Override
     protected Movie createEntity(String name, String coverUrl, Integer userId, Integer score) {
-        Movie movie = new Movie(null, name, userId, score, false);
+        Movie movie = new Movie(null, name, userId, score, MediaStatus.PLANNED);
         movie.setCoverUrl(coverUrl);
         return movie;
     }
@@ -60,7 +61,7 @@ public class MovieService extends AbstractMediaService<Movie, MovieResponse> {
                 movie.getName(),
                 movie.getCoverUrl(),
                 movie.getScore(),
-                movie.isCompleted(),
+                movie.getStatus().name(),
                 genreResponses);
     }
 

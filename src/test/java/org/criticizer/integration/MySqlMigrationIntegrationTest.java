@@ -40,12 +40,12 @@ class MySqlMigrationIntegrationTest {
     @Autowired private UserRepository userRepository;
 
     @Test
-    void flywayAppliedBothMigrations() {
+    void flywayAppliedAllMigrations() {
         Integer applied =
                 jdbc.queryForObject(
                         "select count(*) from flyway_schema_history where success = 1",
                         Integer.class);
-        assertThat(applied).isEqualTo(2);
+        assertThat(applied).isEqualTo(3);
     }
 
     @Test

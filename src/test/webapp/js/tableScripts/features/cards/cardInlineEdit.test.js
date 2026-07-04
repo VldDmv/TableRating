@@ -3,6 +3,19 @@ import { jest } from '@jest/globals';
 // ─── Mock dependencies ────────────────────────────────────────────────────────
 
 jest.unstable_mockModule('@/tableScripts/core/utils.js', () => ({
+    STATUS_META: {
+        PLANNED: { icon: '📋', label: 'Planned' },
+        IN_PROGRESS: { icon: '▶️', label: 'In Progress' },
+        COMPLETED: { icon: '✅', label: 'Completed' },
+        DROPPED: { icon: '🚫', label: 'Dropped' },
+    },
+    statusMeta: (status) =>
+        ({
+            PLANNED: { icon: '📋', label: 'Planned' },
+            IN_PROGRESS: { icon: '▶️', label: 'In Progress' },
+            COMPLETED: { icon: '✅', label: 'Completed' },
+            DROPPED: { icon: '🚫', label: 'Dropped' },
+        })[status] || { icon: '📋', label: 'Planned' },
     htmlUtils: { escape: (s) => s, decode: (s) => s },
     entityUtils: {
         getAvailableItems: jest.fn(() => [
