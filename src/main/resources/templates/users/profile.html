@@ -38,6 +38,14 @@
             </script>
         </div>
 
+        <!-- Compare with my lists (logged-in visitors only) -->
+        <div th:if="${canCompare}" class="compare-bar">
+            <button type="button" id="compareBtn" class="compare-btn">
+                ⚖️ Compare with my lists
+            </button>
+        </div>
+        <section id="compare-section" class="compare-section" style="display: none;"></section>
+
         <div th:if="${canView}">
             <div class="profile-tabs">
                 <button class="tab-link active" data-category="games">Games</button>
@@ -165,6 +173,7 @@
     <script th:if="${canView}" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script th:if="${canView}" type="module" th:src="@{/js/pages/profileScripts.js}"></script>
     <script th:if="${canView}" type="module" th:src="@{/js/pages/profileStats.js}"></script>
+    <script th:if="${canCompare}" type="module" th:src="@{/js/pages/profileCompare.js}"></script>
 </th:block>
 </body>
 </html>

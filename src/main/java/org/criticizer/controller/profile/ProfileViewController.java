@@ -58,6 +58,8 @@ public class ProfileViewController {
         model.addAttribute("profileOwner", profileOwner);
         model.addAttribute("isOwnerViewing", context.isOwner());
         model.addAttribute("canView", context.canView());
+        model.addAttribute(
+                "canCompare", context.canView() && !context.isOwner() && currentUsername != null);
 
         if (context.canView()) {
             var initialData =

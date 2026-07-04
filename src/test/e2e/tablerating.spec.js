@@ -59,6 +59,39 @@ test('search box filters the table down to matching rows', async ({ page }) => {
     await expect(page.locator('#gamesBody tr')).toContainText('Celeste');
 });
 
+test('profile comparison shows taste compatibility between two users', async ({
+    page,
+    browser,
+    baseURL,
+}) => {
+    // User A rates two games and makes their profile public.
+    const userA = await registerAndLogin(page);
+    await page.goto('/games');
+    await addGame(page, 'Celeste', 90);
+    await addGame(page, 'Hades', 80);
+    await page.goto(`/profile?username=${userA}`);
+    await page.check('#privacy-checkbox'); // submits the privacy form
+    await page.waitForURL('**/profile**');
+
+    // User B (separate session) rates one game they share with A.
+    const contextB = await browser.newContext({ baseURL });
+    const pageB = await contextB.newPage();
+    await registerAndLogin(pageB);
+    await pageB.goto('/games');
+    await addGame(pageB, 'Celeste', 70);
+
+    // B opens A's profile and compares: one common item, |70-90| = 20 -> 80%.
+    await pageB.goto(`/profile?username=${userA}`);
+    await pageB.click('#compareBtn');
+
+    const section = pageB.locator('#compare-section');
+    await expect(section.locator('.compat-badge--big')).toHaveText(/80%/);
+    await expect(section).toContainText('Celeste');
+    await expect(section.locator('.compare-diff').first()).toHaveText('−20');
+
+    await contextB.close();
+});
+
 test('inline score edit persists across a reload', async ({ page }) => {
     await registerAndLogin(page);
     await page.goto('/games');
