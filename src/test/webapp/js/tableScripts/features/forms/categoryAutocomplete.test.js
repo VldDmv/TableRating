@@ -81,38 +81,65 @@ describe('UniversalAutocomplete', () => {
     });
 
     describe('parseResults', () => {
-        test('should parse games results to common format', () => {
+        // the server proxy returns one normalized shape for games/movies/shows:
+        // {results: [{name, year, rating, imageUrl, coverUrl}]}
+        test('should parse normalized games results', () => {
             const ac = new UniversalAutocomplete(input, 'games');
             const raw = {
                 results: [
                     {
                         name: 'Mario',
-                        released: '2020-01-01',
-                        rating: 9,
-                        background_image: 'http://img.jpg',
+                        year: 2020,
+                        rating: '93',
+                        imageUrl: 'http://thumb.jpg',
+                        coverUrl: 'http://img.jpg',
                     },
                 ],
             };
             const parsed = ac.apiConfigs.games.parseResults(raw);
             expect(parsed[0].name).toBe('Mario');
+            expect(parsed[0].year).toBe(2020);
             expect(parsed[0].coverUrl).toBe('http://img.jpg');
         });
 
-        test('should parse movies results to common format', () => {
+        test('should parse normalized movies results', () => {
             const ac = new UniversalAutocomplete(input, 'movies');
             const raw = {
                 results: [
                     {
-                        title: 'Inception',
-                        release_date: '2010-07-16',
-                        vote_average: 8.8,
-                        poster_path: '/abc.jpg',
+                        name: 'Inception',
+                        year: 2010,
+                        rating: null,
+                        imageUrl: 'http://a/100x100bb.jpg',
+                        coverUrl: 'http://a/600x600bb.jpg',
                     },
                 ],
             };
             const parsed = ac.apiConfigs.movies.parseResults(raw);
             expect(parsed[0].name).toBe('Inception');
-            expect(parsed[0].coverUrl).toContain('/abc.jpg');
+            expect(parsed[0].coverUrl).toBe('http://a/600x600bb.jpg');
+        });
+
+        test('should default missing optional fields to null', () => {
+            const ac = new UniversalAutocomplete(input, 'shows');
+            const parsed = ac.apiConfigs.shows.parseResults({
+                results: [{ name: 'Lost' }],
+            });
+            expect(parsed[0]).toEqual({
+                name: 'Lost',
+                year: null,
+                rating: null,
+                imageUrl: null,
+                coverUrl: null,
+            });
+        });
+
+        test('should cap results at maxResults', () => {
+            const ac = new UniversalAutocomplete(input, 'games', { maxResults: 2 });
+            const raw = {
+                results: [{ name: 'A' }, { name: 'B' }, { name: 'C' }],
+            };
+            expect(ac.apiConfigs.games.parseResults(raw)).toHaveLength(2);
         });
 
         test('should handle empty results array', () => {

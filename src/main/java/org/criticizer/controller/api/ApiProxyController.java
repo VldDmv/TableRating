@@ -1,9 +1,9 @@
 package org.criticizer.controller.api;
 
+import org.criticizer.dto.AutocompleteResponse;
 import org.criticizer.service.external.ExternalApiClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,40 +12,73 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 
+/**
+ * Server-side proxy for the autocomplete providers (Steam, iTunes, TVMaze, OpenLibrary). Keeps
+ * external calls off the browser, shares one Caffeine cache across users, and serves games / movies
+ * / shows in a single normalized response format.
+ */
 @RestController
 @RequestMapping("/api/proxy")
 public class ApiProxyController {
 
     private static final Logger log = LoggerFactory.getLogger(ApiProxyController.class);
+    private static final int MIN_QUERY_LENGTH = 2;
+    private static final int MAX_RESULTS = 10;
+
     private final ExternalApiClient externalApi;
 
     public ApiProxyController(ExternalApiClient externalApi) {
         this.externalApi = externalApi;
     }
 
+    /** Game search via the key-less Steam store search. */
     @GetMapping("/games")
-    public ResponseEntity<String> proxyGamesApi(
+    public ResponseEntity<AutocompleteResponse> proxyGamesApi(
             @RequestParam String search, @RequestParam(defaultValue = "10") int pageSize) {
-        log.info("[ApiProxy] Games API called but DISABLED - search: {}", search);
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("{\"error\": \"Games autocomplete is temporarily disabled.\"}");
+        String query = search.trim();
+        if (query.length() < MIN_QUERY_LENGTH) {
+            return ResponseEntity.ok(AutocompleteResponse.empty());
+        }
+        try {
+            return ResponseEntity.ok(
+                    externalApi.searchSteamGames(
+                            ExternalApiClient.normalize(query), capped(pageSize)));
+        } catch (RestClientException e) {
+            log.error("[ApiProxy] Steam API error: {}", e.getMessage());
+            return ResponseEntity.ok(AutocompleteResponse.empty());
+        }
     }
 
+    /** Movie search via the key-less iTunes Search API. */
     @GetMapping("/movies")
-    public ResponseEntity<String> proxyMoviesApi(@RequestParam String query) {
-        log.info("[ApiProxy] Movies API called but DISABLED - query: {}", query);
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("{\"error\": \"Movies autocomplete is temporarily disabled.\"}");
+    public ResponseEntity<AutocompleteResponse> proxyMoviesApi(@RequestParam String query) {
+        String q = query.trim();
+        if (q.length() < MIN_QUERY_LENGTH) {
+            return ResponseEntity.ok(AutocompleteResponse.empty());
+        }
+        try {
+            return ResponseEntity.ok(
+                    externalApi.searchItunesMovies(ExternalApiClient.normalize(q), MAX_RESULTS));
+        } catch (RestClientException e) {
+            log.error("[ApiProxy] iTunes API error: {}", e.getMessage());
+            return ResponseEntity.ok(AutocompleteResponse.empty());
+        }
     }
 
+    /** TV show search via the key-less TVMaze API. */
     @GetMapping("/shows")
-    public ResponseEntity<String> proxyShowsApi(@RequestParam String query) {
-        log.info("[ApiProxy] Shows API called but DISABLED - query: {}", query);
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("{\"error\": \"Shows autocomplete is temporarily disabled.\"}");
+    public ResponseEntity<AutocompleteResponse> proxyShowsApi(@RequestParam String query) {
+        String q = query.trim();
+        if (q.length() < MIN_QUERY_LENGTH) {
+            return ResponseEntity.ok(AutocompleteResponse.empty());
+        }
+        try {
+            return ResponseEntity.ok(
+                    externalApi.searchTvMazeShows(ExternalApiClient.normalize(q), MAX_RESULTS));
+        } catch (RestClientException e) {
+            log.error("[ApiProxy] TVMaze API error: {}", e.getMessage());
+            return ResponseEntity.ok(AutocompleteResponse.empty());
+        }
     }
 
     /** Open Library Books API */
@@ -88,5 +121,9 @@ public class ApiProxyController {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"docs\":[]}");
         }
+    }
+
+    private static int capped(int requested) {
+        return Math.max(1, Math.min(requested, MAX_RESULTS));
     }
 }

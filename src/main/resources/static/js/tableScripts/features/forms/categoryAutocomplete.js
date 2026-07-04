@@ -14,6 +14,20 @@ function getToast() {
 }
 
 export class UniversalAutocomplete {
+    /**
+     * Maps the server proxy's normalized payload
+     * ({results: [{name, year, rating, imageUrl, coverUrl}]}) to suggestions.
+     */
+    static parseNormalized(data, options) {
+        return (data.results || []).slice(0, options.maxResults).map((item) => ({
+            name: item.name,
+            year: item.year ?? null,
+            rating: item.rating ?? null,
+            imageUrl: item.imageUrl ?? null,
+            coverUrl: item.coverUrl ?? null,
+        }));
+    }
+
     constructor(inputElement, entityType, options = {}) {
         this.input = inputElement;
         this.entityType = entityType;
@@ -36,15 +50,9 @@ export class UniversalAutocomplete {
                     url.searchParams.set('pageSize', this.options.maxResults);
                     return url;
                 },
-                parseResults: (data) => {
-                    return (data.results || []).map((item) => ({
-                        name: item.name,
-                        year: item.released ? new Date(item.released).getFullYear() : null,
-                        rating: item.rating,
-                        imageUrl: item.background_image,
-                        coverUrl: item.background_image,
-                    }));
-                },
+                // the server proxy (Steam) already returns the normalized
+                // {results: [{name, year, rating, imageUrl, coverUrl}]} shape
+                parseResults: (data) => UniversalAutocomplete.parseNormalized(data, this.options),
             },
             movies: {
                 apiUrl: '/api/proxy/movies',
@@ -53,19 +61,8 @@ export class UniversalAutocomplete {
                     url.searchParams.set('query', query);
                     return url;
                 },
-                parseResults: (data) => {
-                    return (data.results || []).slice(0, this.options.maxResults).map((item) => ({
-                        name: item.title,
-                        year: item.release_date ? new Date(item.release_date).getFullYear() : null,
-                        rating: item.vote_average ? item.vote_average.toFixed(1) : null,
-                        imageUrl: item.poster_path
-                            ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
-                            : null,
-                        coverUrl: item.poster_path
-                            ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-                            : null,
-                    }));
-                },
+                // server proxy (iTunes Search), normalized shape
+                parseResults: (data) => UniversalAutocomplete.parseNormalized(data, this.options),
             },
             shows: {
                 apiUrl: '/api/proxy/shows',
@@ -74,21 +71,8 @@ export class UniversalAutocomplete {
                     url.searchParams.set('query', query);
                     return url;
                 },
-                parseResults: (data) => {
-                    return (data.results || []).slice(0, this.options.maxResults).map((item) => ({
-                        name: item.name,
-                        year: item.first_air_date
-                            ? new Date(item.first_air_date).getFullYear()
-                            : null,
-                        rating: item.vote_average ? item.vote_average.toFixed(1) : null,
-                        imageUrl: item.poster_path
-                            ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
-                            : null,
-                        coverUrl: item.poster_path
-                            ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-                            : null,
-                    }));
-                },
+                // server proxy (TVMaze), normalized shape
+                parseResults: (data) => UniversalAutocomplete.parseNormalized(data, this.options),
             },
             books: {
                 apiUrl: '/api/proxy/books',

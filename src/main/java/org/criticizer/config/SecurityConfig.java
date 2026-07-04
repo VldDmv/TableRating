@@ -63,14 +63,17 @@ public class SecurityConfig {
                                                                     + " font-src 'self'"
                                                                     + " https://fonts.gstatic.com"
                                                                     + " data:; img-src 'self' data:"
-                                                                    + " https:; connect-src 'self'"
-                                                                    + " https://openlibrary.org"
-                                                                    + " https://api.rawg.io"
-                                                                    + " https://api.themoviedb.org"
-                                                                    + " https://cdn.jsdelivr.net;"
-                                                                    + " frame-ancestors 'self';"
-                                                                    + " base-uri 'self';"
-                                                                    + " form-action 'self'"))
+                                                                        // covers come from the
+                                                                        // providers' CDNs
+                                                                        + " https:; connect-src"
+                                                                        + " 'self'"
+                                                                        // autocomplete goes through
+                                                                        // our /api/proxy, so no
+                                                                        // external connect targets
+                                                                        + " https://cdn.jsdelivr.net;"
+                                                                        + " frame-ancestors 'self';"
+                                                                        + " base-uri 'self';"
+                                                                        + " form-action 'self'"))
                                         .permissionsPolicy(
                                                 perm ->
                                                         perm.policy(

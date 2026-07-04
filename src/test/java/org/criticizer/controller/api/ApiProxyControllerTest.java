@@ -6,6 +6,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.List;
+import org.criticizer.dto.AutocompleteResponse;
+import org.criticizer.dto.AutocompleteResult;
 import org.criticizer.service.external.ExternalApiClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestClientException;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ApiProxyController Tests")
@@ -34,39 +38,75 @@ class ApiProxyControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/proxy/games - Should return service unavailable")
-    void gamesApiShouldBeDisabled() throws Exception {
+    @DisplayName("GET /api/proxy/games - Should return normalized results")
+    void gamesApiReturnsNormalizedResults() throws Exception {
+        when(externalApi.searchSteamGames(anyString(), anyInt()))
+                .thenReturn(
+                        new AutocompleteResponse(
+                                List.of(
+                                        new AutocompleteResult(
+                                                "Hades",
+                                                null,
+                                                "93",
+                                                "http://thumb.jpg",
+                                                "http://cover.jpg"))));
+
         mockMvc.perform(
                         get("/api/proxy/games")
-                                .param("search", "test")
+                                .param("search", "hades")
                                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isServiceUnavailable())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").exists());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].name").value("Hades"))
+                .andExpect(jsonPath("$.results[0].rating").value("93"))
+                .andExpect(jsonPath("$.results[0].coverUrl").value("http://cover.jpg"));
     }
 
     @Test
-    @DisplayName("GET /api/proxy/movies - Should return service unavailable")
-    void moviesApiShouldBeDisabled() throws Exception {
+    @DisplayName("GET /api/proxy/games - Should return empty for short query")
+    void gamesApiReturnsEmptyForShortQuery() throws Exception {
+        mockMvc.perform(
+                        get("/api/proxy/games")
+                                .param("search", "a")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results").isEmpty());
+    }
+
+    @Test
+    @DisplayName("GET /api/proxy/movies - Should return normalized results")
+    void moviesApiReturnsNormalizedResults() throws Exception {
+        when(externalApi.searchItunesMovies(anyString(), anyInt()))
+                .thenReturn(
+                        new AutocompleteResponse(
+                                List.of(
+                                        new AutocompleteResult(
+                                                "Inception",
+                                                2010,
+                                                null,
+                                                "http://a.jpg",
+                                                "http://b.jpg"))));
+
         mockMvc.perform(
                         get("/api/proxy/movies")
-                                .param("query", "test")
+                                .param("query", "inception")
                                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isServiceUnavailable())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").exists());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].name").value("Inception"))
+                .andExpect(jsonPath("$.results[0].year").value(2010));
     }
 
     @Test
-    @DisplayName("GET /api/proxy/shows - Should return service unavailable")
-    void showsApiShouldBeDisabled() throws Exception {
+    @DisplayName("GET /api/proxy/shows - Should return empty when upstream fails")
+    void showsApiReturnsEmptyOnUpstreamError() throws Exception {
+        when(externalApi.searchTvMazeShows(anyString(), anyInt()))
+                .thenThrow(new RestClientException("boom"));
+
         mockMvc.perform(
                         get("/api/proxy/shows")
-                                .param("query", "test")
+                                .param("query", "lost")
                                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isServiceUnavailable())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").exists());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results").isEmpty());
     }
 
     @Test
