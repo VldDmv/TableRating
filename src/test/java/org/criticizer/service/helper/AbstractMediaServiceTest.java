@@ -8,7 +8,6 @@ import static org.mockito.Mockito.*;
 import java.util.List;
 import java.util.Optional;
 import org.criticizer.dto.helper.PageResponse;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.exceptions.data.ItemAlreadyExistsException;
 import org.criticizer.exceptions.data.ResourceNotFoundException;
 import org.criticizer.exceptions.validation.EmptyNameException;
@@ -570,13 +569,13 @@ class AbstractMediaServiceTest {
     class ToggleStatusTests {
 
         @Test
-        @DisplayName("Should advance PLANNED to IN_PROGRESS")
-        void shouldAdvancePlannedToInProgress() {
+        @DisplayName("Should toggle status from false to true")
+        void shouldToggleFromFalseToTrue() {
             // Given
             when(validator.validateName(ENTITY_NAME, "TestMedia name")).thenReturn(ENTITY_NAME);
 
             TestMediaEntity entity = createEntity(1, ENTITY_NAME, SCORE);
-            entity.setStatus(MediaStatus.PLANNED);
+            entity.setCompleted(false);
 
             when(repository.findByNameIgnoreCaseAndUserId(ENTITY_NAME, USER_ID))
                     .thenReturn(Optional.of(entity));
@@ -587,17 +586,17 @@ class AbstractMediaServiceTest {
 
             // Then
             verify(repository).save(entityCaptor.capture());
-            assertThat(entityCaptor.getValue().getStatus()).isEqualTo(MediaStatus.IN_PROGRESS);
+            assertThat(entityCaptor.getValue().isCompleted()).isTrue();
         }
 
         @Test
-        @DisplayName("Should advance COMPLETED to DROPPED")
-        void shouldAdvanceCompletedToDropped() {
+        @DisplayName("Should toggle status from true to false")
+        void shouldToggleFromTrueToFalse() {
             // Given
             when(validator.validateName(ENTITY_NAME, "TestMedia name")).thenReturn(ENTITY_NAME);
 
             TestMediaEntity entity = createEntity(1, ENTITY_NAME, SCORE);
-            entity.setStatus(MediaStatus.COMPLETED);
+            entity.setCompleted(true);
 
             when(repository.findByNameIgnoreCaseAndUserId(ENTITY_NAME, USER_ID))
                     .thenReturn(Optional.of(entity));
@@ -608,7 +607,7 @@ class AbstractMediaServiceTest {
 
             // Then
             verify(repository).save(entityCaptor.capture());
-            assertThat(entityCaptor.getValue().getStatus()).isEqualTo(MediaStatus.DROPPED);
+            assertThat(entityCaptor.getValue().isCompleted()).isFalse();
         }
 
         @Test
@@ -753,15 +752,15 @@ class AbstractMediaServiceTest {
             when(validator.validateName(ENTITY_NAME, "TestMedia name")).thenReturn(ENTITY_NAME);
 
             TestMediaEntity entity = createEntity(1, ENTITY_NAME, SCORE);
-            entity.setStatus(MediaStatus.COMPLETED);
+            entity.setCompleted(true);
             when(repository.findByNameIgnoreCaseAndUserId(ENTITY_NAME, USER_ID))
                     .thenReturn(Optional.of(entity));
 
             // When
-            MediaStatus result = service.getItemStatus(ENTITY_NAME, USER_ID);
+            boolean result = service.getItemStatus(ENTITY_NAME, USER_ID);
 
             // Then
-            assertThat(result).isEqualTo(MediaStatus.COMPLETED);
+            assertThat(result).isTrue();
         }
 
         @Test
@@ -771,15 +770,15 @@ class AbstractMediaServiceTest {
             when(validator.validateName(ENTITY_NAME, "TestMedia name")).thenReturn(ENTITY_NAME);
 
             TestMediaEntity entity = createEntity(1, ENTITY_NAME, SCORE);
-            entity.setStatus(MediaStatus.PLANNED);
+            entity.setCompleted(false);
             when(repository.findByNameIgnoreCaseAndUserId(ENTITY_NAME, USER_ID))
                     .thenReturn(Optional.of(entity));
 
             // When
-            MediaStatus result = service.getItemStatus(ENTITY_NAME, USER_ID);
+            boolean result = service.getItemStatus(ENTITY_NAME, USER_ID);
 
             // Then
-            assertThat(result).isEqualTo(MediaStatus.PLANNED);
+            assertThat(result).isFalse();
         }
 
         @Test
@@ -804,7 +803,7 @@ class AbstractMediaServiceTest {
         private String name;
         private Integer userId;
         private Integer score;
-        private MediaStatus status = MediaStatus.PLANNED;
+        private boolean completed;
         private String coverUrl;
 
         @Override
@@ -846,13 +845,13 @@ class AbstractMediaServiceTest {
         }
 
         @Override
-        public MediaStatus getStatus() {
-            return status;
+        public boolean isCompleted() {
+            return completed;
         }
 
         @Override
-        public void setStatus(MediaStatus status) {
-            this.status = status;
+        public void setCompleted(boolean completed) {
+            this.completed = completed;
         }
 
         @Override
@@ -887,7 +886,7 @@ class AbstractMediaServiceTest {
             entity.setCoverUrl(coverUrl);
             entity.setUserId(userId);
             entity.setScore(score);
-            entity.setStatus(MediaStatus.PLANNED);
+            entity.setCompleted(false);
             return entity;
         }
 
@@ -914,7 +913,7 @@ class AbstractMediaServiceTest {
         entity.setName(name);
         entity.setScore(score);
         entity.setUserId(USER_ID);
-        entity.setStatus(MediaStatus.PLANNED);
+        entity.setCompleted(false);
         entity.setCoverUrl(COVER_URL);
         return entity;
     }

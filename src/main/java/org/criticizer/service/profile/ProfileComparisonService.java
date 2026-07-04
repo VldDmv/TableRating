@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.User;
 import org.criticizer.repository.BookRepository;
 import org.criticizer.repository.GameRepository;
@@ -47,7 +46,7 @@ public class ProfileComparisonService {
         this.showRepository = showRepository;
     }
 
-    private record Item(String name, int score, MediaStatus status) {}
+    private record Item(String name, int score) {}
 
     @Transactional(readOnly = true)
     public Map<String, Object> compare(User me, User other) {
@@ -78,8 +77,6 @@ public class ProfileComparisonService {
                 row.put("myScore", mineItem.score());
                 row.put("theirScore", theirItem.score());
                 row.put("diff", diff);
-                row.put("myStatus", mineItem.status().name());
-                row.put("theirStatus", theirItem.status().name());
                 rows.add(row);
             }
 
@@ -123,19 +120,19 @@ public class ProfileComparisonService {
         return switch (category) {
             case "games" ->
                     gameRepository.findByUserIdWithTags(userId).stream()
-                            .map(g -> new Item(g.getName(), g.getScore(), g.getStatus()))
+                            .map(g -> new Item(g.getName(), g.getScore()))
                             .toList();
             case "movies" ->
                     movieRepository.findByUserIdWithGenres(userId).stream()
-                            .map(m -> new Item(m.getName(), m.getScore(), m.getStatus()))
+                            .map(m -> new Item(m.getName(), m.getScore()))
                             .toList();
             case "books" ->
                     bookRepository.findByUserIdWithGenres(userId).stream()
-                            .map(b -> new Item(b.getName(), b.getScore(), b.getStatus()))
+                            .map(b -> new Item(b.getName(), b.getScore()))
                             .toList();
             case "shows" ->
                     showRepository.findByUserIdWithGenres(userId).stream()
-                            .map(s -> new Item(s.getName(), s.getScore(), s.getStatus()))
+                            .map(s -> new Item(s.getName(), s.getScore()))
                             .toList();
             default -> List.of();
         };

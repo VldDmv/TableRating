@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import org.criticizer.entity.Book;
 import org.criticizer.entity.Game;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.Movie;
 import org.criticizer.entity.Show;
 import org.criticizer.entity.User;
@@ -59,8 +58,8 @@ class ProfileComparisonServiceTest {
         when(showRepository.findByUserIdWithGenres(anyInt())).thenReturn(List.of());
     }
 
-    private static Game game(int id, String name, int userId, int score, MediaStatus status) {
-        return new Game(id, name, userId, score, status);
+    private static Game game(int id, String name, int userId, int score) {
+        return new Game(id, name, userId, score, true);
     }
 
     @Test
@@ -69,15 +68,15 @@ class ProfileComparisonServiceTest {
         when(gameRepository.findByUserIdWithTags(1))
                 .thenReturn(
                         List.of(
-                                game(1, "Celeste", 1, 90, MediaStatus.COMPLETED),
-                                game(2, "Hades", 1, 80, MediaStatus.IN_PROGRESS),
-                                game(3, "Only Mine", 1, 50, MediaStatus.PLANNED)));
+                                game(1, "Celeste", 1, 90),
+                                game(2, "Hades", 1, 80),
+                                game(3, "Only Mine", 1, 50)));
         when(gameRepository.findByUserIdWithTags(2))
                 .thenReturn(
                         List.of(
-                                game(4, "CELESTE", 2, 70, MediaStatus.DROPPED),
-                                game(5, "hades", 2, 85, MediaStatus.COMPLETED),
-                                game(6, "Only Theirs", 2, 60, MediaStatus.PLANNED)));
+                                game(4, "CELESTE", 2, 70),
+                                game(5, "hades", 2, 85),
+                                game(6, "Only Theirs", 2, 60)));
 
         Map<String, Object> result = service.compare(me, other);
 
@@ -102,8 +101,6 @@ class ProfileComparisonServiceTest {
         assertThat(items.get(0).get("myScore")).isEqualTo(90);
         assertThat(items.get(0).get("theirScore")).isEqualTo(70);
         assertThat(items.get(0).get("diff")).isEqualTo(20);
-        assertThat(items.get(0).get("myStatus")).isEqualTo("COMPLETED");
-        assertThat(items.get(0).get("theirStatus")).isEqualTo("DROPPED");
         assertThat(items.get(1).get("name")).isEqualTo("Hades");
         assertThat(items.get(1).get("diff")).isEqualTo(-5);
     }
@@ -111,14 +108,12 @@ class ProfileComparisonServiceTest {
     @Test
     @DisplayName("Should compute per-category and overall compatibility")
     void shouldComputeCompatibility() {
-        when(gameRepository.findByUserIdWithTags(1))
-                .thenReturn(List.of(game(1, "Celeste", 1, 90, MediaStatus.COMPLETED)));
-        when(gameRepository.findByUserIdWithTags(2))
-                .thenReturn(List.of(game(2, "Celeste", 2, 70, MediaStatus.COMPLETED)));
+        when(gameRepository.findByUserIdWithTags(1)).thenReturn(List.of(game(1, "Celeste", 1, 90)));
+        when(gameRepository.findByUserIdWithTags(2)).thenReturn(List.of(game(2, "Celeste", 2, 70)));
         when(movieRepository.findByUserIdWithGenres(1))
-                .thenReturn(List.of(new Movie(1, "Heat", 1, 95, MediaStatus.COMPLETED)));
+                .thenReturn(List.of(new Movie(1, "Heat", 1, 95, true)));
         when(movieRepository.findByUserIdWithGenres(2))
-                .thenReturn(List.of(new Movie(2, "Heat", 2, 85, MediaStatus.COMPLETED)));
+                .thenReturn(List.of(new Movie(2, "Heat", 2, 85, true)));
 
         Map<String, Object> result = service.compare(me, other);
 
@@ -138,9 +133,9 @@ class ProfileComparisonServiceTest {
     @DisplayName("Should return null compatibility when nothing is in common")
     void shouldHandleNoOverlap() {
         when(bookRepository.findByUserIdWithGenres(1))
-                .thenReturn(List.of(new Book(1, "Dune", 1, 88, MediaStatus.COMPLETED)));
+                .thenReturn(List.of(new Book(1, "Dune", 1, 88, true)));
         when(bookRepository.findByUserIdWithGenres(2))
-                .thenReturn(List.of(new Book(2, "1984", 2, 92, MediaStatus.COMPLETED)));
+                .thenReturn(List.of(new Book(2, "1984", 2, 92, true)));
 
         Map<String, Object> result = service.compare(me, other);
 
@@ -161,9 +156,9 @@ class ProfileComparisonServiceTest {
     @DisplayName("Should include all four categories in the result")
     void shouldIncludeAllCategories() {
         when(showRepository.findByUserIdWithGenres(1))
-                .thenReturn(List.of(new Show(1, "The Wire", 1, 97, MediaStatus.COMPLETED)));
+                .thenReturn(List.of(new Show(1, "The Wire", 1, 97, true)));
         when(showRepository.findByUserIdWithGenres(2))
-                .thenReturn(List.of(new Show(2, "the wire", 2, 97, MediaStatus.IN_PROGRESS)));
+                .thenReturn(List.of(new Show(2, "the wire", 2, 97, true)));
 
         Map<String, Object> result = service.compare(me, other);
 
@@ -181,9 +176,9 @@ class ProfileComparisonServiceTest {
     @DisplayName("Should trim and lower-case names before matching")
     void shouldNormalizeNames() {
         when(gameRepository.findByUserIdWithTags(1))
-                .thenReturn(List.of(game(1, "  Hollow Knight ", 1, 90, MediaStatus.COMPLETED)));
+                .thenReturn(List.of(game(1, "  Hollow Knight ", 1, 90)));
         when(gameRepository.findByUserIdWithTags(2))
-                .thenReturn(List.of(game(2, "hollow knight", 2, 92, MediaStatus.COMPLETED)));
+                .thenReturn(List.of(game(2, "hollow knight", 2, 92)));
 
         Map<String, Object> result = service.compare(me, other);
 

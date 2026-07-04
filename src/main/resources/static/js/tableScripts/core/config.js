@@ -72,9 +72,9 @@ const COMMON_COLUMNS = {
         sortable: true,
         hideable: false,
     },
-    status: {
-        name: 'Status',
-        key: 'status',
+    completed: {
+        name: 'Completed',
+        key: 'completed',
         index: 4,
         type: 'status',
         sortable: true,

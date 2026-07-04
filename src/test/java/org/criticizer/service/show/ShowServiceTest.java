@@ -12,7 +12,6 @@ import java.util.Optional;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.dto.show.ShowResponse;
 import org.criticizer.entity.Genre;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.Show;
 import org.criticizer.exceptions.data.ItemAlreadyExistsException;
 import org.criticizer.exceptions.data.ResourceNotFoundException;
@@ -50,7 +49,7 @@ class ShowServiceTest {
 
     @BeforeEach
     void setUp() {
-        testShow = new Show(1, "Breaking Bad", TEST_USER_ID, 98, MediaStatus.PLANNED);
+        testShow = new Show(1, "Breaking Bad", TEST_USER_ID, 98, false);
         testShow.setCoverUrl("http://example.com/bb.jpg");
 
         testGenre = new Genre(1, "Crime");
@@ -87,7 +86,7 @@ class ShowServiceTest {
                                                     show.getName(),
                                                     show.getUserId(),
                                                     show.getScore(),
-                                                    show.getStatus());
+                                                    show.isCompleted());
                                     savedShow.setCoverUrl(show.getCoverUrl());
                                     savedShow.setGenres(show.getGenres());
                                     return savedShow;
@@ -278,10 +277,10 @@ class ShowServiceTest {
     class ToggleStatusTests {
 
         @Test
-        @DisplayName("Should advance PLANNED to IN_PROGRESS")
-        void shouldAdvancePlannedToInProgress() {
+        @DisplayName("Should toggle from unwatched to watched")
+        void shouldToggleToWatched() {
             // Given
-            testShow.setStatus(MediaStatus.PLANNED);
+            testShow.setCompleted(false);
             when(validator.validateName("Breaking Bad", "Show name")).thenReturn("Breaking Bad");
             when(showRepository.findByNameIgnoreCaseAndUserId("Breaking Bad", TEST_USER_ID))
                     .thenReturn(Optional.of(testShow));
@@ -291,16 +290,15 @@ class ShowServiceTest {
             ShowResponse result = showService.toggleStatus("Breaking Bad", TEST_USER_ID);
 
             // Then
-            assertThat(result.getStatus()).isEqualTo("IN_PROGRESS");
-            verify(showRepository)
-                    .save(argThat(show -> show.getStatus() == MediaStatus.IN_PROGRESS));
+            assertThat(result.isCompleted()).isTrue();
+            verify(showRepository).save(argThat(Show::isCompleted));
         }
 
         @Test
-        @DisplayName("Should advance COMPLETED to DROPPED")
-        void shouldAdvanceCompletedToDropped() {
+        @DisplayName("Should toggle from watched to unwatched")
+        void shouldToggleToUnwatched() {
             // Given
-            testShow.setStatus(MediaStatus.COMPLETED);
+            testShow.setCompleted(true);
             when(validator.validateName("Breaking Bad", "Show name")).thenReturn("Breaking Bad");
             when(showRepository.findByNameIgnoreCaseAndUserId("Breaking Bad", TEST_USER_ID))
                     .thenReturn(Optional.of(testShow));
@@ -310,8 +308,8 @@ class ShowServiceTest {
             ShowResponse result = showService.toggleStatus("Breaking Bad", TEST_USER_ID);
 
             // Then
-            assertThat(result.getStatus()).isEqualTo("DROPPED");
-            verify(showRepository).save(argThat(show -> show.getStatus() == MediaStatus.DROPPED));
+            assertThat(result.isCompleted()).isFalse();
+            verify(showRepository).save(argThat(show -> !show.isCompleted()));
         }
     }
 
@@ -336,8 +334,8 @@ class ShowServiceTest {
                             eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
                     .thenReturn(showIds);
 
-            Show show1 = new Show(1, "Show 1", TEST_USER_ID, 80, MediaStatus.PLANNED);
-            Show show2 = new Show(2, "Show 2", TEST_USER_ID, 85, MediaStatus.PLANNED);
+            Show show1 = new Show(1, "Show 1", TEST_USER_ID, 80, false);
+            Show show2 = new Show(2, "Show 2", TEST_USER_ID, 85, false);
             when(showRepository.findByIdsWithCategories(Arrays.asList(1, 2)))
                     .thenReturn(Arrays.asList(show1, show2));
 
@@ -476,7 +474,7 @@ class ShowServiceTest {
         @DisplayName("Should include all show properties in response")
         void shouldIncludeAllProperties() {
             // Given
-            testShow.setStatus(MediaStatus.COMPLETED);
+            testShow.setCompleted(true);
             String name = "Breaking Bad";
 
             when(validator.validateName(name, "Show name")).thenReturn(name);
@@ -492,7 +490,7 @@ class ShowServiceTest {
             assertThat(result.getName()).isEqualTo(testShow.getName());
             assertThat(result.getCoverUrl()).isEqualTo(testShow.getCoverUrl());
             assertThat(result.getScore()).isEqualTo(testShow.getScore());
-            assertThat(result.getStatus()).isEqualTo("DROPPED");
+            assertThat(result.isCompleted()).isFalse();
         }
     }
 
@@ -524,17 +522,17 @@ class ShowServiceTest {
         @DisplayName("Should get show completion status")
         void shouldGetShowStatus() {
             // Given
-            testShow.setStatus(MediaStatus.COMPLETED);
+            testShow.setCompleted(true);
 
             when(validator.validateName("Breaking Bad", "Show name")).thenReturn("Breaking Bad");
             when(showRepository.findByNameIgnoreCaseAndUserId("Breaking Bad", TEST_USER_ID))
                     .thenReturn(Optional.of(testShow));
 
             // When
-            MediaStatus result = showService.getItemStatus("Breaking Bad", TEST_USER_ID);
+            boolean result = showService.getItemStatus("Breaking Bad", TEST_USER_ID);
 
             // Then
-            assertThat(result).isEqualTo(MediaStatus.COMPLETED);
+            assertThat(result).isTrue();
         }
     }
 }

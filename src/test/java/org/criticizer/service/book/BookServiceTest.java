@@ -13,7 +13,6 @@ import org.criticizer.dto.book.BookResponse;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.entity.Book;
 import org.criticizer.entity.Genre;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.exceptions.data.ItemAlreadyExistsException;
 import org.criticizer.exceptions.data.ResourceNotFoundException;
 import org.criticizer.repository.BookRepository;
@@ -50,7 +49,7 @@ class BookServiceTest {
 
     @BeforeEach
     void setUp() {
-        testBook = new Book(1, "1984", TEST_USER_ID, 95, MediaStatus.PLANNED);
+        testBook = new Book(1, "1984", TEST_USER_ID, 95, false);
         testBook.setCoverUrl("http://example.com/1984.jpg");
 
         testGenre = new Genre(1, "Dystopian");
@@ -87,7 +86,7 @@ class BookServiceTest {
                                                     book.getName(),
                                                     book.getUserId(),
                                                     book.getScore(),
-                                                    book.getStatus());
+                                                    book.isCompleted());
                                     savedBook.setCoverUrl(book.getCoverUrl());
                                     savedBook.setGenres(book.getGenres());
                                     return savedBook;
@@ -253,10 +252,10 @@ class BookServiceTest {
     class ToggleStatusTests {
 
         @Test
-        @DisplayName("Should advance PLANNED to IN_PROGRESS")
-        void shouldAdvancePlannedToInProgress() {
+        @DisplayName("Should toggle from unread to read")
+        void shouldToggleToCompleted() {
             // Given
-            testBook.setStatus(MediaStatus.PLANNED);
+            testBook.setCompleted(false);
             when(validator.validateName("1984", "Book name")).thenReturn("1984");
             when(bookRepository.findByNameIgnoreCaseAndUserId("1984", TEST_USER_ID))
                     .thenReturn(Optional.of(testBook));
@@ -266,16 +265,15 @@ class BookServiceTest {
             BookResponse result = bookService.toggleStatus("1984", TEST_USER_ID);
 
             // Then
-            assertThat(result.getStatus()).isEqualTo("IN_PROGRESS");
-            verify(bookRepository)
-                    .save(argThat(book -> book.getStatus() == MediaStatus.IN_PROGRESS));
+            assertThat(result.isCompleted()).isTrue();
+            verify(bookRepository).save(argThat(Book::isCompleted));
         }
 
         @Test
-        @DisplayName("Should advance COMPLETED to DROPPED")
-        void shouldAdvanceCompletedToDropped() {
+        @DisplayName("Should toggle from read to unread")
+        void shouldToggleToIncomplete() {
             // Given
-            testBook.setStatus(MediaStatus.COMPLETED);
+            testBook.setCompleted(true);
             when(validator.validateName("1984", "Book name")).thenReturn("1984");
             when(bookRepository.findByNameIgnoreCaseAndUserId("1984", TEST_USER_ID))
                     .thenReturn(Optional.of(testBook));
@@ -285,8 +283,8 @@ class BookServiceTest {
             BookResponse result = bookService.toggleStatus("1984", TEST_USER_ID);
 
             // Then
-            assertThat(result.getStatus()).isEqualTo("DROPPED");
-            verify(bookRepository).save(argThat(book -> book.getStatus() == MediaStatus.DROPPED));
+            assertThat(result.isCompleted()).isFalse();
+            verify(bookRepository).save(argThat(book -> !book.isCompleted()));
         }
     }
 
@@ -311,8 +309,8 @@ class BookServiceTest {
                             eq(TEST_USER_ID), isNull(), isNull(), any(), any(), any()))
                     .thenReturn(bookIds);
 
-            Book book1 = new Book(1, "Book 1", TEST_USER_ID, 80, MediaStatus.PLANNED);
-            Book book2 = new Book(2, "Book 2", TEST_USER_ID, 85, MediaStatus.PLANNED);
+            Book book1 = new Book(1, "Book 1", TEST_USER_ID, 80, false);
+            Book book2 = new Book(2, "Book 2", TEST_USER_ID, 85, false);
             when(bookRepository.findByIdsWithCategories(Arrays.asList(1, 2)))
                     .thenReturn(Arrays.asList(book1, book2));
 
@@ -449,7 +447,7 @@ class BookServiceTest {
         @DisplayName("Should include all book properties in response")
         void shouldIncludeAllProperties() {
             // Given
-            testBook.setStatus(MediaStatus.COMPLETED);
+            testBook.setCompleted(true);
             String name = "1984";
 
             when(validator.validateName(name, "Book name")).thenReturn(name);
@@ -465,7 +463,7 @@ class BookServiceTest {
             assertThat(result.getName()).isEqualTo(testBook.getName());
             assertThat(result.getCoverUrl()).isEqualTo(testBook.getCoverUrl());
             assertThat(result.getScore()).isEqualTo(testBook.getScore());
-            assertThat(result.getStatus()).isEqualTo("DROPPED");
+            assertThat(result.isCompleted()).isFalse();
         }
     }
 
@@ -492,17 +490,17 @@ class BookServiceTest {
         void shouldGetBookStatus() {
             // Given
             String name = "1984";
-            testBook.setStatus(MediaStatus.COMPLETED);
+            testBook.setCompleted(true);
 
             when(validator.validateName(name, "Book name")).thenReturn(name);
             when(bookRepository.findByNameIgnoreCaseAndUserId(name, TEST_USER_ID))
                     .thenReturn(Optional.of(testBook));
 
             // When
-            MediaStatus result = bookService.getItemStatus(name, TEST_USER_ID);
+            boolean result = bookService.getItemStatus(name, TEST_USER_ID);
 
             // Then
-            assertThat(result).isEqualTo(MediaStatus.COMPLETED);
+            assertThat(result).isTrue();
         }
 
         @Test

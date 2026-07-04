@@ -6,7 +6,6 @@ import org.criticizer.dto.book.BookResponse;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.entity.Book;
 import org.criticizer.entity.Genre;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.repository.BookRepository;
 import org.criticizer.repository.GenreRepository;
 import org.criticizer.service.helper.AbstractMediaService;
@@ -33,7 +32,7 @@ public class BookService extends AbstractMediaService<Book, BookResponse> {
 
     @Override
     protected Book createEntity(String name, String coverUrl, Integer userId, Integer score) {
-        Book book = new Book(null, name, userId, score, MediaStatus.PLANNED);
+        Book book = new Book(null, name, userId, score, false);
         book.setCoverUrl(coverUrl);
         return book;
     }
@@ -61,7 +60,7 @@ public class BookService extends AbstractMediaService<Book, BookResponse> {
                 book.getName(),
                 book.getCoverUrl(),
                 book.getScore(),
-                book.getStatus().name(),
+                book.isCompleted(),
                 genreResponses);
     }
 

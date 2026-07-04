@@ -88,18 +88,14 @@ public class ExportService {
 
     private ExportRow toRow(Game g) {
         return new ExportRow(
-                g.getName(),
-                g.getScore(),
-                g.getStatus().name(),
-                g.getCoverUrl(),
-                names(g.getTags()));
+                g.getName(), g.getScore(), g.isCompleted(), g.getCoverUrl(), names(g.getTags()));
     }
 
     private ExportRow toRow(Movie m) {
         return new ExportRow(
                 m.getName(),
                 m.getScore(),
-                m.getStatus().name(),
+                m.isCompleted(),
                 m.getCoverUrl(),
                 genreNames(m.getGenres()));
     }
@@ -108,7 +104,7 @@ public class ExportService {
         return new ExportRow(
                 b.getName(),
                 b.getScore(),
-                b.getStatus().name(),
+                b.isCompleted(),
                 b.getCoverUrl(),
                 genreNames(b.getGenres()));
     }
@@ -117,7 +113,7 @@ public class ExportService {
         return new ExportRow(
                 s.getName(),
                 s.getScore(),
-                s.getStatus().name(),
+                s.isCompleted(),
                 s.getCoverUrl(),
                 genreNames(s.getGenres()));
     }

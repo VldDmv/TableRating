@@ -3,7 +3,7 @@
  * Manages inline editing for cards - similar to table row inline editing
  */
 
-import { htmlUtils, entityUtils, securityUtils, ICONS, statusMeta } from '../../core/utils.js';
+import { htmlUtils, entityUtils, securityUtils, ICONS } from '../../core/utils.js';
 import { ErrorHandler } from '../../core/errorHandler.js';
 
 export class CardInlineEditManager {
@@ -177,8 +177,9 @@ export class CardInlineEditManager {
                       .join(' ')
                 : '<span class="card-no-tags">No tags</span>';
 
-        // Get lifecycle status from card dataset (defaults to PLANNED)
-        const status = statusMeta(card.dataset.status);
+        // Get completed status from card dataset (or assume false)
+        const completed = card.dataset.completed === 'true';
+        const completedIcon = completed ? ICONS.COMPLETED || '✓' : ICONS.NOT_COMPLETED || '✗';
 
         // Restore view mode content
         cardContent.innerHTML = `
@@ -198,10 +199,10 @@ export class CardInlineEditManager {
                     : `
             <div class="card-status">
                 <button class="status-button" data-item-name="${htmlUtils.escape(originalName)}">
-                    ${status.icon}
+                    ${completedIcon}
                 </button>
                 <span class="status-label">
-                    ${status.label}
+                    ${completed ? 'Completed' : 'In Progress'}
                 </span>
             </div>
 

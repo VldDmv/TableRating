@@ -226,14 +226,14 @@ public abstract class AbstractMediaService<T extends MediaEntity, R> {
                         .orElseThrow(
                                 () -> new ResourceNotFoundException(getEntityName(), trimmedName));
 
-        entity.setStatus(entity.getStatus().next());
+        entity.setCompleted(!entity.isCompleted());
         T updated = repository.save(entity);
 
         log.debug(
-                "Advanced status for {} '{}' to {}",
+                "Toggled completion status for {} '{}' to {}",
                 getEntityName(),
                 updated.getName(),
-                updated.getStatus());
+                updated.isCompleted());
 
         return toResponse(updated);
     }
@@ -245,7 +245,7 @@ public abstract class AbstractMediaService<T extends MediaEntity, R> {
     }
 
     /** Get item status. */
-    public org.criticizer.entity.MediaStatus getItemStatus(String name, Integer userId) {
+    public boolean getItemStatus(String name, Integer userId) {
         String trimmedName = validator.validateName(name, getEntityName() + " name");
 
         T entity =
@@ -254,7 +254,7 @@ public abstract class AbstractMediaService<T extends MediaEntity, R> {
                         .orElseThrow(
                                 () -> new ResourceNotFoundException(getEntityName(), trimmedName));
 
-        return entity.getStatus();
+        return entity.isCompleted();
     }
 
     /**

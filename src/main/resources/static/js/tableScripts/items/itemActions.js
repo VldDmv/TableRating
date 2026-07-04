@@ -3,7 +3,7 @@
  */
 
 import { ErrorHandler } from '../core/errorHandler.js';
-import { securityUtils, ICONS, statusMeta } from '../core/utils.js';
+import { securityUtils, ICONS } from '../core/utils.js';
 
 export class ItemActionsManager {
     constructor(tableBody, config, inlineEditManager) {
@@ -74,13 +74,11 @@ export class ItemActionsManager {
 
             const data = await response.json();
 
-            if (data && typeof data.status !== 'undefined') {
-                const meta = statusMeta(data.status);
-                button.innerHTML = meta.icon;
-                button.title = `${meta.label} — click to change`;
+            if (data && typeof data.completed !== 'undefined') {
+                button.innerHTML = data.completed ? ICONS.COMPLETED : ICONS.NOT_COMPLETED;
 
-                if (typeof window.syncItemStatus === 'function') {
-                    window.syncItemStatus(itemName, data.status);
+                if (typeof window.syncItemCompleted === 'function') {
+                    window.syncItemCompleted(itemName, data.completed);
                 }
             } else {
                 throw new Error('Invalid server response.');

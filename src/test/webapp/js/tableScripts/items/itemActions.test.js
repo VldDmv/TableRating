@@ -10,19 +10,6 @@ jest.unstable_mockModule('@/tableScripts/core/errorHandler.js', () => ({
 }));
 
 jest.unstable_mockModule('@/tableScripts/core/utils.js', () => ({
-    STATUS_META: {
-        PLANNED: { icon: '📋', label: 'Planned' },
-        IN_PROGRESS: { icon: '▶️', label: 'In Progress' },
-        COMPLETED: { icon: '✅', label: 'Completed' },
-        DROPPED: { icon: '🚫', label: 'Dropped' },
-    },
-    statusMeta: (status) =>
-        ({
-            PLANNED: { icon: '📋', label: 'Planned' },
-            IN_PROGRESS: { icon: '▶️', label: 'In Progress' },
-            COMPLETED: { icon: '✅', label: 'Completed' },
-            DROPPED: { icon: '🚫', label: 'Dropped' },
-        })[status] || { icon: '📋', label: 'Planned' },
     securityUtils: { getCsrfToken: jest.fn(() => 'mock-csrf-token') },
     ICONS: { COMPLETED: '✅', NOT_COMPLETED: '❌' },
 }));
@@ -147,7 +134,7 @@ describe('ItemActionsManager.handleToggleStatus', () => {
         tableBody.appendChild(tr);
         global.fetch.mockResolvedValue({
             ok: true,
-            json: async () => ({ status: 'COMPLETED' }),
+            json: async () => ({ completed: true }),
         });
 
         await manager.handleToggleStatus(btn);
@@ -163,7 +150,7 @@ describe('ItemActionsManager.handleToggleStatus', () => {
         tableBody.appendChild(tr);
         global.fetch.mockResolvedValue({
             ok: true,
-            json: async () => ({ status: 'PLANNED' }),
+            json: async () => ({ completed: false }),
         });
 
         await manager.handleToggleStatus(btn);
@@ -176,12 +163,12 @@ describe('ItemActionsManager.handleToggleStatus', () => {
         );
     });
 
-    test('updates button to COMPLETED icon when server returns status COMPLETED', async () => {
+    test('updates button to COMPLETED icon when server returns completed:true', async () => {
         const { tr, btn } = makeRow({ itemName: 'Game', icon: '❌' });
         tableBody.appendChild(tr);
         global.fetch.mockResolvedValue({
             ok: true,
-            json: async () => ({ status: 'COMPLETED' }),
+            json: async () => ({ completed: true }),
         });
 
         await manager.handleToggleStatus(btn);
@@ -189,17 +176,17 @@ describe('ItemActionsManager.handleToggleStatus', () => {
         expect(btn.innerHTML).toBe('✅');
     });
 
-    test('updates button to PLANNED icon when server returns status PLANNED', async () => {
+    test('updates button to NOT_COMPLETED icon when server returns completed:false', async () => {
         const { tr, btn } = makeRow({ itemName: 'Game', icon: '✅' });
         tableBody.appendChild(tr);
         global.fetch.mockResolvedValue({
             ok: true,
-            json: async () => ({ status: 'PLANNED' }),
+            json: async () => ({ completed: false }),
         });
 
         await manager.handleToggleStatus(btn);
 
-        expect(btn.innerHTML).toBe('📋');
+        expect(btn.innerHTML).toBe('❌');
     });
 
     test('restores original button content on fetch error', async () => {

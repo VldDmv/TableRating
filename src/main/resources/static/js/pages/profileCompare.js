@@ -4,7 +4,6 @@
  * Loaded only for logged-in visitors looking at someone else's profile.
  */
 
-const STATUS_ICONS = { PLANNED: '📋', IN_PROGRESS: '▶️', COMPLETED: '✅', DROPPED: '🚫' };
 const CATEGORY_LABELS = { games: 'Games', movies: 'Movies', books: 'Books', shows: 'Shows' };
 
 export { compatibilityClass, formatDiff, renderCategory, renderComparison };
@@ -29,10 +28,6 @@ function formatDiff(diff) {
     return diff > 0 ? `+${diff}` : `−${-diff}`;
 }
 
-function statusIcon(status) {
-    return STATUS_ICONS[status] || STATUS_ICONS.PLANNED;
-}
-
 function renderCategory(key, cat, names) {
     const label = CATEGORY_LABELS[key] || key;
     const counts = `${cat.myCount} vs ${cat.theirCount}`;
@@ -50,14 +45,8 @@ function renderCategory(key, cat, names) {
             (item) => `
             <tr>
                 <td class="compare-name">${escapeHtml(item.name)}</td>
-                <td class="compare-score">
-                    <span title="${item.myStatus}">${statusIcon(item.myStatus)}</span>
-                    ${item.myScore}
-                </td>
-                <td class="compare-score">
-                    <span title="${item.theirStatus}">${statusIcon(item.theirStatus)}</span>
-                    ${item.theirScore}
-                </td>
+                <td class="compare-score">${item.myScore}</td>
+                <td class="compare-score">${item.theirScore}</td>
                 <td class="compare-diff ${
                     item.diff === 0 ? 'diff-zero' : item.diff > 0 ? 'diff-pos' : 'diff-neg'
                 }">${formatDiff(item.diff)}</td>

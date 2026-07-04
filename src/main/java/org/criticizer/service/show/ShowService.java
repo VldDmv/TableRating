@@ -5,7 +5,6 @@ import java.util.List;
 import org.criticizer.dto.genre.GenreResponse;
 import org.criticizer.dto.show.ShowResponse;
 import org.criticizer.entity.Genre;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.Show;
 import org.criticizer.repository.GenreRepository;
 import org.criticizer.repository.ShowRepository;
@@ -33,7 +32,7 @@ public class ShowService extends AbstractMediaService<Show, ShowResponse> {
 
     @Override
     protected Show createEntity(String name, String coverUrl, Integer userId, Integer score) {
-        Show show = new Show(null, name, userId, score, MediaStatus.PLANNED);
+        Show show = new Show(null, name, userId, score, false);
         show.setCoverUrl(coverUrl);
         return show;
     }
@@ -61,7 +60,7 @@ public class ShowService extends AbstractMediaService<Show, ShowResponse> {
                 show.getName(),
                 show.getCoverUrl(),
                 show.getScore(),
-                show.getStatus().name(),
+                show.isCompleted(),
                 genreResponses);
     }
 

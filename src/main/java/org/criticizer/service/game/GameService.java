@@ -5,7 +5,6 @@ import java.util.List;
 import org.criticizer.dto.game.GameResponse;
 import org.criticizer.dto.tag.TagResponse;
 import org.criticizer.entity.Game;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.Tag;
 import org.criticizer.repository.GameRepository;
 import org.criticizer.repository.TagRepository;
@@ -33,7 +32,7 @@ public class GameService extends AbstractMediaService<Game, GameResponse> {
 
     @Override
     protected Game createEntity(String name, String coverUrl, Integer userId, Integer score) {
-        Game game = new Game(null, name, userId, score, MediaStatus.PLANNED);
+        Game game = new Game(null, name, userId, score, false);
         game.setCoverUrl(coverUrl);
         return game;
     }
@@ -63,7 +62,7 @@ public class GameService extends AbstractMediaService<Game, GameResponse> {
                 game.getName(),
                 game.getCoverUrl(),
                 game.getScore(),
-                game.getStatus().name(),
+                game.isCompleted(),
                 tagResponses);
     }
 

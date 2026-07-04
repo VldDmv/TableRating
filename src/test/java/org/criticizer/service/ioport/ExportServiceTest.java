@@ -9,7 +9,6 @@ import java.util.List;
 import org.criticizer.dto.ioport.ExportRow;
 import org.criticizer.entity.Game;
 import org.criticizer.entity.Genre;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.entity.Movie;
 import org.criticizer.entity.Tag;
 import org.criticizer.exceptions.validation.InvalidInputException;
@@ -40,11 +39,11 @@ class ExportServiceTest {
     @Test
     @DisplayName("Exports games sorted by name with tag names")
     void exportsGamesSortedWithTags() {
-        Game witcher = new Game(1, "The Witcher 3", USER_ID, 95, MediaStatus.COMPLETED);
+        Game witcher = new Game(1, "The Witcher 3", USER_ID, 95, true);
         witcher.setCoverUrl("http://cover/w3.jpg");
         witcher.setTags(new HashSet<>(List.of(new Tag(1, "RPG"), new Tag(2, "Action"))));
 
-        Game doom = new Game(2, "Doom", USER_ID, 88, MediaStatus.PLANNED);
+        Game doom = new Game(2, "Doom", USER_ID, 88, false);
         doom.setTags(new HashSet<>());
 
         when(gameRepository.findByUserIdWithTags(USER_ID)).thenReturn(List.of(witcher, doom));
@@ -58,7 +57,7 @@ class ExportServiceTest {
 
         ExportRow w3 = rows.get(1);
         assertThat(w3.score()).isEqualTo(95);
-        assertThat(w3.status()).isEqualTo("COMPLETED");
+        assertThat(w3.completed()).isTrue();
         assertThat(w3.coverUrl()).isEqualTo("http://cover/w3.jpg");
         // Categories are sorted alphabetically.
         assertThat(w3.categories()).containsExactly("Action", "RPG");
@@ -68,7 +67,7 @@ class ExportServiceTest {
     @Test
     @DisplayName("Exports movies via the genre-eager finder")
     void exportsMoviesWithGenres() {
-        Movie matrix = new Movie(1, "The Matrix", USER_ID, 96, MediaStatus.COMPLETED);
+        Movie matrix = new Movie(1, "The Matrix", USER_ID, 96, true);
         matrix.setGenres(new HashSet<>(List.of(new Genre(1, "Sci-Fi"))));
         when(movieRepository.findByUserIdWithGenres(USER_ID)).thenReturn(List.of(matrix));
 

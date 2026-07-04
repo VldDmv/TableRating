@@ -146,15 +146,6 @@ export const entityUtils = {
     },
 };
 
-export const STATUS_META = {
-    PLANNED: { icon: '📋', label: 'Planned' },
-    IN_PROGRESS: { icon: '▶️', label: 'In Progress' },
-    COMPLETED: { icon: '✅', label: 'Completed' },
-    DROPPED: { icon: '🚫', label: 'Dropped' },
-};
-
-export const statusMeta = (status) => STATUS_META[status] || STATUS_META.PLANNED;
-
 export const ICONS = {
     COMPLETED: '✅',
     NOT_COMPLETED: '❌',

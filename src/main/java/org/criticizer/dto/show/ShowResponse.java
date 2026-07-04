@@ -11,7 +11,7 @@ public class ShowResponse {
     private final String name;
     private final String coverUrl;
     private final int score;
-    private final String status;
+    private final boolean completed;
     private final List<GenreResponse> genres;
 
     public ShowResponse(
@@ -19,13 +19,13 @@ public class ShowResponse {
             String name,
             String coverUrl,
             int score,
-            String status,
+            boolean completed,
             List<GenreResponse> genres) {
         this.id = id;
         this.name = name;
         this.coverUrl = coverUrl;
         this.score = score;
-        this.status = status;
+        this.completed = completed;
         this.genres = genres != null ? List.copyOf(genres) : List.of();
     }
 
@@ -35,7 +35,7 @@ public class ShowResponse {
                 show.getName(),
                 show.getCoverUrl(),
                 show.getScore(),
-                show.getStatus().name(),
+                show.isCompleted(),
                 show.getGenres().stream().map(GenreResponse::from).toList());
     }
 
@@ -55,8 +55,8 @@ public class ShowResponse {
         return score;
     }
 
-    public String getStatus() {
-        return status;
+    public boolean isCompleted() {
+        return completed;
     }
 
     public List<GenreResponse> getGenres() {

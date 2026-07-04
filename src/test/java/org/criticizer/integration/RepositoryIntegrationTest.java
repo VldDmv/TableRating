@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.criticizer.entity.*;
-import org.criticizer.entity.MediaStatus;
 import org.criticizer.repository.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -88,7 +87,7 @@ class RepositoryIntegrationTest {
         Tag rpg = tagRepository.save(new Tag(null, "RPG"));
         Tag action = tagRepository.save(new Tag(null, "Action"));
 
-        Game game = new Game(null, "Skyrim", user.getId(), 95, MediaStatus.PLANNED);
+        Game game = new Game(null, "Skyrim", user.getId(), 95, false);
         game.setTags(new HashSet<>(List.of(rpg, action)));
 
         Game saved = gameRepository.save(game);
@@ -103,9 +102,9 @@ class RepositoryIntegrationTest {
         User user = userRepository.save(new User("gamer", "hash"));
         Tag rpg = tagRepository.save(new Tag(null, "RPG"));
 
-        Game game1 = new Game(null, "Dark Souls", user.getId(), 90, MediaStatus.COMPLETED);
+        Game game1 = new Game(null, "Dark Souls", user.getId(), 90, true);
         game1.setTags(new HashSet<>(List.of(rpg)));
-        Game game2 = new Game(null, "Elden Ring", user.getId(), 95, MediaStatus.PLANNED);
+        Game game2 = new Game(null, "Elden Ring", user.getId(), 95, false);
         game2.setTags(new HashSet<>(List.of(rpg)));
 
         gameRepository.saveAll(List.of(game1, game2));
@@ -126,9 +125,9 @@ class RepositoryIntegrationTest {
         Tag rpg = tagRepository.save(new Tag(null, "RPG"));
         Tag fps = tagRepository.save(new Tag(null, "FPS"));
 
-        Game game1 = new Game(null, "Skyrim", user.getId(), 95, MediaStatus.PLANNED);
+        Game game1 = new Game(null, "Skyrim", user.getId(), 95, false);
         game1.setTags(new HashSet<>(List.of(rpg)));
-        Game game2 = new Game(null, "Doom", user.getId(), 85, MediaStatus.PLANNED);
+        Game game2 = new Game(null, "Doom", user.getId(), 85, false);
         game2.setTags(new HashSet<>(List.of(fps)));
 
         gameRepository.saveAll(List.of(game1, game2));
@@ -148,9 +147,9 @@ class RepositoryIntegrationTest {
         User user = userRepository.save(new User("gamer", "hash"));
         gameRepository.saveAll(
                 List.of(
-                        new Game(null, "Dark Souls", user.getId(), 90, MediaStatus.PLANNED),
-                        new Game(null, "Dark Souls 2", user.getId(), 85, MediaStatus.PLANNED),
-                        new Game(null, "Elden Ring", user.getId(), 95, MediaStatus.PLANNED)));
+                        new Game(null, "Dark Souls", user.getId(), 90, false),
+                        new Game(null, "Dark Souls 2", user.getId(), 85, false),
+                        new Game(null, "Elden Ring", user.getId(), 95, false)));
 
         // Two-step query update
         Page<Integer> ids =
@@ -172,7 +171,7 @@ class RepositoryIntegrationTest {
         Genre action = genreRepository.save(new Genre(null, "Action"));
         Genre scifi = genreRepository.save(new Genre(null, "Sci-Fi"));
 
-        Movie movie = new Movie(null, "The Matrix", user.getId(), 95, MediaStatus.PLANNED);
+        Movie movie = new Movie(null, "The Matrix", user.getId(), 95, false);
         movie.setGenres(new HashSet<>(List.of(action, scifi)));
 
         Movie saved = movieRepository.save(movie);
@@ -190,9 +189,9 @@ class RepositoryIntegrationTest {
         Genre action = genreRepository.save(new Genre(null, "Action"));
         Genre drama = genreRepository.save(new Genre(null, "Drama"));
 
-        Movie movie1 = new Movie(null, "Die Hard", user.getId(), 90, MediaStatus.PLANNED);
+        Movie movie1 = new Movie(null, "Die Hard", user.getId(), 90, false);
         movie1.setGenres(new HashSet<>(List.of(action)));
-        Movie movie2 = new Movie(null, "The Godfather", user.getId(), 100, MediaStatus.PLANNED);
+        Movie movie2 = new Movie(null, "The Godfather", user.getId(), 100, false);
         movie2.setGenres(new HashSet<>(List.of(drama)));
 
         movieRepository.saveAll(List.of(movie1, movie2));
@@ -235,7 +234,7 @@ class RepositoryIntegrationTest {
         Genre action = genreRepository.save(new Genre(null, "Action"));
         Genre unused = genreRepository.save(new Genre(null, "Unused"));
 
-        Movie movie = new Movie(null, "Test Movie", user.getId(), 80, MediaStatus.PLANNED);
+        Movie movie = new Movie(null, "Test Movie", user.getId(), 80, false);
         movie.setGenres(new HashSet<>(List.of(action)));
         movieRepository.save(movie);
 
@@ -254,7 +253,7 @@ class RepositoryIntegrationTest {
         Tag rpg = tagRepository.save(new Tag(null, "RPG"));
         Tag openWorld = tagRepository.save(new Tag(null, "Open World"));
 
-        Game game = new Game(null, "Skyrim", user.getId(), 95, MediaStatus.PLANNED);
+        Game game = new Game(null, "Skyrim", user.getId(), 95, false);
         game.setTags(new HashSet<>(List.of(rpg, openWorld)));
         Game saved = gameRepository.save(game);
 
@@ -270,7 +269,7 @@ class RepositoryIntegrationTest {
         Tag usedTag = tagRepository.save(new Tag(null, "Used"));
         Tag unusedTag = tagRepository.save(new Tag(null, "Unused"));
 
-        Game game = new Game(null, "Test Game", user.getId(), 80, MediaStatus.PLANNED);
+        Game game = new Game(null, "Test Game", user.getId(), 80, false);
         game.setTags(new HashSet<>(List.of(usedTag)));
         gameRepository.save(game);
 
@@ -286,10 +285,10 @@ class RepositoryIntegrationTest {
     @Test
     void userRepository_DeleteUser_CascadesMediaDeletion() {
         User user = userRepository.save(new User("testuser", "hash"));
-        gameRepository.save(new Game(null, "Game1", user.getId(), 80, MediaStatus.PLANNED));
-        movieRepository.save(new Movie(null, "Movie1", user.getId(), 80, MediaStatus.PLANNED));
-        bookRepository.save(new Book(null, "Book1", user.getId(), 80, MediaStatus.PLANNED));
-        showRepository.save(new Show(null, "Show1", user.getId(), 80, MediaStatus.PLANNED));
+        gameRepository.save(new Game(null, "Game1", user.getId(), 80, false));
+        movieRepository.save(new Movie(null, "Movie1", user.getId(), 80, false));
+        bookRepository.save(new Book(null, "Book1", user.getId(), 80, false));
+        showRepository.save(new Show(null, "Show1", user.getId(), 80, false));
 
         gameRepository.deleteByUserId(user.getId());
         movieRepository.deleteByUserId(user.getId());
@@ -311,9 +310,9 @@ class RepositoryIntegrationTest {
         User user = userRepository.save(new User("gamer", "hash"));
         gameRepository.saveAll(
                 List.of(
-                        new Game(null, "Low", user.getId(), 60, MediaStatus.PLANNED),
-                        new Game(null, "High", user.getId(), 95, MediaStatus.PLANNED),
-                        new Game(null, "Medium", user.getId(), 75, MediaStatus.PLANNED)));
+                        new Game(null, "Low", user.getId(), 60, false),
+                        new Game(null, "High", user.getId(), 95, false),
+                        new Game(null, "Medium", user.getId(), 75, false)));
 
         // Two-step query update
         Page<Integer> ascIds =

@@ -23,9 +23,8 @@ public abstract class BaseEntity implements MediaEntity {
     @Column(name = "score", nullable = false)
     private Integer score;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
-    private MediaStatus status = MediaStatus.PLANNED;
+    @Column(name = "completed", nullable = false)
+    private boolean completed;
 
     @Column(name = "cover_url", length = 500)
     private String coverUrl;
@@ -33,12 +32,12 @@ public abstract class BaseEntity implements MediaEntity {
     protected BaseEntity() {}
 
     protected BaseEntity(
-            Integer id, String name, Integer userId, Integer score, MediaStatus status) {
+            Integer id, String name, Integer userId, Integer score, boolean completed) {
         this.id = id;
         this.name = name;
         this.userId = userId;
         this.score = score;
-        this.status = status == null ? MediaStatus.PLANNED : status;
+        this.completed = completed;
     }
 
     @Override
@@ -80,13 +79,13 @@ public abstract class BaseEntity implements MediaEntity {
     }
 
     @Override
-    public MediaStatus getStatus() {
-        return status;
+    public boolean isCompleted() {
+        return completed;
     }
 
     @Override
-    public void setStatus(MediaStatus status) {
-        this.status = status == null ? MediaStatus.PLANNED : status;
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 
     @Override

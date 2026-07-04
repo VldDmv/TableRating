@@ -11,7 +11,7 @@ public class GameResponse {
     private final String name;
     private final String coverUrl;
     private final int score;
-    private final String status;
+    private final boolean completed;
     private final List<TagResponse> tags;
 
     public GameResponse(
@@ -19,13 +19,13 @@ public class GameResponse {
             String name,
             String coverUrl,
             int score,
-            String status,
+            boolean completed,
             List<TagResponse> tags) {
         this.id = id;
         this.name = name;
         this.coverUrl = coverUrl;
         this.score = score;
-        this.status = status;
+        this.completed = completed;
         this.tags = tags != null ? List.copyOf(tags) : List.of();
     }
 
@@ -35,7 +35,7 @@ public class GameResponse {
                 game.getName(),
                 game.getCoverUrl(),
                 game.getScore(),
-                game.getStatus().name(),
+                game.isCompleted(),
                 game.getTags().stream()
                         .map(tag -> new TagResponse(tag.getId(), tag.getName()))
                         .toList());
@@ -57,8 +57,8 @@ public class GameResponse {
         return score;
     }
 
-    public String getStatus() {
-        return status;
+    public boolean isCompleted() {
+        return completed;
     }
 
     public List<TagResponse> getTags() {

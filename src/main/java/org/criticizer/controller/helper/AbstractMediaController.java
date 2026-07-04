@@ -125,19 +125,18 @@ public abstract class AbstractMediaController<
                 "User {} toggling status for {}: {}", currentUser.getName(), getEntityName(), name);
 
         service.toggleStatus(name, currentUser.getId());
-        org.criticizer.entity.MediaStatus newStatus =
-                service.getItemStatus(name, currentUser.getId());
+        boolean newStatus = service.getItemStatus(name, currentUser.getId());
 
         return ResponseEntity.ok(
                 new StatusToggleResponse(
-                        getEntityName() + " status advanced successfully", newStatus.name()));
+                        getEntityName() + " status toggled successfully", newStatus));
     }
 
     @GetMapping("/{name}/status")
     public ResponseEntity<StatusResponse> getItemStatus(@PathVariable String name) {
         User currentUser = securityUtil.getCurrentUser();
-        return ResponseEntity.ok(
-                new StatusResponse(service.getItemStatus(name, currentUser.getId()).name()));
+        boolean status = service.getItemStatus(name, currentUser.getId());
+        return ResponseEntity.ok(new StatusResponse(status));
     }
 
     @GetMapping("/{name}/exists")

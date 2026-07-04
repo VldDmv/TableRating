@@ -20,12 +20,7 @@ public interface MediaEntity {
 
     void setScore(Integer score);
 
-    org.criticizer.entity.MediaStatus getStatus();
+    boolean isCompleted();
 
-    void setStatus(org.criticizer.entity.MediaStatus status);
-
-    /** Convenience for stats: an item counts as completed only in the COMPLETED status. */
-    default boolean isCompleted() {
-        return getStatus() == org.criticizer.entity.MediaStatus.COMPLETED;
-    }
+    void setCompleted(boolean completed);
 }

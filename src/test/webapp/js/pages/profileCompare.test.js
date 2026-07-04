@@ -18,8 +18,6 @@ function makeCategory(overrides = {}) {
                 myScore: 90,
                 theirScore: 85,
                 diff: 5,
-                myStatus: 'COMPLETED',
-                theirStatus: 'IN_PROGRESS',
             },
         ],
         ...overrides,
@@ -66,13 +64,13 @@ describe('formatDiff', () => {
 // ─── renderCategory ───────────────────────────────────────────────────────────
 
 describe('renderCategory', () => {
-    test('renders a table with both scores, statuses and the diff', () => {
+    test('renders a table with both scores and the diff', () => {
         const html = renderCategory('games', makeCategory(), NAMES);
 
         expect(html).toContain('Games');
         expect(html).toContain('Celeste');
-        expect(html).toContain('✅');
-        expect(html).toContain('▶️');
+        expect(html).toContain('>90<');
+        expect(html).toContain('>85<');
         expect(html).toContain('+5');
         expect(html).toContain('95%');
         expect(html).toContain('alice');
