@@ -27,7 +27,10 @@ async function addGame(page, name, score) {
     }
     await page.fill('#itemName', name);
     await page.fill('#gameScore', String(score));
-    await page.click('#add-game-form button[type="submit"]');
+    // Submit with Enter instead of clicking the button: typing a real game
+    // name opens the autocomplete dropdown (live Steam suggestions on CI),
+    // which can cover the submit button and swallow the click.
+    await page.locator('#gameScore').press('Enter');
     await expect(page.locator('#gamesBody tr').filter({ hasText: name })).toBeVisible();
 }
 
